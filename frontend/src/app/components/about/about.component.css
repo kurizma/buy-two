@@ -1,0 +1,18 @@
+.gradient-bg {
+    /* background: linear-gradient(
+    135deg,
+    #0aeb7e,
+    #7c3aed,
+    #243145,
+    #0f172a
+    ); */
+box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+color: #f9fafb;
+border-radius: 0.75rem;
+padding: 2.5rem 2rem;
+}
+
+.narrow-text {
+    color: var(--link);
+    font-size: 2rem;
+}

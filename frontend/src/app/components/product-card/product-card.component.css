@@ -1,0 +1,30 @@
+.card-title {
+  color: var(--link);
+}
+
+.card-text {
+  color: var(--text-secondary);
+}
+
+.btn-outline-primary {
+  color: var(--link);
+  border-color: var(--link);
+}
+
+.btn-outline-secondary {
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
+}
+
+.btn-outline-secondary:hover {
+  color: white;
+  border-color: var(--text-secondary);
+  background-color: var(--text-secondary);
+}
+
+.fade-animate {
+  transition: opacity 0.35s;
+}
+.fade-animate.fade {
+  opacity: 0.25;
+}

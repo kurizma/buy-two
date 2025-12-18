@@ -1,0 +1,96 @@
+<div class="container py-4">
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="text-center py-5 text-white">
+    Loading categories and products...
+  </div>
+  <!-- Error state -->
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger text-center">
+    {{ errorMessage }}
+  </div>
+</div>
+<!-- Main content -->
+<div *ngIf="!isLoading && !errorMessage">
+  <div class="container py-5 categories-page">
+      <div class="row">
+        <!-- Mobile nav -->
+        <nav 
+          class="col-12 d-md-none mb-3"
+          *ngIf="categories.length">
+          <!-- Mobile: title + divider -->
+          <h5 class="sidebar-title text-uppercase text-white mb-2">
+            Browse categories
+          </h5>
+          <div class="sidebar-divider mb-2"></div>
+
+          <!-- Mobile: Horizontal scrollable list -->
+          <ul class="nav nav-pills flex-row overflow-auto">
+            <li class="nav-item" *ngFor="let cat of categories">
+              <a
+                class="nav-link"
+                [class.active]="cat.slug === selectedCategorySlug"
+                (click)="selectCategory(cat.slug)">
+                <i [ngClass]="cat.icon"></i>
+                {{ cat.name }}
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <!-- Sidebar (md+) -->
+        <div class="col-md-3 col-lg-2 d-none d-md-block">
+          <!-- Sidebar with categories -->
+          <aside class="sidebar">
+            <h5 class="sidebar-title text-uppercase text-white mb-3">
+              Browse categories
+            </h5>
+            <!-- Divider under title -->
+            <div class="sidebar-divider"></div>
+            <ul>
+              <li *ngFor="let cat of categories"
+                  [class.active]="cat.slug === selectedCategorySlug"
+                  (click)="selectCategory(cat.slug)">
+                <i [ngClass]="cat.icon"></i>
+                <span>{{ cat.name }}</span>
+              </li>
+            </ul>
+          </aside>
+        </div>
+        <!-- Main grid area -->
+        <div class="col-12 col-md-9 col-lg-10 product-grid-wrapper">
+          <!-- Category header -->
+          <header class="category-header mb-4" *ngIf="selectedCategory">
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <div
+                class="d-flex align-items-center justify-content-center rounded-circle category-icon"
+                style="width: 48px; height: 48px">
+                <i [ngClass]="selectedCategory.icon" style="font-size: 1.4rem"></i>
+              </div>
+              <div>           
+                <h2 class="mb-1 fw-bold">{{ selectedCategory.name }}</h2>
+                <p class="mb-0 text-white">
+                  {{ selectedCategory.description }}
+                </p>
+              </div>
+            </div>
+          </header>
+          <!-- Empty category state (inside grid area) -->
+          <div *ngIf="selectedCategory && filteredProducts.length === 0" class="text-center py-5 text-white">
+            No products in "{{ selectedCategory.name }}" yet. Please check back later.
+          </div>
+          <!-- Product grid (only if there are products) -->
+          <div class="row g-4">
+            <div *ngFor="let product of filteredProducts" class="col-12 col-sm-6 col-lg-4">
+              <app-product-grid-card
+                [product]="product"
+                [seller]="getSeller(product.userId)"
+                [showSeller]="true"
+                [showCategory]="true"
+                [categoryName]="getCategoryName(product.categoryId)"
+                (view)="viewProductDetail($event)"
+                (addToCartClick)="addToCart()">
+              </app-product-grid-card>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>

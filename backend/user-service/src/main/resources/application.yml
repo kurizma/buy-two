@@ -1,0 +1,33 @@
+server:
+  port: 8456
+
+spring:
+  application:
+    name: user-service
+  data:
+    mongodb:
+      uri: "mongodb+srv://Cluster05093:.qwe.qwe.qwe@cluster05093.dh3rmhg.mongodb.net/buy-one?retryWrites=true&w=majority&appName=Cluster05093"
+  security:
+    user:
+      name: user
+      password: password
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+
+jwt:
+  secret: "oogabooga123oogabooga123oogabooga123!"
+  expirationMs: 86400000
+
+#    // Expiration: 1 day (configurable)
+#    // 600000 // 10 min
+#    // 300000 // 5 minutes
+#    // 60000  // 1 minute
+
+logging:
+  level:
+    org.springframework.security: DEBUG

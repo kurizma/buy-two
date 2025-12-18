@@ -1,0 +1,27 @@
+.sign-in-card {
+  padding: 2rem;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+}
+
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-primary {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.text-primary:hover {
+  color: var(--link-complementary);
+  text-decoration: underline;
+}
+
+:host ::ng-deep .mat-mdc-card-header {
+  display: block !important;
+}

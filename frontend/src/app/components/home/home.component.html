@@ -1,0 +1,37 @@
+<app-hero
+  (shopNow)="shopNow()"
+  (registerSeller)="registerSeller()"
+  (browseCreators)="browseCreators()"
+>
+</app-hero>
+
+<div class="container py-5">
+  <div class="text-center mb-4">
+    <h2 class="mb-3 fw-bold">Explore Our Collections</h2>
+    <p class="text-secondary mx-auto cat-text" style="max-width: 600px">
+      From developer humor to anime fandoms, find the perfect tee that speaks your language
+    </p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-12 col-md-6 col-lg-4" *ngFor="let category of categories">
+      <div
+        class="card h-100 shadow-sm border-0 cursor-pointer cat-bg hover-lift"
+        style="cursor: pointer;"
+        (click)="onCategoryClick(category.slug)">
+        <div class="card-body text-center home-category-card-body">
+          <div
+            class="d-flex align-items-center justify-content-center rounded-circle mb-3 mx-auto category-icon"
+            style="width: 64px; height: 64px">
+            <i [class]="category.icon" style="font-size: 2rem"></i>
+          </div>
+          <h5 class="card-title mb-1 fw-semibold">{{ category.name }}</h5>
+          <p class="card-text text-secondary small cat-text">{{ category.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-infinite-slider [sellers]="sliderSellers" [products]="sliderProducts"></app-infinite-slider>
+

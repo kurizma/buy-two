@@ -1,0 +1,36 @@
+.card-title {
+  color: var(--link);
+}
+
+.badge.bg-secondary {
+  text-align: left !important;
+}
+
+.btn-outline-primary {
+  color: var(--link);
+  border-color: var(--link);
+}
+
+.btn-outline-secondary {
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
+}
+
+.custom-input,
+.form-select {
+  background-color: transparent;
+  color: var(--link);
+  border-color: var(--border);
+}
+
+.custom-input::placeholder {
+  color: var(--link);
+}
+
+.seller-name {
+  font-size: 1rem;
+}
+
+.price-text {
+  font-size: 1.8rem;
+}

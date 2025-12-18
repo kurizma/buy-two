@@ -1,0 +1,182 @@
+<div *ngIf="showSuccess" class="alert alert-info alert-dismissible fade show" role="alert">
+  {{ successMessage }}
+  <button
+    type="button"
+    class="btn-close visible-close-btn"
+    (click)="showSuccess = false"
+  >
+
+  </button>
+</div>
+
+<div class="container mt-4 mb-5">
+  <div class="card p-4 shadow rounded-3">
+    <div class="row">
+      <div class="col-md-5 text-center position-relative" *ngIf="loaded">
+        <div style="display: inline-block; position: relative">
+          <img
+            [src]="avatarPreview === null
+              ? 'assets/avatars/user-default.png'
+              : (avatarPreview || currentUser?.avatar || 'assets/avatars/user-default.png')"
+            class="rounded-circle border"
+            style="width: 120px; height: 120px"
+            alt="avatar"
+          />
+          <!-- Dropdown menu trigger -->
+          <div
+            class="dropdown custom-avatar-dropdown"
+            style="position: absolute; right: 0; bottom: 0"
+          >
+            <button
+              class="btn btn-dark btn-sm p-1 dropdown-toggle"
+              type="button"
+              id="avatarActions"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              style="border-radius: 50%; box-shadow: 0 1px 4px rgba(33, 33, 33, 0.1)"
+            >
+              <i class="bi bi-camera"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="avatarActions">
+              <li>
+                <label for="avatarUpload" class="dropdown-item mb-0" style="cursor: pointer">
+                  Upload
+                  <input
+                    id="avatarUpload"
+                    type="file"
+                    accept="image/*"
+                    (change)="onAvatarSelect($event)"
+                    class="d-none"
+                  />
+                </label>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <button
+                  class="dropdown-item text-danger"
+                  type="button"
+                  (click)="handleRemoveAvatar()"
+                >
+                  Remove
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div *ngIf="avatarError" class="avatar-error">
+          {{ avatarError }}
+        </div>
+        <div class="mt-3">
+          <div class="fw-bold mb-2 fs-2">{{ currentUser?.name }}</div>
+          <span class="badge bg-primary">{{ currentUser?.role }}</span>
+          <!-- <span class="badge bg-secondary ms-2">{{ currentUser?.id }}</span> -->
+        </div>
+      </div>
+      <div class="col-md-6">
+        <form [formGroup]="profileForm" class="row g-3" (ngSubmit)="saveProfile()">
+          <div class="row-md-5">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control custom-width" formControlName="name" />
+          </div>
+          <div class="row-md-5">
+            <label class="form-label">Email<small class="text-white"> (Cannot be changed)</small></label>
+            <input type="email" readonly class="form-control custom-width" formControlName="email" />
+          </div>
+          <div class="col-12 d-flex justify-content-end">
+            <button 
+              type="submit" 
+              class="btn btn-primary hover-lift" 
+              [disabled]="!profileForm.valid || avatarError">
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <hr class="my-4" />
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">Change Password</div>
+          <div class="card-body">
+            <form *ngIf="passwordForm" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+              <div class="mb-3">
+                <label class="form-label">Current Password</label>
+                <input
+                  type="password"
+                  class="form-control custom-width"
+                  formControlName="currentPassword"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">New Password</label>
+                <input
+                  type="password"
+                  class="form-control custom-width"
+                  formControlName="newPassword"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Confirm Password</label>
+                <input
+                  type="password"
+                  class="form-control custom-width"
+                  formControlName="confirmPassword"
+                />
+                <div
+                  *ngIf="
+                    passwordForm.errors?.['mismatch'] &&
+                    passwordForm.get('confirmPassword')?.touched
+                  "
+                  class="text-danger small"
+                >
+                  Passwords do not match.
+                </div>
+              </div>
+              <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-success hover-lift" [disabled]="!passwordForm.valid">
+                  Change Password
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card-header">Connected Accounts</div>
+        <div class="social-icons">
+          <a
+            href="https://facebook.com/yourprofile"
+            target="_blank"
+            class="social-icon"
+            aria-label="Facebook"
+          >
+            <i class="bi bi-facebook me-2"></i> Facebook
+          </a>
+          <a href="https://instragram.com/yourprofile" class="social-icon" aria-label="Instagram">
+            <i class="bi bi-instagram me-2"></i> Instagram
+          </a>
+          <a
+            href="https://twitter.com/yourprofile"
+            target="_blank"
+            class="social-icon"
+            aria-label="Twitter"
+          >
+            <i class="bi bi-twitter me-2"></i> Twitter
+          </a>
+          <a
+            href="https://github.com/yourprofile"
+            target="_blank"
+            class="social-icon"
+            aria-label="GitHub"
+          >
+            <i class="bi bi-github me-2"></i> GitHub
+          </a>
+          <a href="mailto:your@email.com" class="social-icon" aria-label="Email">
+            <i class="bi bi-envelope me-2"></i> Email
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,165 @@
+/* Page container makes sidebar stretch with content */
+.container.categories-page {
+  min-height: 80vh;
+}
+
+/* Sidebar */
+.sidebar {
+  /* width: 220px; */
+  /* border-right: 2px solid var(--link-hover); */
+  padding: 2.5rem 0;
+}
+
+.product-grid-wrapper {
+  padding-left: 0;
+}
+
+.sidebar-title {
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  padding: 10px 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Sidebar list item */
+.sidebar li {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 6px 0 0 6px;
+  transition: background .2s, color .2s;
+  max-width: 100%;  
+  box-sizing: border-box; 
+}
+
+/* Icon + text */
+.sidebar li i {
+  flex: 0 0 auto;
+  line-height: 1;
+}
+
+/* text wraps inside remaining width */
+.sidebar li span {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.sidebar li.active, .sidebar li:hover {
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(69, 85, 108, 0.18);
+  transform: translateY(-4px) scale(1.03);
+  transition:
+  box-shadow 0.2s,
+  transform 0.2s;
+  cursor: pointer;
+  background-color: var(--link-hover);
+}
+
+/* Optional subtle divider if you want to group sections */
+.sidebar-divider {
+  margin: 0.75rem 1.25rem;
+  border-bottom: 1px solid #e3e7ec;
+}
+
+.nav-link {
+  color: white;
+}
+
+.nav-link.active {
+  background-color: var(--link-hover);
+}
+
+/* Main content spacing */
+.product-grid-wrapper {
+  padding-left: 0;
+}
+
+.card-title {
+  color: var(--link);
+}
+.category-icon {
+  margin-left: 5px;
+  background: linear-gradient(
+    135deg,
+    #0aeb7e,
+    #7c3aed,
+    #243145,
+    #0f172a
+  );
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  color: #f9fafb;
+}
+.badge.bg-secondary {
+  text-align: left !important;
+}
+.btn-outline-primary {
+  color: var(--link);
+  border-color: var(--link);
+}
+.btn-outline-secondary {
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
+}
+.price-text {
+  font-size: 1.8rem;
+}
+
+.product-grid {
+  margin-left: 1.5rem; /* Or more for bigger gap */
+}
+
+@media (min-width: 768px) {
+  .product-grid-wrapper {
+    padding-left: 1.5rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .product-grid-wrapper {
+    padding-left: 2rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+    /* Wrap the whole mobile nav in a soft panel */
+  nav.col-12.d-md-none {
+    background: rgba(0, 0, 0, 0.421);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+  /* adjust sidebar/divider just for small screens */
+  .sidebar-divider {
+    margin: 0.5rem 0;
+  }
+}
+
+
+
+
+/* .card:hover {
+  box-shadow: 0 8px 24px rgba(69, 85, 108, 0.18);
+  transform: translateY(-4px) scale(1.03);
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+  cursor: pointer;
+  background-color: rgba(7, 76, 140, 0.357);
+}
+
+.cat-bg {
+  background-color: transparent;
+}
+
+h5 , .category-icon {
+  color: var(--link-complementary);
+} */
