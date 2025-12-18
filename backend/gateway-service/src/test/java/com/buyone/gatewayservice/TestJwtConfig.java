@@ -1,0 +1,19 @@
+package com.buyone.gatewayservice;
+
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+
+import javax.crypto.spec.SecretKeySpec;
+
+@TestConfiguration
+public class TestJwtConfig {
+    @Bean
+    public ReactiveJwtDecoder jwtDecoder() {
+        String secret = "oogabooga123oogabooga123oogabooga123!";
+        return NimbusReactiveJwtDecoder
+                .withSecretKey(new SecretKeySpec(secret.getBytes(), "HmacSHA256"))
+                .build();
+    }
+}

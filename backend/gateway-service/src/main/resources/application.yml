@@ -1,0 +1,76 @@
+server:
+  port: 8080
+  ssl:
+    enabled: true
+    key-store: classpath:gateway-keystore.p12
+    key-store-password: buyOne
+    key-store-type: PKCS12
+    key-alias: gateway
+
+spring:
+  application:
+    name: gateway-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret: "oogabooga123oogabooga123oogabooga123!"
+  cloud:
+    gateway:
+      routes:
+        - id: user-auth
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/auth/**
+          # NO JwtHeader filter - let USER-SERVICE handle login/register
+
+        # NEW: public GET for individual users (sellers)
+        - id: user-service-public-get
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
+            - Method=GET
+          # IMPORTANT: no JwtHeader filter here
+
+        - id: user-service-api
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - JwtHeader
+
+        # Existing secured user API route (for non-GET, admin, etc.)
+        - id: product-service
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/products/**
+          filters:
+            - JwtHeader
+
+        - id: media-service
+          uri: lb://MEDIA-SERVICE
+          predicates:
+            - Path=/media/**
+          filters:
+            - JwtHeader
+        
+           # NEW: Public categories route (no JWT required)
+        - id: categories-service
+          uri: lb://PRODUCT-SERVICE  # Assuming categories in product-service
+          predicates:
+            - Path=/categories/**
+           # NO filters needed - path matches perfectly
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+

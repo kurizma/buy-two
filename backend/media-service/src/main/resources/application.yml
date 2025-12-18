@@ -1,0 +1,57 @@
+server:
+  port: 8678
+spring:
+  application:
+    name: media-service
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: media-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.buyone.*
+  data:
+    mongodb:
+      uri: "mongodb+srv://Cluster05093:.qwe.qwe.qwe@cluster05093.dh3rmhg.mongodb.net/buy-one?retryWrites=true&w=majority&appName=Cluster05093"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          secret: "oogabooga123oogabooga123oogabooga123!"
+  servlet:
+    multipart:
+      max-file-size: 2MB    # each file must be ≤ 2 MB
+      max-request-size: 10MB # up to 5 images, 2 MB each” in a single request
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+
+
+app:
+  media:
+      public-base-url: "https://pub-0695601915114c88a20b5aa2ba5091cd.r2.dev"
+  kafka:
+    topic:
+      product-deleted: product.deleted
+
+cloudflare:
+  r2:
+    account-id: "ed2494a6dd015fe932f0eb26102d514d"
+    access-key-id: "98633bbe85642d122cbdc482bedd7c33"
+    secret-access-key: "d6ebfdcba1a5136a4bcaa047f40527ef71bdcc6333f8d2e9823c331541918cac"
+    bucket: "buyone-images"
+    endpoint: "https://ed2494a6dd015fe932f0eb26102d514d.r2.cloudflarestorage.com"
+    region: "auto"
+
+logging:
+  level:
+    org.springframework.security: DEBUG
