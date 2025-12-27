@@ -64,10 +64,12 @@ describe('ProductCardComponent', () => {
     component = fixture.componentInstance;
   });
 
+  // ✅ 1. Component creates
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
+  // ✅ 2. Product name displays
   it('should display product name', () => {
     component.product = mockProduct;
     fixture.detectChanges();
@@ -76,6 +78,7 @@ describe('ProductCardComponent', () => {
     expect(h2Element.textContent).toContain('Cool T-Shirt');
   });
 
+  // ✅ 3. Price displays
   it('should display product price', () => {
     component.product = mockProduct;
     fixture.detectChanges();
@@ -84,6 +87,7 @@ describe('ProductCardComponent', () => {
     expect(priceElement.textContent).toContain('19.99');
   });
 
+  // ✅ 4. Product image displays
   it('should display product image', () => {
     const product = { ...mockProduct, images: ['tshirt-front.jpg'] };
     component.product = product;
