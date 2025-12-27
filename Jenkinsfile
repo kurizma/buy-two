@@ -68,5 +68,31 @@ pipeline {
                 }
             }
         }
+        stage('Deploy') {
+            steps {
+                script {
+                    // Work from project root where docker-compose.yml is
+                    dir("${env.WORKSPACE}") {
+                        try {
+                            // 1) Stop any existing stack for this project
+                            sh 'docker compose -f docker-compose.yml down'
+
+                            // 2) Rebuild images and start containers in background
+                            sh 'docker compose -f docker-compose.yml up -d --build'
+                        } catch (err) {
+                            echo "Deploy failed: ${err}"
+                            echo "Attempting basic rollback (restart previous containers without rebuild)..."
+
+                            // Basic rollback: restart stack with existing local images
+                            sh 'docker compose -f docker-compose.yml down || true'
+                            sh 'docker compose -f docker-compose.yml up -d || true'
+
+                            // Mark build as failed so the broken deployment is visible
+                            error "Deployment failed and rollback was attempted."
+                        }
+                    }
+                }
+            }
+        }
     }
 }
