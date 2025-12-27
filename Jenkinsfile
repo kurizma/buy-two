@@ -36,5 +36,13 @@ pipeline {
                 }
             }
         }
+
+        stage('Backend - user-service') {
+            steps {
+                dir('backend/user-service') {
+                    sh './mvnw clean verify'
+                }
+            }
+        }
     }
 }
