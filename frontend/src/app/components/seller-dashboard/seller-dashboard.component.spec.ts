@@ -14,7 +14,7 @@ const mockProducts = [
     id: '1',
     name: 'T-Shirt',
     price: 19.99,
-    images: ['tshirt.jpg'],
+    // images: ['tshirt.jpg'],
     categoryId: 'cat1',
     quantity: 10,
   },
