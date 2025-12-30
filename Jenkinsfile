@@ -201,22 +201,24 @@ pipeline {
                                     sh 'docker compose -f docker-compose.yml up -d'
                                 }
                                 echo "Rolled back to previous stable version."
-
-                                sh """
-                                curl -X POST -H 'Content-type: application/json' --data '{
-                                    "text": ":information_source: Rollback SUCCESSFUL!\\n*Job:* ${env.JOB_NAME}\\n*Build:* ${env.BUILD_NUMBER}\\n*Branch:* ${params.BRANCH}"
-                                }' ${env.SLACK_WEBHOOK}
-                                """
+                                withEnv(["SLACK_WEBHOOK_URL=${SLACK_WEBHOOK}"]) {
+                                    sh '''
+                                    curl -X POST -H "Content-type: application/json" --data "{
+                                      \\"text\\": \\":information_source: Rollback SUCCESSFUL!\\n*Job:* ${JOB_NAME}\\n*Build:* ${BUILD_NUMBER}\\n*Branch:* ${BRANCH}\\"
+                                    }" "${SLACK_WEBHOOK_URL}"
+                                    '''
+                                }
                             } catch (Exception rollbackErr) {
                                 echo "FATAL: Rollback failed!"
                                 echo "Reason: ${rollbackErr.getMessage()}"
-                                sh """
-                                curl -X POST -H 'Content-type: application/json' --data '{
-                                    "text": ":rotating_light: Rollback FAILED!\\n*Reason:* ${rollbackErr.getMessage()}\\n*Job:* ${env.JOB_NAME}\\n*Build:* ${env.BUILD_NUMBER}\\n*Branch:* ${params.BRANCH}\\nManual intervention needed!"
-                                }' ${env.SLACK_WEBHOOK}
-                                """
+                                withEnv(["SLACK_WEBHOOK_URL=${SLACK_WEBHOOK}"]) {
+                                    sh '''
+                                    curl -X POST -H "Content-type: application/json" --data "{
+                                      \\"text\\": \\":rotating_light: Rollback FAILED\\n*Job:* ${JOB_NAME}\\n*Build:* ${BUILD_NUMBER}\\n*Branch:* ${BRANCH}\\n*Reason:* see Jenkins logs\\"
+                                    }" "${SLACK_WEBHOOK_URL}"
+                                    '''
+                                }
                             }
-
                             error "Deployment failed - rollback executed."
                         }
                     }
@@ -244,20 +246,24 @@ pipeline {
 
         success {
             echo "Build succeeded! Sending Slack notification..."
-            sh """
-            curl -v -X POST -H 'Content-type: application/json' --data '{
-                "text": ":white_check_mark: Build SUCCESS\\\\n*Job:* ${env.JOB_NAME}\\\\n*Build:* ${env.BUILD_NUMBER}\\\\n*Branch:* ${params.BRANCH}"
-            }' ${env.SLACK_WEBHOOK}
-            """
+            withEnv(["SLACK_WEBHOOK_URL=${SLACK_WEBHOOK}"]) {
+                sh '''
+                curl -v -X POST -H "Content-type: application/json" --data "{
+                  \\"text\\": \\":white_check_mark: Build SUCCESS\\n*Job:* ${JOB_NAME}\\n*Build:* ${BUILD_NUMBER}\\n*Branch:* ${BRANCH}\\"
+                }" "${SLACK_WEBHOOK_URL}"
+                '''
+            }
         }
 
         failure {
             echo "Build failed! Sending Slack notification..."
-            sh """
-            curl -v -X POST -H 'Content-type: application/json' --data '{
-                "text": ":x: Build FAILED\\\\n*Job:* ${env.JOB_NAME}\\\\n*Build:* ${env.BUILD_NUMBER}\\\\n*Branch:* ${params.BRANCH}\\\\n*Result:* ${currentBuild.currentResult}"
-            }' ${env.SLACK_WEBHOOK}
-            """
+            withEnv(["SLACK_WEBHOOK_URL=${SLACK_WEBHOOK}"]) {
+                sh '''
+                curl -v -X POST -H "Content-type: application/json" --data "{
+                  \\"text\\": \\":x: Build FAILED\\n*Job:* ${JOB_NAME}\\n*Build:* ${BUILD_NUMBER}\\n*Branch:* ${BRANCH}\\n*Result:* ${currentBuild.currentResult}\\"
+                }" "${SLACK_WEBHOOK_URL}"
+                '''
+            }
         }
     }
 }
