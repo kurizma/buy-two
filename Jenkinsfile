@@ -129,7 +129,7 @@ pipeline {
         /************
          * Frontend *
          ************/
-        stage('Frontend') {
+        stage('Frontend - Tests Included') {
             steps {
                 dir('frontend') {
                     nodejs(nodeJSInstallationName: 'node-20.19.6') {
@@ -191,6 +191,10 @@ pipeline {
                                 docker tag product-service:${VERSION}   product-service:${STABLE_TAG}   || true
                                 docker tag media-service:${VERSION}     media-service:${STABLE_TAG}     || true
                             """
+                            echo "Re-deploying using stable tag..."
+
+                            withEnv(["IMAGE_TAG=${STABLE_TAG}"]) {
+                                sh 'docker compose -f docker-compose.yml up -d'
 
                         } catch (Exception e) {
                             echo "Deployment failed or crashed! Initiating rollback..."
@@ -233,7 +237,7 @@ pipeline {
     post {
         always {
             script {
-                junit 'backend/*/target/surefire-report/*.xml'
+                junit 'backend/*/target/surefire-reports/*.xml'
                 archiveArtifacts artifacts: 'backend/*/target/surefire-reports/*.xml', allowEmptyArchive: true
 
                 junit allowEmptyResults: true, testResults: 'frontend/test-results/junit/*.xml'
