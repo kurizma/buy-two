@@ -116,7 +116,6 @@ pipeline {
                 }
             }
         }
-
         /******************************
          * Deploy, verify, and rollback
          ******************************/
@@ -147,7 +146,7 @@ pipeline {
 
                             // Tag images with stable tag after successful verification
                             sh """
-                                docker tag frontend:${VERSION}         frontend:${STABLE_TAG}         || true
+                                docker tag frontend:${VERSION}          frontend:${STABLE_TAG}          || true
                                 docker tag discovery-service:${VERSION} discovery-service:${STABLE_TAG} || true
                                 docker tag gateway-service:${VERSION}   gateway-service:${STABLE_TAG}   || true
                                 docker tag user-service:${VERSION}      user-service:${STABLE_TAG}      || true
@@ -164,4 +163,30 @@ pipeline {
                                 withEnv(["IMAGE_TAG=${STABLE_TAG}"]) {
                                     sh 'docker compose -f docker-compose.yml up -d'
                                 }
-                                echo "Rolled back to previous
+                                echo "Rolled back to previous stable version."
+
+                                // Slack notification for successful rollback
+                                sh """
+                                curl -X POST -H 'Content-type: application/json' --data '{
+                                    "text": ":information_source: Rollback SUCCESSFUL!\\n*Job:* ${env.JOB_NAME}\\n*Build:* ${env.BUILD_NUMBER}\\n*Branch:* ${params.BRANCH}"
+                                }' ${env.SLACK_WEBHOOK}
+                                """
+                            } catch (Exception rollbackErr) {
+                                echo "FATAL: Rollback failed!"
+                                echo "Reason: ${rollbackErr.getMessage()}"
+                                sh """
+                                curl -X POST -H 'Content-type: application/json' --data '{
+                                    "text": ":rotating_light: Rollback FAILED!\\n*Reason:* ${rollbackErr.getMessage()}\\n*Job:* ${env.JOB_NAME}\\n*Build:* ${env.BUILD_NUMBER}\\n*Branch:* ${params.BRANCH}\\nManual intervention needed!"
+                                }' ${env.SLACK_WEBHOOK}
+                                """
+                            }
+
+                            // Mark build as failed after rollback attempt
+                            error "Deployment failed - rollback executed."
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
