@@ -33,7 +33,7 @@ pipeline {
                     $class: 'GitSCM',
                     branches: [[name: "*/${params.BRANCH}"]],
                     userRemoteConfigs: [[
-                        url: 'https://github.com/kurizma/java-jenk.git',
+                        url: 'https://github.com/mareerray/java-jenk.git',
                         credentialsId: 'github-java-jenk'
                     ]]
                 ])
