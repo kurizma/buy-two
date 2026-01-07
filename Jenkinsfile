@@ -410,7 +410,7 @@ pipeline {
                     def emoji = (buildState == 'success') ? ':white_check_mark:' : ':x:'
                     sh """
                         curl -sS -X POST -H 'Content-type: application/json' \\
-                            --data '{"text":"${emoji} *${buildState.toUpperCase()}*\\\\n*Job:* ${JOB_NAME}\\\\n*Build:* ${BUILD_NUMBER}\\\\n*Branch:* ${BRANCH_NAME ?: GIT_BRANCH}"}' \\
+                            --data '{"text":"${emoji} *${buildState.toUpperCase()}*\\\\n*Job:* ${JOB_NAME}\\\\n*Build:* ${BUILD_NUMBER}\\\\n*Branch:* ${BRANCH ?: GIT_BRANCH}"}' \\
                             "\${SLACK_WEBHOOK}" || true
                     """
                 }
