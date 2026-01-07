@@ -388,10 +388,22 @@ pipeline {
                     echo "No workspace available; skipping cleanWs"
                 }
                 // Post GitHub status
-                withCredentials([string(credentialsId: 'github-safezone-token', variable: 'GITHUB_TOKEN')]) {
-                    setGitHubPullRequestStatus(context: 'safezone', state: currentBuild.result, message: "Build ${currentBuild.result}")
-                    setGitHubPullRequestStatus(context: 'safe-quality-gate', state: currentBuild.result, message: "Quality gate ${currentBuild.result}")
-                }
+                step([
+                    $class: "GitHubCommitStatusSetter",
+                    reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/mareerray/java-jenk"],
+                    contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "safezone"],
+                    statusResultSource: [$class: "ConditionalStatusResultSource", 
+                        results: [[$class: "AnyBuildResult", state: "${currentBuild.result}", message: "Build ${currentBuild.result}"]]
+                    ]
+                ])
+                step([
+                    $class: "GitHubCommitStatusSetter",
+                    reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/mareerray/java-jenk"],
+                    contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "safe-quality-gate"],
+                    statusResultSource: [$class: "ConditionalStatusResultSource", 
+                        results: [[$class: "AnyBuildResult", state: "${currentBuild.result}", message: "Quality gate ${currentBuild.result}"]]
+                    ]
+                ])
             }
         }
         
