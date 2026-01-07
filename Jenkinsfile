@@ -403,40 +403,41 @@ pipeline {
     //     }
     
     post {
-        success {
-            script {
-                echo 'Build succeeded!'
-                // GitHub success status
-                if (env.GIT_COMMIT) {
-                    withCredentials([string(credentialsId: 'github-safe-zone-token', variable: 'GITHUB_TOKEN')]) {
-                        sh """
-                            curl -s -H "Authorization: token \${GITHUB_TOKEN}" \\
-                                -X POST -H "Accept: application/vnd.github.v3+json" \\
-                                -d '{"state":"success", "context":"safezone", "description":"Build success"}' \\
-                                https://api.github.com/repos/mareerray/java-jenk/statuses/\${GIT_COMMIT}
-                        """
-                    }
-                }
-            }
-        }
-        failure {
-            script {
-                echo 'Build failed!'
-                // GitHub failure status
-                if (env.GIT_COMMIT) {
-                    withCredentials([string(credentialsId: 'github-safe-zone-token', variable: 'GITHUB_TOKEN')]) {
-                        sh """
-                            curl -s -H "Authorization: token \${GITHUB_TOKEN}" \\
-                                -X POST -H "Accept: application/vnd.github.v3+json" \\
-                                -d '{"state":"failure", "context":"safezone", "description":"Build failed"}' \\
-                                https://api.github.com/repos/mareerray/java-jenk/statuses/\${GIT_COMMIT}
-                        """
-                    }
-                }
-            }
-        }
         always {
-            cleanWs notFailBuild: true
+            script {
+                // Clean workspace
+                cleanWs notFailBuild: true
+                
+                def buildState = currentBuild.currentResult ?: 'success'
+                
+                // GitHub statuses
+                if (env.GIT_COMMIT) {
+                    withCredentials([string(credentialsId: 'github-safe-zone-token', variable: 'GITHUB_TOKEN')]) {
+                        sh """
+                            curl -s -H "Authorization: token \${GITHUB_TOKEN}" \\
+                                -X POST -H "Accept: application/vnd.github.v3+json" \\
+                                -d '{"state":"${buildState}", "context":"safezone", "description":"Jenkins \${buildState}"}' \\
+                                https://api.github.com/repos/mareerray/java-jenk/statuses/\${GIT_COMMIT}
+                        """
+                        sh """
+                            curl -s -H "Authorization: token \${GITHUB_TOKEN}" \\
+                                -X POST -H "Accept: application/vnd.github.v3+json" \\
+                                -d '{"state":"${buildState}", "context":"safe-quality-gate", "description":"Quality gate \${buildState}"}' \\
+                                https://api.github.com/repos/mareerray/java-jenk/statuses/\${GIT_COMMIT}
+                        """
+                    }
+                }
+                
+                // Slack notification (secure)
+                withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
+                    def emoji = (buildState == 'SUCCESS') ? ':white_check_mark:' : ':x:'
+                    sh """
+                        curl -sS -X POST -H 'Content-type: application/json' \\
+                            --data '{ "text": "${emoji} *${buildState}* \\\\\\n*Job:* ${JOB_NAME} \\\\\\n*Build:* ${BUILD_NUMBER} \\\\\\n*Branch:* ${GIT_BRANCH}" }' \\
+                            "\${SLACK_WEBHOOK}" || echo "Slack failed (non-fatal)"
+                    """
+                }
+            }
         }
     }
 }
