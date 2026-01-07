@@ -393,8 +393,8 @@ pipeline {
                     githubStatus(context: 'safe-quality-gate', state: currentBuild.result, message: "Quality gate ${currentBuild.result}")
                 }
             }
-            }
         }
+        
 
         success {
             echo "Build succeeded! Sending Slack notification..."
