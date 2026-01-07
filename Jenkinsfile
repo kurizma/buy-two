@@ -408,14 +408,14 @@ pipeline {
                 cleanWs notFailBuild: true
                 
                 def buildState = currentBuild.currentResult?.toLowerCase() ?: 'success'
-                def ghState = (buildState == 'unstable') ? 'error' : buildState
+                def ghState = (buildState == 'success') ? 'success' : 'failure'
                 
                 if (env.GIT_COMMIT) {
                     withCredentials([string(credentialsId: 'github-safezone-token', variable: 'GITHUB_TOKEN')]) {
                         sh """
                             curl -s -H "Authorization: token \${GITHUB_TOKEN}" \\
                                 -X POST -H "Accept: application/vnd.github.v3+json" \\
-                                -d '{"state":"${ghState}", "context":"safezone", "description":"Jenkins ${buildState}"}' \\
+                                -d '{"state":"${ghState}", "context":"safezone", "description":"Jenkins ${buildState}", "target_url":"${BUILD_URL}"}' \\
                                 https://api.github.com/repos/mareerray/java-jenk/statuses/\${GIT_COMMIT}
                         """
                         sh """
