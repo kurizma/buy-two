@@ -405,36 +405,34 @@ pipeline {
     post {
         always {
             script {
-                // Clean workspace
                 cleanWs notFailBuild: true
                 
-                def buildState = currentBuild.currentResult ?: 'success'
+                def buildState = currentBuild.currentResult?.toLowerCase() ?: 'success'
+                def ghState = (buildState == 'unstable') ? 'error' : buildState
                 
-                // GitHub statuses
                 if (env.GIT_COMMIT) {
                     withCredentials([string(credentialsId: 'github-safezone-token', variable: 'GITHUB_TOKEN')]) {
                         sh """
                             curl -s -H "Authorization: token \${GITHUB_TOKEN}" \\
                                 -X POST -H "Accept: application/vnd.github.v3+json" \\
-                                -d '{"state":"${buildState}", "context":"safezone", "description":"Jenkins \${buildState}"}' \\
+                                -d '{"state":"${ghState}", "context":"safezone", "description":"Jenkins ${buildState}"}' \\
                                 https://api.github.com/repos/mareerray/java-jenk/statuses/\${GIT_COMMIT}
                         """
                         sh """
                             curl -s -H "Authorization: token \${GITHUB_TOKEN}" \\
                                 -X POST -H "Accept: application/vnd.github.v3+json" \\
-                                -d '{"state":"${buildState}", "context":"safe-quality-gate", "description":"Quality gate \${buildState}"}' \\
+                                -d '{"state":"${ghState}", "context":"safe-quality-gate", "description":"Quality gate ${buildState}"}' \\
                                 https://api.github.com/repos/mareerray/java-jenk/statuses/\${GIT_COMMIT}
                         """
                     }
                 }
                 
-                // Slack notification (secure)
                 withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
-                    def emoji = (buildState == 'SUCCESS') ? ':white_check_mark:' : ':x:'
+                    def emoji = (buildState == 'success') ? ':white_check_mark:' : ':x:'
                     sh """
                         curl -sS -X POST -H 'Content-type: application/json' \\
-                            --data '{ "text": "${emoji} *${buildState}* \\\\\\n*Job:* ${JOB_NAME} \\\\\\n*Build:* ${BUILD_NUMBER} \\\\\\n*Branch:* ${GIT_BRANCH}" }' \\
-                            "\${SLACK_WEBHOOK}" || echo "Slack failed (non-fatal)"
+                            --data '{"text":"${emoji} *${buildState.toUpperCase()}*\\\\n*Job:* ${JOB_NAME}\\\\n*Build:* ${BUILD_NUMBER}\\\\n*Branch:* ${BRANCH_NAME ?: GIT_BRANCH}"}' \\
+                            "\${SLACK_WEBHOOK}" || true
                     """
                 }
             }
