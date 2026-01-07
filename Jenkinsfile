@@ -373,40 +373,68 @@ pipeline {
     }
     // end of stages
 
+    // post {
+    //     always {
+    //         script {
+    //             // Clean workspace
+    //             if (env.WORKSPACE) {
+    //                 cleanWs notFailBuild: true
+    //             } else {
+    //                 echo "No workspace available; skipping cleanWs"
+    //             }
+    //             // Post GitHub status
+    //             step([
+    //                 $class: "GitHubCommitStatusSetter",
+    //                 reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/mareerray/java-jenk"],
+    //                 contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "safezone"],
+    //                 statusResultSource: [$class: "ConditionalStatusResultSource", 
+    //                     results: [[$class: "AnyBuildResult", state: "${currentBuild.result}", message: "Build ${currentBuild.result}"]]
+    //                 ]
+    //             ])
+    //             step([
+    //                 $class: "GitHubCommitStatusSetter",
+    //                 reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/mareerray/java-jenk"],
+    //                 contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "safe-quality-gate"],
+    //                 statusResultSource: [$class: "ConditionalStatusResultSource", 
+    //                     results: [[$class: "AnyBuildResult", state: "${currentBuild.result}", message: "Quality gate ${currentBuild.result}"]]
+    //                 ]
+    //             ])
+    //         }
+    //     }
+    
     post {
-        always {
-            script {
-                // junit 'backend/*/target/surefire-reports/*.xml'
-                // archiveArtifacts artifacts: 'backend/*/target/surefire-reports/*.xml', allowEmptyArchive: true
-
-                // junit allowEmptyResults: true, testResults: 'frontend/test-results/junit/*.xml'
-                // archiveArtifacts artifacts: 'frontend/test-results/junit/*.xml', allowEmptyArchive: true
-
-                if (env.WORKSPACE) {
-                    cleanWs notFailBuild: true
-                } else {
-                    echo "No workspace available; skipping cleanWs"
-                }
-                // Post GitHub status
-                step([
-                    $class: "GitHubCommitStatusSetter",
-                    reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/mareerray/java-jenk"],
-                    contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "safezone"],
-                    statusResultSource: [$class: "ConditionalStatusResultSource", 
-                        results: [[$class: "AnyBuildResult", state: "${currentBuild.result}", message: "Build ${currentBuild.result}"]]
-                    ]
-                ])
-                step([
-                    $class: "GitHubCommitStatusSetter",
-                    reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/mareerray/java-jenk"],
-                    contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "safe-quality-gate"],
-                    statusResultSource: [$class: "ConditionalStatusResultSource", 
-                        results: [[$class: "AnyBuildResult", state: "${currentBuild.result}", message: "Quality gate ${currentBuild.result}"]]
-                    ]
-                ])
+    always {
+        script {
+            // Clean workspace safely
+            if (env.WORKSPACE) {
+                cleanWs notFailBuild: true
+            } else {
+                echo "No workspace available; skipping cleanWs"
+            }
+            
+            // Post safezone build status to GitHub
+            withCredentials([string(credentialsId: 'github-safe-zone-token', variable: 'GITHUB_TOKEN')]) {
+                sh """
+                    curl -H "Authorization: token \${GITHUB_TOKEN}" \\
+                        -X POST \\
+                        -H "Accept: application/vnd.github.v3+json" \\
+                        -d '{"state":"${currentBuild.currentResult ?: 'success'}", "context":"safezone", "description":"Jenkins Build ${currentBuild.currentResult ?: 'success'}"}' \\
+                        https://api.github.com/repos/mareerray/java-jenk/statuses/\${GIT_COMMIT}
+                """
+                
+                // Post SonarQube quality gate status
+                sh """
+                    curl -H "Authorization: token \${GITHUB_TOKEN}" \\
+                        -X POST \\
+                        -H "Accept: application/vnd.github.v3+json" \\
+                        -d '{"state":"${currentBuild.currentResult ?: 'success'}", "context":"safe-quality-gate", "description":"SonarQube Quality Gate ${currentBuild.currentResult ?: 'success'}"}' \\
+                        https://api.github.com/repos/mareerray/java-jenk/statuses/\${GIT_COMMIT}
+                """
             }
         }
-        
+    }
+}
+
 
         success {
             echo "Build succeeded! Sending Slack notification..."
