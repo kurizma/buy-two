@@ -384,6 +384,11 @@ pipeline {
     post {
         always {
             script {
+                archiveArtifacts artifacts: 'backend/*/target/surefire-reports/*.xml', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'frontend/test-results/junit/*.xml', allowEmptyArchive: true
+                junit 'backend/*/target/surefire-reports/*.xml'
+                junit 'frontend/test-results/junit/*.xml'
+                
                 cleanWs notFailBuild: true
                 
                 def buildState = currentBuild.currentResult?.toLowerCase() ?: 'success'
@@ -414,11 +419,6 @@ pipeline {
                             -d '{"text":"${emoji} *${buildState.toUpperCase()}* | Job: ${JOB_NAME} | Build: #${BUILD_NUMBER} |Branch: ${BRANCH ?: GIT_BRANCH}"}' \\
                             \$SLACK_WEBHOOK || true
                     """
-                    // sh """
-                    //     curl -sS -X POST -H 'Content-type: application/json' \\
-                    //         --data '{"text":"${emoji} *${buildState.toUpperCase()}*\\*Job:* ${JOB_NAME}\\Build:* ${BUILD_NUMBER}\\\\n*Branch:* ${BRANCH ?: GIT_BRANCH}"}' \\
-                    //         "\${SLACK_WEBHOOK}" || true
-                    // """
                 }
             }
         }
