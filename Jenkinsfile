@@ -366,8 +366,18 @@ pipeline {
                             withCredentials([string(credentialsId: 'webhook-slack-safe-zone', variable: 'SLACK_WEBHOOK')]) {
                                 sh """
                                     curl -sS -X POST -H 'Content-type: application/json' \\
-                                    --data "{\"text\":\":rollback: Rollback to ${STABLE_TAG} SUCCESS #${BUILD_NUMBER}\"}" \\
-                                    \${SLACK_WEBHOOK} || true
+                                    --data '{
+                                        "channel": "#safe-zone",
+                                        "text": "🚨 *Rollback Triggered* #${BUILD_NUMBER}",
+                                        "attachments": [{
+                                            "color": "danger",
+                                            "fields": [
+                                                {"title": "Cause", "value": "${e.message}", "short": false},
+                                                {"title": "Version", "value": "${VERSION} → ${STABLE_TAG}", "short": true},
+                                                {"title": "Branch", "value": "${cleanBranch}", "short": true}
+                                            ]
+                                        }]
+                                    }' \${SLACK_WEBHOOK}
                                 """
                             }
                             currentBuild.result = 'UNSTABLE'  // Not FAILURE to show rollback worked
@@ -377,11 +387,7 @@ pipeline {
                 }
             }
         }
-
-        // stage('Deploy & Verify') {
-        //     steps {
-        //         script {
-        //             dir("${env.WORKSPACE}") {
+    
         //                 def cleanBranch = "${BRANCH ?: GIT_BRANCH ?: 'main'}".replaceAll(/^origin\//, '')
                         
         //                 // Cleanup
