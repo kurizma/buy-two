@@ -331,12 +331,12 @@ pipeline {
                             withEnv(["IMAGE_TAG=${VERSION}"]) {
                                 sh 'docker compose build --pull always'
                                 sh '''
-                                    docker tag frontend:${VERSION} frontend:${STABLE_TAG}
-                                    docker tag discovery-service:${VERSION} discovery-service:${STABLE_TAG}
-                                    docker tag gateway-service:${VERSION} gateway-service:${STABLE_TAG}
-                                    docker tag user-service:${VERSION} user-service:${STABLE_TAG}
-                                    docker tag product-service:${VERSION} product-service:${STABLE_TAG}
-                                    docker tag media-service:${VERSION} media-service:${STABLE_TAG}
+                                    docker tag frontend:${VERSION} frontend:${STABLE_TAG} frontend:build-${BUILD_NUMBER}
+                                    docker tag discovery-service:${VERSION} discovery-service:${STABLE_TAG} discovery-service:build-${BUILD_NUMBER}
+                                    docker tag gateway-service:${VERSION} gateway-service:${STABLE_TAG} gateway-service:build-${BUILD_NUMBER}
+                                    docker tag user-service:${VERSION} user-service:${STABLE_TAG} user-service:build-${BUILD_NUMBER}
+                                    docker tag product-service:${VERSION} product-service:${STABLE_TAG} product-service:build-${BUILD_NUMBER}
+                                    docker tag media-service:${VERSION} media-service:${STABLE_TAG} media-service:build-${BUILD_NUMBER}
                                 '''
                                 
                                 // Deploy new version for verification
@@ -349,7 +349,7 @@ pipeline {
                                     if docker compose ps | grep -q "Exit"; then exit 1; fi
                                 '''
                             }
-                            echo "✅ New deploy verified - promote to stable"
+                            echo "✅ New deploy verified - promoted build-${BUILD_NUMBER} to stable"
                             currentBuild.result = 'SUCCESS'
 
                         } catch (Exception e) {
@@ -362,12 +362,15 @@ pipeline {
                                 IMAGE_TAG=\$STABLE_TAG docker compose up -d --pull never
                                 sleep 10
                                 docker compose ps  # Verify
-                                echo "✅ Rolled back to \$STABLE_TAG"
+                                # Get previous build from image labels/history
+                                PREV_BUILD=\$(docker inspect frontend:\$STABLE_TAG | jq -r '.[0].Config.Labels["org.label-schema.build"] // \"unknown\"' || echo \$STABLE_TAG)
+                                echo "✅ Rolled back to \$STABLE_TAG (build \$PREV_BUILD)"
                             """
                             
                             withCredentials([string(credentialsId: 'webhook-slack-safe-zone', variable: 'SLACK_WEBHOOK')]) {
                             sh """
-                                curl -sS -X POST -H 'Content-type: application/json' --data '{\"text\":\"🚨 Rollback to \${STABLE_TAG:-latest} #${BUILD_NUMBER}\"}' \$SLACK_WEBHOOK || true
+                                curl -sS -X POST -H 'Content-type: application/json' \\
+                                    --data '{\"text\":\"🚨 Rollback #${BUILD_NUMBER} → \$PREV_BUILD (\$STABLE_TAG)\"}' \$SLACK_WEBHOOK || true
                             """
                         }
                         currentBuild.result = 'UNSTABLE'
