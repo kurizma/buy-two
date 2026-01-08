@@ -148,6 +148,9 @@ pipeline {
                     
                         sh 'npm ci'
                         sh 'npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox --no-progress'
+                        sh 'ls -la test-results/ || echo "No test-results dir"'
+                        sh 'find . -name "*.xml" -path "*/junit/*" || echo "No junit XML found"'
+                        sh 'pwd && ls -la'
                         sh 'npx ng build --configuration production'
                     
                 }
