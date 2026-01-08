@@ -361,32 +361,22 @@ pipeline {
                             
                             withCredentials([string(credentialsId: 'webhook-slack-safe-zone', variable: 'SLACK_WEBHOOK')]) {
                                 sh '''
-                                    # Remove broken containers/images
-                                    docker compose rm -f || true
-                                    docker rmi frontend:v999-broken-nonexistent || true
+                                    # Targeted cleanup only
+                                    docker stop $(docker ps -q --filter "name=v${BUILD_NUMBER}") 2>/dev/null || true
+                                    docker rm $(docker ps -aq --filter "name=v${BUILD_NUMBER}") 2>/dev/null || true
                                     
                                     if docker images | grep -q ":[s]table"; then
-                                        IMAGE_TAG=stable docker compose up -d
-                                        echo "✅ Rollback complete"
-                                        curl ... "Rollback SUCCESS"
+                                        IMAGE_TAG=${STABLE_TAG} docker compose up -d --pull never
+                                        echo "✅ Rolled back"
+                                        curl -sS -X POST -H "Content-type: application/json" \\
+                                        --data "{\"text\":\":ok_hand: Rollback SUCCESS #${BUILD_NUMBER}\"}" \\
+                                        ${SLACK_WEBHOOK} || true
                                     else
-                                        curl ... "No stable"
+                                        echo "⚠️ No stable"
+                                        curl -sS -X POST -H "Content-type: application/json" \\
+                                        --data "{\"text\":\":warning: No stable #${BUILD_NUMBER}\"}" \\
+                                        ${SLACK_WEBHOOK} || true
                                     fi
-                                    // docker compose down || true
-                                    // sleep 5
-                                    
-                                    // if docker images | grep -q ":[s]table"; then
-                                    //     IMAGE_TAG=${STABLE_TAG} docker compose up -d
-                                    //     echo "✅ Rolled back (partial stable OK)"
-                                    //     curl -sS -X POST -H "Content-type: application/json" \\
-                                    //     --data "{\"text\":\":ok_hand: Rollback SUCCESS #${BUILD_NUMBER} (${cleanBranch})\"}" \\
-                                    //     ${SLACK_WEBHOOK} || true
-                                    // else
-                                    //     echo "⚠️ No stable images → Manual intervention"
-                                    //     curl -sS -X POST -H "Content-type: application/json" \\
-                                    //     --data "{\"text\":\":warning: Rollback SKIPPED #${BUILD_NUMBER} - no stable\"}" \\
-                                    //     ${SLACK_WEBHOOK} || true
-                                    // fi
                                 '''
                             }
                             // Green build after rollback
