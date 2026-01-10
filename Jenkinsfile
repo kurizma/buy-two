@@ -323,6 +323,9 @@ pipeline {
          ******************************/
         stage('Deploy & Verify') {
             steps {
+                options {
+                    timeout(time: 30, unit: 'MINUTES')
+                }
                 script {
                     dir("${env.WORKSPACE}") {
                         def cleanBranch = "${BRANCH ?: GIT_BRANCH ?: 'main'}".replaceAll(/^origin\//, '')
