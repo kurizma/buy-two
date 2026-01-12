@@ -19,7 +19,7 @@ pipeline {
 
 	environment {
 		// Credentials
-		SLACK_WEBHOOK = credentials('Slack Incoming webhook')
+		SLACK_WEBHOOK = credentials('slack-webhook')
 		BRANCH = "${env.BRANCH_NAME ?: env.GIT_BRANCH ?: params.BRANCH ?: 'main'}"
 
 		// Image versioning
@@ -170,7 +170,7 @@ pipeline {
 						testFailed = true
 					}
 					if (testFailed) {
-						withCredentials([string(credentialsId: 'Slack Incoming webhook', variable: 'SLACK_WEBHOOK')]) {
+						withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
 							sh '''
                                 curl -sS -X POST -H "Content-type: application/json" --data "{
                                     \\"text\\": \\":x: TESTS FAILED!\\n*Job:* ${JOB_NAME}\\n*Build:* ${BUILD_NUMBER}\\n*Branch:* ${cleanBranch}
@@ -378,7 +378,7 @@ pipeline {
 
 							echo "❌ Deploy failed: ${e.message}"
 
-							withCredentials([string(credentialsId: 'Slack Incoming webhook', variable: 'SLACK_WEBHOOK')]) {
+							withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
 								sh """
                                     curl -sS -X POST -H 'Content-type: application/json' \\
                                         --data '{\"text\":\"🚨 Rollback #${BUILD_NUMBER} → ${stableTag}\"}' \$SLACK_WEBHOOK
@@ -411,7 +411,7 @@ pipeline {
 				def ghState = (buildState == 'success') ? 'success' : 'failure'
 				def cleanBranch = "${BRANCH ?: GIT_BRANCH ?: 'main'}".replaceAll(/^origin\//, '')
 
-				withCredentials([string(credentialsId: 'Slack Incoming webhook', variable: 'SLACK_WEBHOOK')]) {
+				withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
 					def emoji = (buildState == 'success') ? ':white_check_mark:' : ':x:'
 					sh """
                         curl -sS -X POST \\
