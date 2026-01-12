@@ -11,13 +11,13 @@ import javax.crypto.spec.SecretKeySpec;
 @Configuration
 public class JwtDecoderConfig {
     
-    @Value("${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_SECRET}")
+    @Value("${spring.security.oauth2.resourceserver.jwt.secret}")
     private String jwtSecret;
     
     @Bean
     public ReactiveJwtDecoder jwtDecoder() {
         return NimbusReactiveJwtDecoder.withSecretKey(
-                new SecretKeySpec(secret.getBytes(), "HmacSHA256")
+                new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256")
         ).build();
     }
 }
