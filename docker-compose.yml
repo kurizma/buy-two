@@ -108,7 +108,7 @@ services:
     ports: ["4200:443"]
     depends_on: [gateway-service]
 
-  # CRASH TEST (no build)  
+  # CRASH TEST (no build)
   # frontend:
   #   image: frontend:v999-broken-nonexistent
   #   container_name: frontend-v999-broken
