@@ -21,7 +21,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          secret: "oogabooga123oogabooga123oogabooga123!"
+          secret: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_SECRET}
   servlet:
     multipart:
       max-file-size: 2MB    # each file must be ≤ 2 MB
