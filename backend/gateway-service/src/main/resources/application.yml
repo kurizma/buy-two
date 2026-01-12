@@ -14,7 +14,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          secret: "oogabooga123oogabooga123oogabooga123!"
+          secret: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_SECRET}
   cloud:
     gateway:
       routes:

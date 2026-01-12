@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# SSL / keys
+server.key
+*.key
+*.p12
+*.jks
+

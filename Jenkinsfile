@@ -423,8 +423,6 @@ pipeline {
 
 				if (env.GIT_COMMIT) {
 					withCredentials([string(credentialsId: 'safe-zone', variable: 'GITHUB_TOKEN')]) {
-						// ghState = (buildState == 'success') ? 'success' : 'failure'
-
 						sh """
 							set +e
 

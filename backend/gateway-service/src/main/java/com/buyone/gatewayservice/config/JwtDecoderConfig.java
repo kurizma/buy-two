@@ -9,9 +9,12 @@ import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 public class JwtDecoderConfig {
+    
+    @Value("${spring.security.oauth2.resourceserver.jwt.secret}")
+    private String jwtSecret;
+    
     @Bean
     public ReactiveJwtDecoder jwtDecoder() {
-        String secret = "oogabooga123oogabooga123oogabooga123!"; // Must match the gateway YAML and user-service
         return NimbusReactiveJwtDecoder.withSecretKey(
                 new SecretKeySpec(secret.getBytes(), "HmacSHA256")
         ).build();
