@@ -10,7 +10,7 @@ import javax.crypto.spec.SecretKeySpec;
 @Configuration
 public class JwtDecoderConfig {
     
-    @Value("${spring.security.oauth2.resourceserver.jwt.secret}")
+    @Value("${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_SECRET}")
     private String jwtSecret;
     
     @Bean
