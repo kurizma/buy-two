@@ -49,7 +49,7 @@ pipeline {
 					branches: [[name: "*/${params.BRANCH}"]],
 					userRemoteConfigs: [[
 						url: 'https://github.com/kurizma/safe-zone.git',
-						credentialsId: 'github-safezone-token'
+						credentialsId: 'safe-zone'
 					]]
 				])
 			}
@@ -332,26 +332,24 @@ pipeline {
 		 ******************************/
 		stage('Deploy & Verify') {
 			steps {
-				options {
-					timeout(time: 30, unit: 'MINUTES')
-				}
-				script {
-					dir("${env.WORKSPACE}") {
-						def cleanBranch = "${BRANCH ?: GIT_BRANCH ?: 'main'}".replaceAll(/^origin\//, '')
+				timeout(time: 30, unit: 'MINUTES') {
+					script {
+						dir("${env.WORKSPACE}") {
+							def cleanBranch = "${BRANCH ?: GIT_BRANCH ?: 'main'}".replaceAll(/^origin\//, '')
 
-						// Cleanup old containers
-						sh 'docker compose down || true'
-						sleep 3
+							// Cleanup old containers
+							sh 'docker compose down || true'
+							sleep 3
 
-						try {
-							echo "Building and tagging ${VERSION} as potential stable"
+							try {
+								echo "Building and tagging ${VERSION} as potential stable"
 
-							// Build ALL services, tag as VERSION and STABLE
-							withEnv(["IMAGE_TAG=${VERSION}"]) {
-								// Fail fast if frontend can't build/pull
-								sh 'docker compose build frontend || exit 1'
-								sh 'docker compose build --pull --parallel --progress=plain'
-								sh '''
+								// Build ALL services, tag as VERSION and STABLE
+								withEnv(["IMAGE_TAG=${VERSION}"]) {
+									// Fail fast if frontend can't build/pull
+									sh 'docker compose build frontend || exit 1'
+									sh 'docker compose build --pull --parallel --progress=plain'
+									sh '''
                                     docker tag frontend:${VERSION} frontend:${STABLE_TAG} frontend:build-${BUILD_NUMBER} || true
                                     docker tag discovery-service:${VERSION} discovery-service:${STABLE_TAG} discovery-service:build-${BUILD_NUMBER} || true
                                     docker tag gateway-service:${VERSION} gateway-service:${STABLE_TAG} gateway-service:build-${BUILD_NUMBER} || true
@@ -360,33 +358,33 @@ pipeline {
                                     docker tag media-service:${VERSION} media-service:${STABLE_TAG} media-service:build-${BUILD_NUMBER} || true
                                 '''
 
-								// Deploy new version for verification
-								sh 'docker compose up -d'
-								sleep 20
+									// Deploy new version for verification
+									sh 'docker compose up -d'
+									sleep 20
 
-								// Strong health check
-								sh '''
+									// Strong health check
+									sh '''
                                     timeout 30 bash -c "until docker compose ps | grep -q Up && curl -f http://localhost:4200 || curl -f http://localhost:8080/health; do sleep 2; done" || exit 1
                                     if docker compose ps | grep -q "Exit"; then exit 1; fi
                                 '''
-							}
-							echo "✅ New deploy verified - promoted build-${BUILD_NUMBER} to stable"
-							currentBuild.result = 'SUCCESS'
+								}
+								echo "✅ New deploy verified - promoted build-${BUILD_NUMBER} to stable"
+								currentBuild.result = 'SUCCESS'
 
-						} catch (Exception e) {
-							def stableTag = env.STABLE_TAG ?: 'latest'
+							} catch (Exception e) {
+								def stableTag = env.STABLE_TAG ?: 'latest'
 
-							echo "❌ Deploy failed: ${e.message}"
+								echo "❌ Deploy failed: ${e.message}"
 
-							withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
-								sh """
+								withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
+									sh """
                                     curl -sS -X POST -H 'Content-type: application/json' \\
                                         --data '{\"text\":\"🚨 Rollback #${BUILD_NUMBER} → ${stableTag}\"}' \$SLACK_WEBHOOK
                                 """
-							}
+								}
 
-							// Rollback: Always deploy known stable
-							sh """
+								// Rollback: Always deploy known stable
+								sh """
                                 STABLE_TAG=\${STABLE_TAG:-latest}
                                 docker compose down || true
                                 IMAGE_TAG=\$STABLE_TAG docker compose up -d --pull never
@@ -394,8 +392,9 @@ pipeline {
                                 docker compose ps  # Verify
                                 echo "✅ Rolled back to ${stableTag}"
                             """
-							currentBuild.result = 'UNSTABLE'
-							throw e
+								currentBuild.result = 'UNSTABLE'
+								throw e
+							}
 						}
 					}
 				}
@@ -430,22 +429,26 @@ pipeline {
 
 				if (env.GIT_COMMIT) {
 					withCredentials([string(credentialsId: 'safe-zone', variable: 'GITHUB_TOKEN')]) {
-						// STATUS CHECK #1: Overall build status -> shows on GitHub ✅ safezone — Jenkins success
+						def ghState = (buildState == 'success') ? 'success' : 'failure'
+
 						sh """
-                            curl -s -H "Authorization: token \${GITHUB_TOKEN}" \\
-                                -X POST -H "Accept: application/vnd.github.v3+json" \\
-                                -d '{"state":"${ghState}", "context":"safezone", "description":"Jenkins ${buildState}", "target_url":"${BUILD_URL}"}' \\
-                                https://api.github.com/repos/kurizma/safe-zone/statuses/\${GIT_COMMIT}
-                        """
-						// STATUS CHECK #2: Quality gate status -> shows on GitHub ✅ safezone — Quality gate success
-						sh """
-                            curl -s -H "Authorization: token \${GITHUB_TOKEN}" \\
-                                -X POST -H "Accept: application/vnd.github.v3+json" \\
-                                -d '{"state":"${ghState}", "context":"safe-quality-gate", "description":"Quality gate ${buildState}"}' \\
-                                https://api.github.com/repos/kurizma/safe-zone/statuses/\${GIT_COMMIT}
-                        """
+							set +e
+
+							curl -s -H "Authorization: token ${GITHUB_TOKEN}" \\
+							  -X POST -H "Accept: application/vnd.github.v3+json" \\
+							  -d '{"state":"${ghState}", "context":"safezone", "description":"Jenkins ${buildState}", "target_url":"${BUILD_URL}"}' \\
+							  https://api.github.com/repos/kurizma/safe-zone/statuses/${GIT_COMMIT} || true
+
+							curl -s -H "Authorization: token ${GITHUB_TOKEN}" \\
+							  -X POST -H "Accept: application/vnd.github.v3+json" \\
+							  -d '{"state":"${ghState}", "context":"safe-quality-gate", "description":"Quality gate ${buildState}"}' \\
+							  https://api.github.com/repos/kurizma/safe-zone/statuses/${GIT_COMMIT} || true
+
+							exit 0
+						"""
 					}
 				}
+
 			}
 		}
 	}

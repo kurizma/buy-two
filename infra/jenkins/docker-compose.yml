@@ -14,12 +14,12 @@ services:
     environment:
       - JAVA_OPTS=-Xmx2048m -Xms1024m
     networks:
-      - java-jenk_sonarnet 
+      - safe-zone-net
 
 volumes:
   jenkins_home:
 
 networks:
-  java-jenk_sonarnet: # Tells Docker to use existing network, not create new one
+  safe-zone-net: # Tells Docker to use existing network, not create new one
     external: true  
-    name: java-jenk_java-jenk_sonarnet
+    name: safe-zone_java-jenk_sonarnet
