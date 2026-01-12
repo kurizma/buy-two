@@ -193,7 +193,7 @@ pipeline {
 					env.PATH = "${scannerHome}/bin:${env.PATH}"
 
 					withSonarQubeEnv('SonarQube Dev') {
-						withCredentials([string(credentialsId: 'SQT', variable: 'SONAR_TOKEN'),
+						withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN'),
 							string(credentialsId: 'sonarqube-host-url', variable: 'SONAR_HOST')]) {
 							dir('backend/discovery-service') {
 								sh '''
@@ -272,7 +272,7 @@ pipeline {
 						env.PATH = "${scannerHome}/bin:${env.PATH}"
 
 						withSonarQubeEnv('SonarQube Dev') {
-							withCredentials([string(credentialsId: 'SQT', variable: 'SONAR_TOKEN'),
+							withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN'),
 								string(credentialsId: 'sonarqube-host-url', variable: 'SONAR_HOST')]) {
 								sh '''
                                     sonar-scanner \
