@@ -143,7 +143,16 @@
         </div>
       </div>
       <div class="col-md-6">
-        <div class="card-header">Connected Accounts</div>
+        <!-- <app-profile-analytics
+          *ngIf="currentUser"
+          [role]="currentUser.role"
+          [productsAnalytics]="isUser ? userMostBought : sellerBestSellers"
+          [totalAmount]="isUser ? userTotalSpent : sellerRevenue">
+        </app-profile-analytics> -->
+
+        <div class="card-header">
+          Connected Accounts
+        </div>
         <div class="social-icons">
           <a
             href="https://facebook.com/yourprofile"
