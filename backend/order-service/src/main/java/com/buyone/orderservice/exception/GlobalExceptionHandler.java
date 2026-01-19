@@ -57,10 +57,10 @@ public class GlobalExceptionHandler {
     }
     
     // 404: Not found for product
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleProductNotFound(ProductNotFoundException ex, HttpServletRequest request) {
-        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
-    }
+//    @ExceptionHandler(ProductNotFoundException.class)
+//    public ResponseEntity<ErrorResponse> handleProductNotFound(ProductNotFoundException ex, HttpServletRequest request) {
+//        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
+//    }
     
     // 405: HTTP Method not allowed
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)

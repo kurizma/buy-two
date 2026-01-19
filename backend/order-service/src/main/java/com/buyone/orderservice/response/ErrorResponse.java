@@ -1,8 +1,7 @@
 package com.buyone.orderservice.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Builder;
+import lombok.*;
+
 
 import java.time.LocalDateTime;
 
