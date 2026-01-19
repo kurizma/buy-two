@@ -2,8 +2,8 @@ package com.buyone.orderservice.model;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -12,19 +12,15 @@ import java.util.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
 public class Cart {
     @Id
-    private String id; // userId
+    private String id; // = userId (from JWT)
     
     @Builder.Default
     private List<CartItem> items = new ArrayList<>();
-    
     private double subtotal;
     private double tax;
     private double total;
-    
     private LocalDateTime updatedAt;
-    
-    @Version
-    private Long version;
 }
