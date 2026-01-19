@@ -1,12 +1,17 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { UserResponse } from '../../models/users/user-response.model';
 import { UserUpdateRequest } from '../../models/users/userUpdateRequest.model';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { MediaService } from '../../services/media.service';
 import { AuthService } from '../../services/auth.service';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  AbstractControl,
+} from '@angular/forms';
 
 @Component({
   selector: 'app-profile',
@@ -47,7 +52,7 @@ export class ProfileComponent implements OnInit {
           [
             Validators.required,
             Validators.minLength(8),
-            Validators.pattern('^(?=.*[a-z])(?=.*\\d).{8,}$'),
+            Validators.pattern(String.raw`^(?=.*[a-z])(?=.*\d).{8,}$`),
           ],
         ],
         confirmPassword: ['', Validators.required],
@@ -144,7 +149,7 @@ export class ProfileComponent implements OnInit {
 
   private extractMediaId(url?: string): string | null {
     if (!url) return null;
-    const match = url.match(/media\/([a-f0-9-]+)\./);
+    const match = /media\/([a-f0-9-]+)\./.exec(url);
     return match?.[1] || null;
   }
 
