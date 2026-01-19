@@ -1,3 +1,11 @@
-.DS_Store
-cat
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Environment variables
 .env
+
+# Other common ignores (from your past setups)
+target/
+.DS_Store
