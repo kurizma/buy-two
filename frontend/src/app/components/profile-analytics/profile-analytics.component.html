@@ -1,0 +1,58 @@
+<div class="analytics-container">
+
+    <!-- Total Amount Header -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+        <h2 class="total-amount">
+            {{ role === 'user' ? 'Total Spent' : 'Revenue' }}: {{ totalAmount | currency:'EUR' }}
+        </h2>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row mb-4">
+        <!-- Pie Chart (Categories) -->
+        <div class="col-md-6 mb-3">
+        <div class="chart-card">
+            <canvas baseChart
+                    [data]="pieChartData"
+                    [options]="pieOptions">
+            </canvas>
+        </div>
+        </div>
+
+        <!-- Bar Chart (Items) -->
+        <div class="col-md-6 mb-3">
+        <div class="chart-card position-relative">
+            <canvas baseChart
+                    [data]="barChartData"
+                    [options]="barOptions">
+            </canvas>
+            <div class="best-seller-label">{{ bestLabel }} 👑</div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Items Table -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+        <thead>
+            <tr>
+            <th>Product</th>
+            <th>Categories</th>
+            <th>{{ role === 'user' ? 'Times Bought' : 'Units Sold' }}</th>
+            <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of items">
+            <td>{{ item.name }}</td>
+            <td>{{ item.categories }}</td>
+            <td>{{ item.count }}</td>
+            <td>{{ item.amount | currency:'EUR' }}</td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
+</div>
+

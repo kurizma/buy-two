@@ -12,16 +12,23 @@ import {
   ReactiveFormsModule,
   AbstractControl,
 } from '@angular/forms';
+import { ProfileAnalyticsComponent } from '../profile-analytics/profile-analytics.component';
+import { AnalyticsItem } from '../../models/profile/analytics-item';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, ProfileAnalyticsComponent],
 })
 export class ProfileComponent implements OnInit {
   currentUser: UserResponse | null = null;
+  get userRole(): 'user' | 'seller' | null {
+    if (!this.currentUser?.role) return null;
+    return this.currentUser.role === 'CLIENT' ? 'user' : 'seller';
+  }
+
   profileForm: FormGroup;
   passwordForm: FormGroup;
   avatar: string | null = null; // always URL or null
@@ -38,6 +45,27 @@ export class ProfileComponent implements OnInit {
   authService = inject(AuthService);
 
   fb = inject(FormBuilder);
+
+  // ************* Mock analytics data *****************
+  getAnalyticsItems(role: 'user' | 'seller'): AnalyticsItem[] {
+    if (role === 'user') {
+      return [
+        { name: 'Code Wizard Tee', categories: 'CAT-001', count: 2, amount: 58 },
+        { name: 'Keep Coding Tee', categories: 'CAT-001', count: 1, amount: 28 },
+        { name: 'Action Noir Tee', categories: 'CAT-006', count: 1, amount: 45 },
+      ];
+    } else {
+      return [
+        { name: 'Code Wizard Tee', categories: 'CAT-001', count: 2, amount: 58 },
+        { name: 'Pop Code Queen Tee', categories: 'CAT-003', count: 2, amount: 150 },
+        { name: 'Classic Portrait Tee', categories: 'CAT-006', count: 3, amount: 135 },
+      ];
+    }
+  }
+
+  getTotalAmount(role: 'user' | 'seller'): number {
+    return role === 'user' ? 131 : 343;
+  }
 
   constructor() {
     this.profileForm = this.fb.group({

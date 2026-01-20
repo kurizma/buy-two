@@ -1,0 +1,38 @@
+.analytics-container { 
+    padding: 1.5rem; 
+}
+
+.total-amount { 
+    font-size: 2.5rem; 
+    font-weight: bold; 
+    color: var(--link); 
+    margin: 0; 
+}
+
+.chart-card { 
+    height: 350px; 
+    width: 100%;
+    position: relative; 
+}
+
+.chart-card canvas { 
+    max-height: 100%; 
+}
+
+.best-seller-label {
+    position: absolute; 
+    top: 10px; 
+    right: 10px;
+    background: gold; 
+    color: black; 
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px; 
+    font-weight: bold; 
+    font-size: 0.85rem;
+    z-index: 10;
+}
+@media (max-width: 768px) { 
+    .total-amount { 
+        font-size: 2rem; 
+    } 
+}

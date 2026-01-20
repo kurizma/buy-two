@@ -1,14 +1,8 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BaseChartDirective } from 'ng2-charts';
 import { ChartData, ChartOptions, ChartType } from 'chart.js';
-
-interface AnalyticsItem {
-  name: string;
-  categories: string; // CAT-001 etc
-  count: number;
-  amount: number;
-}
+import { BaseChartDirective } from 'ng2-charts';
+import { AnalyticsItem } from '../../models/profile/analytics-item';
 
 @Component({
   selector: 'app-profile-analytics',
@@ -34,7 +28,7 @@ export class ProfileAnalyticsComponent implements OnChanges {
     plugins: {
       title: {
         display: true,
-        text: this.role === 'user' ? 'Most Bought Items' : 'Best Selling Products',
+        text: '',
       },
     },
   };
@@ -44,38 +38,53 @@ export class ProfileAnalyticsComponent implements OnChanges {
   };
 
   ngOnChanges(): void {
-    if (this.items.length) {
-      const maxIdx = this.items.reduce(
-        (maxIdx, item, idx) => (item.count > this.items[maxIdx].count ? idx : maxIdx),
-        0,
-      );
-      this.bestLabel = this.role === 'user' ? 'Most bought item' : 'Best seller';
+    if (!this.items.length) return;
 
-      this.barChartData = {
-        labels: this.items.map((i) => i.name),
-        datasets: [
-          {
-            label: 'Count',
-            data: this.items.map((i) => i.count),
-            backgroundColor: this.items.map((_, i) => (i === maxIdx ? 'gold' : '#2196F3')),
-          },
-        ],
-      };
+    const maxIdx = this.items.reduce(
+      (maxIdx, item, idx) => (item.count > this.items[maxIdx].count ? idx : maxIdx),
+      0,
+    );
+    this.bestLabel = this.role === 'user' ? 'Most bought item' : 'Best seller';
 
-      // Auto pie from categories in items
-      const catSpend: { [key: string]: number } = {};
-      this.items.forEach((item) => {
-        catSpend[item.categories] = (catSpend[item.categories] || 0) + item.amount;
-      });
-      const totalSpend = this.items.reduce((sum, i) => sum + i.amount, 0);
-      this.pieChartData = {
-        labels: Object.keys(catSpend),
-        datasets: [
-          {
-            data: Object.values(catSpend).map((spend) => (spend / totalSpend) * 100),
-          },
-        ],
-      };
-    }
+    // update bar title now that role is known
+    this.barOptions = {
+      ...this.barOptions,
+      plugins: {
+        ...this.barOptions.plugins,
+        title: {
+          display: true,
+          text: this.role === 'user' ? 'Most Bought Items' : 'Best Selling Products',
+        },
+      },
+    };
+    this.barChartData = {
+      labels: this.items.map((i) => i.name),
+      datasets: [
+        {
+          label: 'Count',
+          data: this.items.map((i) => i.count),
+          backgroundColor: this.items.map((_, i) => (i === maxIdx ? 'gold' : '#2196F3')),
+        },
+      ],
+    };
+
+    const catSpend: { [key: string]: number } = {};
+    this.items.forEach((item) => {
+      // Fix: Handle array or string
+      const category = Array.isArray(item.categories)
+        ? item.categories[0] || 'Uncategorized' // First category or fallback
+        : item.categories || 'Uncategorized';
+      catSpend[category] = (catSpend[category] || 0) + item.amount;
+    });
+
+    this.pieChartData = {
+      labels: Object.keys(catSpend),
+      datasets: [
+        {
+          data: Object.values(catSpend).filter((v) => v > 0), // Only positive spends
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+        },
+      ],
+    };
   }
 }

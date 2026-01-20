@@ -1,6 +1,14 @@
 {
   "name": "grit-tee",
   "version": "0.0.0",
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 Edge versions",
+    "Firefox ESR",
+    "not dead"
+  ],
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",
@@ -45,7 +53,7 @@
   "devDependencies": {
     "@angular-eslint/eslint-plugin": "^21.0.1",
     "@angular/build": "^20.3.6",
-    "@angular/cli": "^19.2.19",
+    "@angular/cli": "^21.1.0",
     "@angular/compiler-cli": "^20.3.0",
     "@types/jasmine": "~5.1.0",
     "@typescript-eslint/parser": "^8.48.0",

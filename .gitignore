@@ -1,5 +1,26 @@
+
+/.angular/cache/
+/node_modules/
+/dist/
+/out-tsc/
+/*.log
+
+# Essentials
+node_modules/
+dist/
+.out-tsc/
+coverage/
+.eslintcache
+
+# Editor/OS
+.vscode/
+.idea/
 .DS_Store
-cat
+Thumbs.db
+
+# Environment files
 .env
-.node_modules
-dist
+.env.*
+
+# Husky (optional Git hooks)
+.husky/

@@ -143,13 +143,6 @@
         </div>
       </div>
       <div class="col-md-6">
-        <!-- <app-profile-analytics
-          *ngIf="currentUser"
-          [role]="currentUser.role"
-          [productsAnalytics]="isUser ? userMostBought : sellerBestSellers"
-          [totalAmount]="isUser ? userTotalSpent : sellerRevenue">
-        </app-profile-analytics> -->
-
         <div class="card-header">
           Connected Accounts
         </div>
@@ -184,6 +177,18 @@
           <a href="mailto:your@email.com" class="social-icon" aria-label="Email">
             <i class="bi bi-envelope me-2"></i> Email
           </a>
+        </div>
+      </div>
+
+      <!-- Analytics Dashboard - after password form, replace "Connected Accounts" -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <app-profile-analytics
+            *ngIf="userRole"
+            [role]="userRole"
+            [items]="getAnalyticsItems(userRole)"
+            [totalAmount]="getTotalAmount(userRole)">
+          </app-profile-analytics>
         </div>
       </div>
     </div>
