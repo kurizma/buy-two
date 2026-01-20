@@ -23,7 +23,10 @@ public class Order {
     @Builder.Default
     private List<OrderItem> items = new ArrayList<>();
     
-    private String status;       // "PENDING", "CONFIRMED", "SHIPPED", "DELIVERED", "CANCELLED"
+    @Builder.Default
+    private String status = "PENDING";
+    // "PENDING", "CONFIRMED", "SHIPPED", "DELIVERED", "CANCELLED"
+    
     private String paymentMethod = "PAY_ON_DELIVERY";
     
     private RabbitConnectionDetails.Address shippingAddress;  // Inline or ref

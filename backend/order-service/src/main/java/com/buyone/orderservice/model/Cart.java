@@ -15,7 +15,8 @@ import java.util.*;
 @Setter
 public class Cart {
     @Id
-    private String id; // = userId (from JWT)
+    private String id;
+    private String userId;
     
     @Builder.Default
     private List<CartItem> items = new ArrayList<>();

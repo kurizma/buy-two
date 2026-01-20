@@ -65,8 +65,17 @@ public class CartServiceImpl implements CartService {
     
     @Override
     public Cart clearCart(String userId) {
-        return cartRepository.save(new Cart(userId, new ArrayList<>(), 0, 0, 0, LocalDateTime.now()));
+        return cartRepository.save(Cart.builder()  // ✅ Builder!
+                .id(userId)
+                .userId(userId)
+                .items(new ArrayList<>())
+                .subtotal(0)
+                .tax(0)
+                .total(0)
+                .updatedAt(LocalDateTime.now())
+                .build());
     }
+
     
     private Cart getOrCreateCart(String userId) {
         return cartRepository.findById(userId).orElse(Cart.builder().id(userId).items(new ArrayList<>()).build());
@@ -88,5 +97,13 @@ public class CartServiceImpl implements CartService {
             throw new BadRequestException("Product ID is required");
         }
     }
+    
+    @Override
+    public void saveCart(Cart cart) {
+        // Upsert logic (id exists → update, else insert)
+        cartRepository.save(cart);
+        log.debug("Cart saved for user: {}", cart.getUserId());
+    }
+    
     
 }

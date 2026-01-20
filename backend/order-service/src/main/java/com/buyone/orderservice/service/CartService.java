@@ -10,4 +10,6 @@ public interface CartService {
     Cart updateQuantity(String userId, String productId, int quantity);
     Cart removeItem(String userId, String productId);
     Cart clearCart(String userId);
+    void saveCart(Cart cart);  // Persists/updates cart
+    
 }

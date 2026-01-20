@@ -1,15 +1,19 @@
 package com.buyone.orderservice.service.impl;
 
 import com.buyone.orderservice.exception.ResourceNotFoundException;
-import com.buyone.orderservice.model.CartItem;
-import com.buyone.orderservice.model.Order;
-import com.buyone.orderservice.model.OrderItem;
+import com.buyone.orderservice.model.*;
 import com.buyone.orderservice.service.CartService;
 import com.buyone.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import com.buyone.orderservice.repository.OrderRepository;
+
+import com.buyone.orderservice.dto.request.OrderSearchRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -85,4 +89,60 @@ public class OrderServiceImpl implements OrderService {
         order.setUpdatedAt(LocalDateTime.now());
         return orderRepository.save(order);
     }
+    
+    @Override
+    public void cancelOrder(String orderNumber) {
+        Order order = getOrder(orderNumber);
+        if (!"PENDING".equals(order.getStatus())) {  // String compare
+            throw new IllegalStateException("Only PENDING orders can be cancelled");
+        }
+        order.setStatus("CANCELLED");
+        order.setUpdatedAt(LocalDateTime.now());
+        orderRepository.save(order);
+    }
+    
+    @Override
+    public Order redoOrder(String orderNumber) {
+        Order oldOrder = getOrder(orderNumber);
+        if (!"CANCELLED".equals(oldOrder.getStatus())) {
+            throw new IllegalStateException("Only CANCELLED orders can be redone");
+        }
+        List<CartItem> newItems = oldOrder.getItems().stream()
+                .map(this::orderItemToCartItem)
+                .collect(Collectors.toList());
+        
+        Cart newCart = Cart.builder()
+                .userId(oldOrder.getUserId())  // ✅ Has userId()
+                .items(newItems)
+                .build();
+        cartService.saveCart(newCart);  // ✅ Add to CartService interface
+        return createOrderFromCart(oldOrder.getUserId());
+    }
+    @Override
+    public Page<Order> searchBuyerOrders(String userId, OrderSearchRequest req) {
+        String status = req.getStatus();  // String null-safe
+        Pageable pageable = PageRequest.of(req.getPage(), req.getSize());
+        return orderRepository.findBuyerOrdersSearch(userId, req.getKeyword(),
+                status != null ? OrderStatus.valueOf(status) : null, pageable);
+    }
+    
+    @Override
+    public Page<Order> getSellerOrders(String sellerId, Pageable pageable) {
+        return orderRepository.findSellerOrders(sellerId, pageable);
+    }
+    
+    private CartItem orderItemToCartItem(OrderItem item) {  // ✅ Missing method
+        return CartItem.builder()
+                .productId(item.getProductId())
+                .productName(item.getProductName())
+                .sellerId(item.getSellerId())
+                .price(item.getPrice())
+                .quantity(item.getQuantity())
+                .imageUrl(item.getImageUrl())
+                .build();
+    }
+    
+    
+    
+    
 }
