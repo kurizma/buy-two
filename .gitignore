@@ -9,3 +9,5 @@
 # Other common ignores (from your past setups)
 target/
 .DS_Store
+
+./notebook_files
