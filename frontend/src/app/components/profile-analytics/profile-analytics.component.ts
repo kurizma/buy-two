@@ -39,6 +39,7 @@ export class ProfileAnalyticsComponent implements OnChanges {
 
   barOptions: ChartOptions<'bar'> = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       title: {
         display: true,
@@ -48,7 +49,13 @@ export class ProfileAnalyticsComponent implements OnChanges {
   };
   pieOptions: ChartOptions<'pie'> = {
     responsive: true,
-    plugins: { title: { display: true, text: 'Category Breakdown (%)' } },
+    maintainAspectRatio: false,
+    plugins: {
+      title: {
+        display: true,
+        text: 'Category Breakdown (%)',
+      },
+    },
   };
 
   ngOnChanges(): void {

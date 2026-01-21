@@ -13,9 +13,10 @@
     <div class="row mb-4">
         <!-- Pie Chart (Categories) -->
         <div class="col-md-6 mb-3">
-        <div class="chart-card">
+        <div class="chart-card-pie">
             <canvas baseChart
                     [data]="pieChartData"
+                    [type]="'pie'"
                     [options]="pieOptions">
             </canvas>
         </div>
@@ -23,9 +24,10 @@
 
         <!-- Bar Chart (Items) -->
         <div class="col-md-6 mb-3">
-        <div class="chart-card position-relative">
+        <div class="chart-card-bar position-relative">
             <canvas baseChart
                     [data]="barChartData"
+                    [type]="'bar'"
                     [options]="barOptions">
             </canvas>
             <div class="best-seller-label">{{ bestLabel }} 👑</div>

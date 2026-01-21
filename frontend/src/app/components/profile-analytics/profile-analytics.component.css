@@ -19,6 +19,18 @@
     max-height: 100%; 
 }
 
+.chart-card-pie {
+    height: 300px; 
+    width: 100%;
+    position: relative; 
+}
+
+.chart-card-bar {
+    height: 300px; 
+    width: 100%;
+    position: relative; 
+}
+
 .best-seller-label {
     position: absolute; 
     top: 10px; 
