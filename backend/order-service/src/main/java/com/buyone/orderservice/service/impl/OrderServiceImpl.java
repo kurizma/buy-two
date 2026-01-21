@@ -46,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
                 .userId(userId)
                 .orderNumber(orderNumber)
                 .items(orderItems)
-                .status("PENDING")  // ✅ String for your Order.java
+                .status(PENDING)
                 .subtotal(cart.getSubtotal())
                 .tax(cart.getTax())
                 .total(cart.getTotal())
