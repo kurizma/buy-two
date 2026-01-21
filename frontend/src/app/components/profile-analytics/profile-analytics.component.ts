@@ -23,6 +23,20 @@ export class ProfileAnalyticsComponent implements OnChanges {
   pieType: ChartType = 'pie';
   bestLabel = '';
 
+  private readonly CATEGORY_MAP: Record<string, string> = {
+    'CAT-001': 'code-nerd',
+    'CAT-002': 'anime-pop',
+    'CAT-003': 'code-queen',
+    'CAT-004': 'gaming-esports',
+    'CAT-005': 'geeky-memes',
+    'CAT-006': 'limited-editions',
+  };
+
+  getCategorySlug(categoryId: string | string[]): string {
+    const id = Array.isArray(categoryId) ? categoryId[0] : categoryId;
+    return this.CATEGORY_MAP[id] || id || 'uncategorized';
+  }
+
   barOptions: ChartOptions<'bar'> = {
     responsive: true,
     plugins: {
@@ -63,7 +77,7 @@ export class ProfileAnalyticsComponent implements OnChanges {
         {
           label: 'Count',
           data: this.items.map((i) => i.count),
-          backgroundColor: this.items.map((_, i) => (i === maxIdx ? 'gold' : '#2196F3')),
+          backgroundColor: this.items.map((_, i) => (i === maxIdx ? 'gold' : '#0aeb7e')),
         },
       ],
     };
@@ -71,9 +85,11 @@ export class ProfileAnalyticsComponent implements OnChanges {
     const catSpend: { [key: string]: number } = {};
     this.items.forEach((item) => {
       // Fix: Handle array or string
-      const category = Array.isArray(item.categories)
+      const rawCategory = Array.isArray(item.categories)
         ? item.categories[0] || 'Uncategorized' // First category or fallback
         : item.categories || 'Uncategorized';
+
+      const category = this.getCategorySlug(rawCategory); // use slug if known
       catSpend[category] = (catSpend[category] || 0) + item.amount;
     });
 

@@ -34,9 +34,9 @@
     </div>
 
     <!-- Items Table -->
-    <div class="table-responsive">
+    <div class="table-responsive product-table">
         <table class="table table-striped">
-        <thead>
+        <thead class ="table-head">
             <tr>
             <th>Product</th>
             <th>Categories</th>
@@ -47,7 +47,7 @@
         <tbody>
             <tr *ngFor="let item of items">
             <td>{{ item.name }}</td>
-            <td>{{ item.categories }}</td>
+            <td>{{ getCategorySlug(item.categories) }}</td>
             <td>{{ item.count }}</td>
             <td>{{ item.amount | currency:'EUR' }}</td>
             </tr>

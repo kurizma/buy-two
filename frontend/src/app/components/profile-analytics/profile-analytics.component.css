@@ -10,7 +10,7 @@
 }
 
 .chart-card { 
-    height: 350px; 
+    height: 300px; 
     width: 100%;
     position: relative; 
 }
@@ -31,8 +31,23 @@
     font-size: 0.85rem;
     z-index: 10;
 }
+
+.product-table { 
+    overflow-x: auto; 
+    border-radius: 5px;
+
+}  
+
+.table-head  th{ 
+    background: var(--primary-dark) !important; 
+    color: var(--text-primary); 
+}
+
 @media (max-width: 768px) { 
     .total-amount { 
         font-size: 2rem; 
     } 
+    .chart-card { 
+        height: 200px; 
+    }
 }
