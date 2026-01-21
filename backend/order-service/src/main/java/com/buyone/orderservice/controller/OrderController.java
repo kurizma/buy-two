@@ -1,81 +1,93 @@
 package com.buyone.orderservice.controller;
 
+import com.buyone.orderservice.dto.request.CreateOrderRequest;  // NEW
+import com.buyone.orderservice.dto.request.OrderSearchRequest;
+import com.buyone.orderservice.dto.response.OrderResponse;
+import com.buyone.orderservice.dto.response.OrderItemResponse;
+import com.buyone.orderservice.model.Address;
 import com.buyone.orderservice.model.Order;
+import com.buyone.orderservice.model.OrderStatus;
 import com.buyone.orderservice.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
-import com.buyone.orderservice.model.OrderStatus;
 
-import com.buyone.orderservice.dto.request.OrderSearchRequest;
-import com.buyone.orderservice.dto.response.OrderResponse;
-import com.buyone.orderservice.dto.response.OrderItemResponse;
-import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.ui.Model;  // For @ModelAttribute
-import org.springframework.web.bind.annotation.ModelAttribute;
-
-import java.util.List;
-
+/**
+ * OrderController - REST APIs for cart→checkout, order management, seller dashboards.
+ */
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 @Slf4j
-// @Tag(name = "Orders", description = "Order management APIs")
-@SecurityRequirement(name = "bearerAuth")  // For Swagger/OpenAPI docs
+@SecurityRequirement(name = "bearerAuth")
 public class OrderController {
     
     private final OrderService orderService;
     
+    /**
+     * ✅ CHANGED: Now accepts shipping address for checkout.
+     * Re-fetches fresh product data for legal accuracy.
+     */
     @PostMapping("/checkout")
-    @Operation(summary = "Create order from user's cart", description = "Converts authenticated user's cart to PENDING order")
-    @PreAuthorize("hasRole('CLIENT')")  // Only buyers can checkout
-    public ResponseEntity<Order> createOrderFromCart(Authentication auth) {
-        String userId = auth.getName();  // JWT principal (userId)
-        log.info("Creating order for client: {}", userId);
-        Order order = orderService.createOrderFromCart(userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(order);
+    @Operation(summary = "Create order from user's cart",
+            description = "Converts authenticated user's cart to PENDING order with fresh product snapshots")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<OrderResponse> createOrderFromCart(
+            @Valid @RequestBody CreateOrderRequest req,  // ✅ NEW DTO with Address
+            Authentication auth) {
+        
+        String userId = auth.getName();
+        log.info("Client {} checking out (items: ?)", userId);
+        
+        Order order = orderService.createOrderFromCart(userId, req.getShippingAddress());
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapToOrderResponse(order));
     }
     
     @GetMapping("/buyer")
-    @Operation(summary = "Get buyer's orders", description = "List all orders for authenticated buyer")
+    @Operation(summary = "Get buyer's orders")
     @PreAuthorize("hasRole('CLIENT')")
-    public ResponseEntity<List<Order>> getBuyerOrders(Authentication auth) {
+    public ResponseEntity<List<OrderResponse>> getBuyerOrders(Authentication auth) {
         String userId = auth.getName();
         List<Order> orders = orderService.getBuyerOrders(userId);
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(orders.stream().map(this::mapToOrderResponse).toList());
     }
     
     @GetMapping("/{orderNumber}")
-    @Operation(summary = "Get order details", description = "Fetch specific order by orderNumber")
-    public ResponseEntity<Order> getOrder(@PathVariable @NotBlank String orderNumber) {
+    @Operation(summary = "Get order details")
+    public ResponseEntity<OrderResponse> getOrder(@PathVariable @NotBlank String orderNumber) {
         Order order = orderService.getOrder(orderNumber);
-        return ResponseEntity.ok(order);
+        return ResponseEntity.ok(mapToOrderResponse(order));
     }
     
+    /**
+     * ✅ CHANGED: Now accepts OrderStatus enum (type-safe).
+     */
     @PutMapping("/{orderNumber}/status")
-    @Operation(summary = "Update order status", description = "Seller updates status (e.g., SHIPPED, DELIVERED)")
+    @Operation(summary = "Update order status", description = "Seller: PENDING→CONFIRMED→SHIPPED→DELIVERED")
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<Order> updateStatus(
+    public ResponseEntity<OrderResponse> updateStatus(
             @PathVariable @NotBlank String orderNumber,
-            @RequestParam @NotBlank String status,
+            @RequestParam OrderStatus status,  // ✅ Enum - Swagger dropdown!
             Authentication auth) {
-        // TODO: Add ownership check - verify seller owns items in order
-        log.info("Seller {} updating order {} to status: {}", auth.getName(), orderNumber, status);
+        
+        // TODO: Ownership check (seller owns items.sellerId)
+        log.info("Seller {} → order {}: {}", auth.getName(), orderNumber, status);
         Order updated = orderService.updateStatus(orderNumber, status);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(mapToOrderResponse(updated));
     }
     
     @PostMapping("/{orderNumber}/cancel")
@@ -88,7 +100,7 @@ public class OrderController {
     
     @PostMapping("/{orderNumber}/redo")
     @PreAuthorize("hasRole('CLIENT')")
-    @Operation(summary = "Redo CANCELLED order")
+    @Operation(summary = "Redo CANCELLED order → new cart + fresh snapshots")
     public ResponseEntity<OrderResponse> redoOrder(@PathVariable String orderNumber, Authentication auth) {
         Order order = orderService.redoOrder(orderNumber);
         return ResponseEntity.status(HttpStatus.CREATED).body(mapToOrderResponse(order));
@@ -98,6 +110,7 @@ public class OrderController {
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<Page<OrderResponse>> searchMyOrders(
             @Valid @ModelAttribute OrderSearchRequest req, Authentication auth) {
+        
         Page<Order> orders = orderService.searchBuyerOrders(auth.getName(), req);
         return ResponseEntity.ok(orders.map(this::mapToOrderResponse));
     }
@@ -107,11 +120,15 @@ public class OrderController {
     public ResponseEntity<Page<OrderResponse>> getSellerOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size, Authentication auth) {
+        
         Pageable pageable = PageRequest.of(page, size);
         Page<Order> orders = orderService.getSellerOrders(auth.getName(), pageable);
         return ResponseEntity.ok(orders.map(this::mapToOrderResponse));
     }
     
+    /**
+     * Maps Order → OrderResponse (hides internal fields).
+     */
     private OrderResponse mapToOrderResponse(Order order) {
         List<OrderItemResponse> items = order.getItems().stream()
                 .map(item -> OrderItemResponse.builder()
@@ -124,11 +141,10 @@ public class OrderController {
         
         return OrderResponse.builder()
                 .orderNumber(order.getOrderNumber())
-                .status(OrderStatus.valueOf(order.getStatus()))  // Converts String → enum safely
+                .status(order.getStatus())  // ✅ Already OrderStatus enum
                 .total(order.getTotal())
                 .createdAt(order.getCreatedAt())
                 .items(items)
                 .build();
     }
-    
 }
