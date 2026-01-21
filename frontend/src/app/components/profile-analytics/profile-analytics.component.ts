@@ -40,10 +40,25 @@ export class ProfileAnalyticsComponent implements OnChanges {
   barOptions: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: undefined,
+        ticks: { stepSize: 1 },
+      },
+    },
     plugins: {
       title: {
         display: true,
         text: '',
+      },
+      datalabels: {
+        display: 'auto',
+        anchor: 'end',
+        align: 'top',
+        font: { size: 12, weight: 'bold' },
+        formatter: () => this.bestLabel,
+        color: 'black',
       },
     },
   };
@@ -61,13 +76,19 @@ export class ProfileAnalyticsComponent implements OnChanges {
   ngOnChanges(): void {
     if (!this.items.length) return;
 
-    const maxIdx = this.items.reduce(
-      (maxIdx, item, idx) => (item.count > this.items[maxIdx].count ? idx : maxIdx),
-      0,
-    );
+    // ⭐ Bar chart highest → rightmost
+    const sortedItems = [...this.items].sort((a, b) => a.count - b.count);
+
+    const maxIdx = sortedItems.length - 1;
+
+    console.log(
+      'Sorted USER:',
+      sortedItems.map((i) => `${i.name}(${i.count})`),
+    ); // ⭐
+
     this.bestLabel = this.role === 'user' ? 'Most bought item' : 'Best seller';
 
-    // update bar title now that role is known
+    // update bar title CLIENT vs. SELLER
     this.barOptions = {
       ...this.barOptions,
       plugins: {
@@ -76,22 +97,30 @@ export class ProfileAnalyticsComponent implements OnChanges {
           display: true,
           text: this.role === 'user' ? 'Most Bought Items' : 'Best Selling Products',
         },
+        datalabels: {
+          display: (context: any) => context.dataIndex === maxIdx,
+          anchor: 'end',
+          align: 'top',
+          font: { size: 12, weight: 'bold' },
+          formatter: () => this.bestLabel,
+          color: 'black',
+        },
       },
     };
     this.barChartData = {
-      labels: this.items.map((i) => i.name),
+      labels: sortedItems.map((i) => i.name),
       datasets: [
         {
-          label: 'Count',
-          data: this.items.map((i) => i.count),
-          backgroundColor: this.items.map((_, i) => (i === maxIdx ? 'gold' : '#0aeb7e')),
+          label: 'Units',
+          data: sortedItems.map((i) => i.count),
+          backgroundColor: sortedItems.map((_, i) => (i === maxIdx ? 'gold' : '#0aeb7e')),
         },
       ],
     };
 
+    // ⭐ Pie chart data aggregation
     const catSpend: { [key: string]: number } = {};
-    this.items.forEach((item) => {
-      // Fix: Handle array or string
+    sortedItems.forEach((item) => {
       const rawCategory = Array.isArray(item.categories)
         ? item.categories[0] || 'Uncategorized' // First category or fallback
         : item.categories || 'Uncategorized';

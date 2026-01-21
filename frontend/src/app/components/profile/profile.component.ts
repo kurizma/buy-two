@@ -56,15 +56,15 @@ export class ProfileComponent implements OnInit {
       ];
     } else {
       return [
-        { name: 'Code Wizard Tee', categories: 'CAT-001', count: 2, amount: 58 },
+        { name: 'Code Wizard Tee', categories: 'CAT-001', count: 4, amount: 110 },
         { name: 'Pop Code Queen Tee', categories: 'CAT-003', count: 2, amount: 150 },
-        { name: 'Classic Portrait Tee', categories: 'CAT-006', count: 3, amount: 135 },
+        { name: 'Classic Portrait Tee', categories: 'CAT-006', count: 10, amount: 450 },
       ];
     }
   }
 
   getTotalAmount(role: 'user' | 'seller'): number {
-    return role === 'user' ? 131 : 343;
+    return role === 'user' ? 131 : 710;
   }
 
   constructor() {

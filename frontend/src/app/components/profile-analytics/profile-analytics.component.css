@@ -33,15 +33,15 @@
 
 .best-seller-label {
     position: absolute; 
-    top: 10px; 
+    top: 40px; 
     right: 10px;
-    background: gold; 
-    color: black; 
+    color: gold; 
     padding: 0.3rem 0.8rem;
     border-radius: 20px; 
     font-weight: bold; 
     font-size: 0.85rem;
     z-index: 10;
+    word-wrap: break-word;
 }
 
 .product-table { 
