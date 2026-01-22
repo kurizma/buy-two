@@ -1,8 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject, Output, EventEmitter } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProductImageCarouselComponent } from '../ui/product-image-carousel/product-image-carousel.component';
-import { RouterLink } from '@angular/router';
 
 import { ProductService } from '../../services/product.service';
 import { ProductResponse } from '../../models/products/product-response.model';
@@ -10,6 +9,7 @@ import { UserService } from '../../services/user.service';
 import { UserResponse } from '../../models/users/user-response.model';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/categories/category.model';
+import { CartItem } from '../../models/cart-item/cart-item.model';
 
 @Component({
   selector: 'app-product-card',
@@ -18,15 +18,17 @@ import { Category } from '../../models/categories/category.model';
   imports: [CommonModule, ProductImageCarouselComponent, RouterLink],
 })
 export class ProductCardComponent implements OnInit {
-  private route: ActivatedRoute = inject(ActivatedRoute);
-  private productService: ProductService = inject(ProductService);
-  private userService: UserService = inject(UserService);
-  private categoryService: CategoryService = inject(CategoryService);
+  private readonly route: ActivatedRoute = inject(ActivatedRoute);
+  private readonly productService: ProductService = inject(ProductService);
+  private readonly userService: UserService = inject(UserService);
+  private readonly categoryService: CategoryService = inject(CategoryService);
 
   product!: ProductResponse; // non-null after load
   seller: UserResponse | undefined;
   category: Category | undefined;
   errorMessage: string | null = null;
+
+  @Output() addToCartClick = new EventEmitter<Partial<CartItem>>();
 
   isFading = false;
 
@@ -64,15 +66,23 @@ export class ProductCardComponent implements OnInit {
     return this.category ? this.category.name : '';
   }
 
-  addToCart() {
-    alert('Add to Cart feature coming soon!');
+  onAddToCart(): void {
+    this.addToCartClick.emit({
+      productId: this.product.id,
+      productName: this.product.name,
+      sellerId: this.product.userId,
+      price: this.product.price,
+      categoryId: this.product.categoryId,
+      imageUrl: this.product.images[0],
+      quantity: 1, // Default quantity when adding to cart
+    });
   }
 
   goBack() {
     this.isFading = true;
     setTimeout(() => {
       this.isFading = false;
-      window.history.back();
+      globalThis.history.back();
     }, 350);
   }
 
@@ -85,7 +95,7 @@ export class ProductCardComponent implements OnInit {
         const nextIndex = (currentIndex + 1) % products.length;
         const nextProductId = products[nextIndex].id;
         // Navigate to the next product
-        window.location.href = `/product/${nextProductId}`;
+        globalThis.location.href = `/product/${nextProductId}`;
       });
     }, 350);
   }

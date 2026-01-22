@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { ProductGridCardComponent } from '../product-grid-card/product-grid-card.component';
+import { ProductGridCardComponent } from '../products-grid-card/products-grid-card.component';
 import { ProductService } from '../../services/product.service';
 import { ProductResponse } from '../../models/products/product-response.model';
 import { UserService } from '../../services/user.service';

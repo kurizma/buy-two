@@ -8,8 +8,8 @@ import { RouterLink } from '@angular/router';
 @Component({
   selector: 'app-product-grid-card',
   standalone: true,
-  templateUrl: './product-grid-card.component.html',
-  styleUrls: ['./product-grid-card.component.css'],
+  templateUrl: './products-grid-card.component.html',
+  styleUrls: ['./products-grid-card.component.css'],
   imports: [CommonModule, ProductImageCarouselComponent, RouterLink],
 })
 export class ProductGridCardComponent {
@@ -28,13 +28,20 @@ export class ProductGridCardComponent {
 
   // Events back to parent
   @Output() view = new EventEmitter<string>();
-  @Output() addToCartClick = new EventEmitter<string>();
+  @Output() addToCartClick = new EventEmitter<any>();
 
   onView(): void {
     this.view.emit(this.product.id);
   }
 
   onAddToCart(): void {
-    this.addToCartClick.emit(this.product.id);
+    this.addToCartClick.emit({
+      productId: this.product.id,
+      productName: this.product.name,
+      sellerId: this.product.userId,
+      price: this.product.price,
+      categoryId: this.product.categoryId,
+      imageUrl: this.product.images[0],
+    });
   }
 }

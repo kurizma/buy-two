@@ -56,7 +56,7 @@
             <div class="d-flex align-items-center">
               <img *ngIf="product.images && product.images.length"
                   [src]="product.images[0]"
-                  alt="Product Image"
+                  alt="Product Preview"
                   class="me-3 square-image">
 
               <div class="flex-grow-1">
@@ -114,8 +114,6 @@
                   <i class="fas fa-trash"></i>
                 </button>
               </div>
-              <!-- <button class="btn btn-sm btn-warning me-2 hover-lift" (click)="editProduct(i)">Edit</button>
-              <button class="btn btn-sm btn-danger hover-lift" (click)="deleteProduct(i)">Delete</button> -->
             </div>
           </li>
         </ul>
@@ -136,7 +134,8 @@
   tabindex="-1"
   style="display: block;"
   *ngIf="showModal"
-  (click)="$event.stopPropagation()">
+  (click)="$event.stopPropagation()"
+  (keydown)="$event.stopPropagation()">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -148,8 +147,9 @@
       <div class="modal-body">
         <form [formGroup]="productForm" (ngSubmit)="submitProduct()" novalidate>
           <div class="mb-3">
-            <label class="form-label">Product Name</label>
+            <label class="form-label" for="productName">Product Name</label>
             <input
+              id="productName"
               formControlName="name"
               type="text"
               class="form-control custom-width"
@@ -166,8 +166,9 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label">Description</label>
+            <label class="form-label" for="productDescription">Description</label>
             <textarea
+              id="productDescription"
               formControlName="description"
               class="form-control custom-width"
               [class.is-invalid]="
@@ -186,7 +187,7 @@
           </div>
 
           <div class="mb-3 custom-radio-group">
-            <label class="form-label d-block mb-2">
+            <label class="form-label d-block mb-2" for="categories">
               Category <small class="text-white">(Please choose ONE category)</small>
             </label>
             <div class="d-flex flex-wrap gap-3">
@@ -211,8 +212,9 @@
           <div class="form-control-group">
             <div class="mb-3 d-flex gap-3">
               <div class="flex-fill">
-                <label class="form-label">Price</label>
+                <label class="form-label" for="productPrice">Price</label>
                 <input
+                  id="productPrice"
                   formControlName="price"
                   type="number"
                   class="form-control custom-width"
@@ -229,8 +231,9 @@
               </div>
 
               <div class="flex-fill">
-                <label class="form-label">Quantity</label>
+                <label class="form-label" for="productQuantity">Quantity</label>
                 <input
+                  id="productQuantity"
                   formControlName="quantity"
                   type="number"
                   class="form-control custom-width"
@@ -256,6 +259,7 @@
               <div
                 class="upload-area drop-zone"
                 (click)="fileInput.click()"
+                (keydown.enter)="fileInput.click()"
                 (drop)="onDrop($event)"
                 (dragover)="onDragOver($event)"
                 [class.active]="isDragActive"
@@ -282,7 +286,7 @@
               <!-- Preview Area: show all selected images -->
               <div class="preview-gallery d-flex flex-wrap gap-2 mt-3">
                 <div *ngFor="let img of imagePreviews; let i = index" class="position-relative">
-                  <img [src]="img.dataUrl" class="img-thumbnail" width="120" />
+                  <img [src]="img.dataUrl" alt="Product preview" class="img-thumbnail" width="120" />
                   <button
                     type="button"
                     class="btn btn-danger btn-sm position-absolute top-0 end-0 btn-small-x hover-lift"

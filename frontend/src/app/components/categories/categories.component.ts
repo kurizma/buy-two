@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common'; // for ngClass, ngIf, ngFor
-import { ProductGridCardComponent } from '../product-grid-card/product-grid-card.component';
+import { ProductGridCardComponent } from '../products-grid-card/products-grid-card.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/categories/category.model';
