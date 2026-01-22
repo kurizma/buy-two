@@ -1,4 +1,4 @@
-package com.buyone.orderservice.dto.response;
+package com.buyone.orderservice.dto.response.order;
 
 import lombok.Builder;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.buyone.orderservice.model;
+package com.buyone.orderservice.model.order;
 
 import lombok.*;
 

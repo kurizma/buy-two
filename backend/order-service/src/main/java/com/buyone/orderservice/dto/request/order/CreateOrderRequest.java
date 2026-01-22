@@ -1,4 +1,4 @@
-package com.buyone.orderservice.dto.request;
+package com.buyone.orderservice.dto.request.order;
 
 import com.buyone.orderservice.model.Address;
 import jakarta.validation.Valid;

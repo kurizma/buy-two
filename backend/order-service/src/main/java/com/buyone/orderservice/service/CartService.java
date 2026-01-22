@@ -1,7 +1,7 @@
 package com.buyone.orderservice.service;
 
-import com.buyone.orderservice.model.Cart;
-import com.buyone.orderservice.model.CartItem;
+import com.buyone.orderservice.model.cart.Cart;
+import com.buyone.orderservice.model.cart.CartItem;
 import java.util.Optional;
 
 public interface CartService {

@@ -1,6 +1,9 @@
-package com.buyone.orderservice.response;
+package com.buyone.orderservice.dto.response;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor

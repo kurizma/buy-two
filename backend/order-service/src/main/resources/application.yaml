@@ -1,9 +1,9 @@
 server:
-  port: 8567
+  port: 8789
 
 spring:
   application:
-    name: product-service
+    name: order-service
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
   data:
@@ -13,6 +13,10 @@ spring:
     user:
       name: ${SPRING_SECURITY_USER_NAME:user}
       password: ${SPRING_SECURITY_USER_PASSWORD}
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false # Spring Cloud LoadBalancer
 
 eureka:
   client:
@@ -23,11 +27,10 @@ eureka:
 
 
 app:
+  cart:
+    tax-rate: 0.1
   kafka:
     topic:
-      product-created: product.created
-      product-updated: product.updated
-      product-deleted: product.deleted
 
 logging:
   level:

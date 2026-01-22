@@ -1,7 +1,7 @@
 package com.buyone.orderservice.repository;
 
-import com.buyone.orderservice.model.Order;
-import com.buyone.orderservice.model.OrderStatus;
+import com.buyone.orderservice.model.order.Order;
+import com.buyone.orderservice.model.order.OrderStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import org.springframework.data.domain.Page;

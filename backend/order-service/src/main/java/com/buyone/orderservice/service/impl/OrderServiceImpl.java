@@ -1,9 +1,16 @@
 package com.buyone.orderservice.service.impl;
 
 import com.buyone.orderservice.client.ProductClient;
-import com.buyone.orderservice.dto.request.OrderSearchRequest;
+import com.buyone.orderservice.dto.request.order.OrderSearchRequest;
+import com.buyone.orderservice.exception.BadRequestException;
 import com.buyone.orderservice.exception.ResourceNotFoundException;
 import com.buyone.orderservice.model.*;
+import com.buyone.orderservice.model.cart.Cart;
+import com.buyone.orderservice.model.cart.CartItem;
+import com.buyone.orderservice.model.order.Order;
+import com.buyone.orderservice.model.order.OrderItem;
+import com.buyone.orderservice.model.order.OrderStatus;
+import com.buyone.orderservice.model.order.PaymentMethod;
 import com.buyone.orderservice.repository.OrderRepository;
 import com.buyone.orderservice.service.CartService;
 import com.buyone.orderservice.service.OrderService;
@@ -18,6 +25,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -99,7 +107,7 @@ public class OrderServiceImpl implements OrderService {
                 .productId(product.getId())
                 .productName(product.getName())     // Fresh for receipts
                 .sellerId(product.getUserId())      // Fresh for seller analytics
-                .price(BigDecimal.valueOf(product.getPrice()))  // Fresh for billing
+                .price((product.getPrice())) // Fresh for billing
                 .quantity(cartItem.getQuantity())   // User choice from cart
                 .imageUrl(safeFirstImage(product.getImages()))  // Fresh for UI
                 .build();
@@ -151,29 +159,43 @@ public class OrderServiceImpl implements OrderService {
     }
     
     @Override
-    public Order getOrder(String orderNumber) {
-        return orderRepository.findByOrderNumber(orderNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + orderNumber));
+    public Optional<Order> getOrder(String orderNumber) {
+        return orderRepository.findByOrderNumber(orderNumber);
     }
     
     /**
      * Seller/admin updates status (CONFIRMED→SHIPPED→DELIVERED).
-     * TODO: Add state machine validation.
      */
     @Override
-    public Order updateStatus(String orderNumber, OrderStatus status) {
-        Order order = getOrder(orderNumber);
+    public Optional<Order> updateStatus(String orderNumber, String sellerId, OrderStatus status) {
+        Order order = getOrder(orderNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + orderNumber));
+        
+        // CRITICAL CHECK
+        // Seller owns all items
+        boolean ownsAllItems = order.getItems().stream()
+                .allMatch(item -> sellerId.equals(item.getSellerId()));
+        if (!ownsAllItems) {
+            throw new BadRequestException("Seller not authorized for this order");
+        }
+        
         order.setStatus(status);
         order.setUpdatedAt(LocalDateTime.now());
-        return orderRepository.save(order);
+        return Optional.of(orderRepository.save(order));
     }
     
     /**
      * Buyer cancels PENDING order → CANCELLED.
      */
     @Override
-    public void cancelOrder(String orderNumber) {
-        Order order = getOrder(orderNumber);
+    public void cancelOrder(String orderNumber, String userId) {
+        Order order = getOrder(orderNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found: " + orderNumber));
+        // ownership check
+        if (!userId.equals(order.getUserId())) {
+            throw new BadRequestException("Not your order");
+        }
+        
         if (order.getStatus() != OrderStatus.PENDING) {
             throw new IllegalStateException("Only PENDING orders can be cancelled");
         }
@@ -186,24 +208,21 @@ public class OrderServiceImpl implements OrderService {
      * Buyer redoes CANCELLED order → clones to new cart → new order.
      */
     @Override
-    public Order redoOrder(String orderNumber) {
-        Order oldOrder = getOrder(orderNumber);
-        if (oldOrder.getStatus() != OrderStatus.CANCELLED) {
-            throw new IllegalStateException("Only CANCELLED orders can be redone");
-        }
-        
-        List<CartItem> newItems = oldOrder.getItems().stream()
-                .map(this::orderItemToCartItem)
-                .collect(Collectors.toList());
-        
-        Cart newCart = Cart.builder()
-                .userId(oldOrder.getUserId())
-                .items(newItems)
-                .build();
-        cartService.saveCart(newCart);
-        
-        // Recreate with fresh snapshots
-        return createOrderFromCart(oldOrder.getUserId(), null);
+    public Optional<Order> redoOrder(String orderNumber, String userId) {
+        return getOrder(orderNumber)  // Optional chain
+                .filter(order -> userId.equals(order.getUserId()))  // Ownership
+                .filter(order -> order.getStatus() == OrderStatus.CANCELLED)
+                .map(oldOrder -> {
+                    List<CartItem> newItems = oldOrder.getItems().stream()
+                            .map(this::orderItemToCartItem)
+                            .collect(Collectors.toList());
+                    Cart newCart = Cart.builder()
+                            .userId(userId)
+                            .items(newItems)
+                            .build();
+                    cartService.saveCart(newCart);
+                    return createOrderFromCart(userId, null);  // refresh prices if changed
+                });
     }
     
     @Override
@@ -226,7 +245,7 @@ public class OrderServiceImpl implements OrderService {
                 .productId(item.getProductId())
                 .productName(item.getProductName())
                 .sellerId(item.getSellerId())
-                .price(item.getPrice().doubleValue())  // CartItem expects double
+                .price(item.getPrice())
                 .quantity(item.getQuantity())
                 .imageUrl(item.getImageUrl())
                 .build();

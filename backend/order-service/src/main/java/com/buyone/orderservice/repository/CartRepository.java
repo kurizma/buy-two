@@ -1,6 +1,6 @@
 package com.buyone.orderservice.repository;
 
-import com.buyone.orderservice.model.Cart;
+import com.buyone.orderservice.model.cart.Cart;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.Optional;
 

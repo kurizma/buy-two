@@ -1,4 +1,4 @@
-package com.buyone.orderservice.model;
+package com.buyone.orderservice.model.order;
 
 public enum OrderStatus {
     PENDING,      // Just created

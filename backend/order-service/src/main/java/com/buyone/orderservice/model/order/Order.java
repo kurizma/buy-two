@@ -1,5 +1,6 @@
-package com.buyone.orderservice.model;
+package com.buyone.orderservice.model.order;
 
+import com.buyone.orderservice.model.Address;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -10,8 +11,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.buyone.orderservice.model.OrderStatus.PENDING;
-import static com.buyone.orderservice.model.PaymentMethod.PAY_ON_DELIVERY;
+import static com.buyone.orderservice.model.order.OrderStatus.PENDING;
+import static com.buyone.orderservice.model.order.PaymentMethod.PAY_ON_DELIVERY;
 
 @Document(collection = "orders")
 @Data
@@ -40,11 +41,8 @@ public class Order {
     
     private Address shippingAddress;  // Inline or ref
     
-    @Builder.Default
     private BigDecimal subtotal;
-    @Builder.Default
     private BigDecimal tax;
-    @Builder.Default
     private BigDecimal total;
     
     private LocalDateTime createdAt;

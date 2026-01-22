@@ -1,17 +1,16 @@
 package com.buyone.orderservice.controller;
 
-import com.buyone.orderservice.dto.request.CreateOrderRequest;  // NEW
-import com.buyone.orderservice.dto.request.OrderSearchRequest;
-import com.buyone.orderservice.dto.response.OrderResponse;
-import com.buyone.orderservice.dto.response.OrderItemResponse;
-import com.buyone.orderservice.model.Address;
-import com.buyone.orderservice.model.Order;
-import com.buyone.orderservice.model.OrderStatus;
+import com.buyone.orderservice.dto.request.order.CreateOrderRequest;
+import com.buyone.orderservice.dto.request.order.OrderSearchRequest;
+import com.buyone.orderservice.dto.response.order.OrderResponse;
+import com.buyone.orderservice.dto.response.order.OrderItemResponse;
+import com.buyone.orderservice.model.order.Order;
+import com.buyone.orderservice.model.order.OrderStatus;
 import com.buyone.orderservice.service.OrderService;
+import com.buyone.orderservice.exception.BadRequestException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,9 +25,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * OrderController - REST APIs for cart→checkout, order management, seller dashboards.
- */
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
@@ -38,98 +34,101 @@ public class OrderController {
     
     private final OrderService orderService;
     
-    /**
-     * ✅ CHANGED: Now accepts shipping address for checkout.
-     * Re-fetches fresh product data for legal accuracy.
-     */
     @PostMapping("/checkout")
-    @Operation(summary = "Create order from user's cart",
-            description = "Converts authenticated user's cart to PENDING order with fresh product snapshots")
+    @Operation(summary = "Create order from cart", description = "Pay on Delivery")
     @PreAuthorize("hasRole('CLIENT')")
-    public ResponseEntity<OrderResponse> createOrderFromCart(
-            @Valid @RequestBody CreateOrderRequest req,  // ✅ NEW DTO with Address
+    public ResponseEntity<Order> createOrderFromCart(
+            @Valid @RequestBody CreateOrderRequest req,
             Authentication auth) {
-        
-        String userId = auth.getName();
-        log.info("Client {} checking out (items: ?)", userId);
-        
+        String userId = getUserIdFromAuth(auth);
+        log.info("Client {} checking out with address", userId);
         Order order = orderService.createOrderFromCart(userId, req.getShippingAddress());
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapToOrderResponse(order));
+        return ResponseEntity.status(HttpStatus.CREATED).body(order);
     }
     
     @GetMapping("/buyer")
-    @Operation(summary = "Get buyer's orders")
+    @Operation(summary = "Get buyer orders")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<List<OrderResponse>> getBuyerOrders(Authentication auth) {
-        String userId = auth.getName();
-        List<Order> orders = orderService.getBuyerOrders(userId);
-        return ResponseEntity.ok(orders.stream().map(this::mapToOrderResponse).toList());
+        String userId = getUserIdFromAuth(auth);
+        List<OrderResponse> orders = orderService.getBuyerOrders(userId)
+                .stream()
+                .map(this::mapToOrderResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(orders);
     }
     
     @GetMapping("/{orderNumber}")
     @Operation(summary = "Get order details")
-    public ResponseEntity<OrderResponse> getOrder(@PathVariable @NotBlank String orderNumber) {
-        Order order = orderService.getOrder(orderNumber);
-        return ResponseEntity.ok(mapToOrderResponse(order));
+    public ResponseEntity<OrderResponse> getOrder(@PathVariable String orderNumber) {
+        OrderResponse order = orderService.getOrder(orderNumber)
+                .map(this::mapToOrderResponse)
+                .orElseThrow(() -> new BadRequestException("Order not found: " + orderNumber));
+        return ResponseEntity.ok(order);
     }
     
-    /**
-     * ✅ CHANGED: Now accepts OrderStatus enum (type-safe).
-     */
     @PutMapping("/{orderNumber}/status")
     @Operation(summary = "Update order status", description = "Seller: PENDING→CONFIRMED→SHIPPED→DELIVERED")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<OrderResponse> updateStatus(
-            @PathVariable @NotBlank String orderNumber,
-            @RequestParam OrderStatus status,  // ✅ Enum - Swagger dropdown!
+            @PathVariable String orderNumber,
+            @RequestParam OrderStatus status,
             Authentication auth) {
-        
-        // TODO: Ownership check (seller owns items.sellerId)
-        log.info("Seller {} → order {}: {}", auth.getName(), orderNumber, status);
-        Order updated = orderService.updateStatus(orderNumber, status);
-        return ResponseEntity.ok(mapToOrderResponse(updated));
+        String sellerId = getUserIdFromAuth(auth);
+        log.info("Seller {} updating order {} to {}", sellerId, orderNumber, status);
+        OrderResponse updated = orderService.updateStatus(orderNumber, sellerId, status)
+                .map(this::mapToOrderResponse)
+                .orElseThrow(() -> new BadRequestException("Order not found or update failed: " + orderNumber));
+        return ResponseEntity.ok(updated);  // No .get() needed
     }
     
     @PostMapping("/{orderNumber}/cancel")
-    @PreAuthorize("hasRole('CLIENT')")
     @Operation(summary = "Cancel PENDING order")
+    @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<Void> cancelOrder(@PathVariable String orderNumber, Authentication auth) {
-        orderService.cancelOrder(orderNumber);
+        String userId = getUserIdFromAuth(auth);
+        orderService.cancelOrder(orderNumber, userId);
         return ResponseEntity.noContent().build();
     }
     
     @PostMapping("/{orderNumber}/redo")
+    @Operation(summary = "Redo CANCELLED order")
     @PreAuthorize("hasRole('CLIENT')")
-    @Operation(summary = "Redo CANCELLED order → new cart + fresh snapshots")
     public ResponseEntity<OrderResponse> redoOrder(@PathVariable String orderNumber, Authentication auth) {
-        Order order = orderService.redoOrder(orderNumber);
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapToOrderResponse(order));
+        String userId = getUserIdFromAuth(auth);
+        OrderResponse newOrder = orderService.redoOrder(orderNumber, userId)
+                .map(this::mapToOrderResponse)
+                .orElseThrow(() -> new BadRequestException("Order not found: " + orderNumber));
+        return ResponseEntity.status(HttpStatus.CREATED).body(newOrder);
     }
     
     @GetMapping("/buyer/search")
+    @Operation(summary = "Search buyer orders")
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<Page<OrderResponse>> searchMyOrders(
-            @Valid @ModelAttribute OrderSearchRequest req, Authentication auth) {
-        
-        Page<Order> orders = orderService.searchBuyerOrders(auth.getName(), req);
-        return ResponseEntity.ok(orders.map(this::mapToOrderResponse));
+            @Valid @ModelAttribute OrderSearchRequest req,
+            Authentication auth) {
+        String userId = getUserIdFromAuth(auth);
+        Page<OrderResponse> orders = orderService.searchBuyerOrders(userId, req)
+                .map(this::mapToOrderResponse);
+        return ResponseEntity.ok(orders);
     }
     
     @GetMapping("/seller")
+    @Operation(summary = "Get seller orders", description = "Paginated dashboard")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<Page<OrderResponse>> getSellerOrders(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size, Authentication auth) {
-        
+            @RequestParam(defaultValue = "10") int size,
+            Authentication auth) {
+        String sellerId = getUserIdFromAuth(auth);
         Pageable pageable = PageRequest.of(page, size);
-        Page<Order> orders = orderService.getSellerOrders(auth.getName(), pageable);
-        return ResponseEntity.ok(orders.map(this::mapToOrderResponse));
+        Page<OrderResponse> orders = orderService.getSellerOrders(sellerId, pageable)
+                .map(this::mapToOrderResponse);
+        return ResponseEntity.ok(orders);
     }
     
-    /**
-     * Maps Order → OrderResponse (hides internal fields).
-     */
-    private OrderResponse mapToOrderResponse(Order order) {
+    private OrderResponse mapToOrderResponse(com.buyone.orderservice.model.order.Order order) {
         List<OrderItemResponse> items = order.getItems().stream()
                 .map(item -> OrderItemResponse.builder()
                         .productName(item.getProductName())
@@ -141,10 +140,21 @@ public class OrderController {
         
         return OrderResponse.builder()
                 .orderNumber(order.getOrderNumber())
-                .status(order.getStatus())  // ✅ Already OrderStatus enum
+                .status(order.getStatus())
                 .total(order.getTotal())
+                .subtotal(order.getSubtotal())
+                .tax(order.getTax())
                 .createdAt(order.getCreatedAt())
+                .shippingAddress(order.getShippingAddress())
                 .items(items)
                 .build();
+    }
+    
+    private String getUserIdFromAuth(Authentication auth) {
+        String userId = (String) auth.getPrincipal();
+        if (userId == null || userId.trim().isEmpty()) {
+            throw new BadRequestException("User ID not found in authentication");
+        }
+        return userId;
     }
 }
