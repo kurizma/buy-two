@@ -1,9 +1,4 @@
 <nav class="navbar"> 
-<!-- <a class="logo-link d-flex align-items-center gap-2" routerLink="/">
-  <img src="./assets/logo/grit-tee-logo.png" alt="grit:Tee logo" class="navbar-logo" />
-  <span>grit:Tee</span>
-</a> -->
-
   <a class="logo-link d-flex align-items-center gap-2" routerLink="/">
     <span class="logo-mark rounded-circle d-inline-flex align-items-center justify-content-center">
       <i class="fas fa-shirt"></i>
@@ -11,17 +6,22 @@
     <span>grit:Tee</span>
   </a> 
 
-  <!-- <a routerLink="/" class="logo-link">grit:Tee</a> -->
   <div class="nav-links">
     <a routerLink="/product-listing">Shop All</a>
     <a routerLink="/categories">Browse Collections</a>
     <a routerLink="/about">About Us</a>
-    <!-- <a routerLink="/about">About Us</a> -->
     <a *ngIf="authService.isSeller()" routerLink="/seller-dashboard">Seller Dashboard</a>
 
   </div>
   <div class="nav-actions">
     <ng-container *ngIf="isAuthenticated; else guestLinks">
+      <!-- <button 
+        class="btn btn-outline-secondary mb-2 w-100 hover-lift"
+        (click)="addToCart();
+        $event.stopPropagation()"
+      >
+        <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+      </button> -->
       <a routerLink="/profile">
         <span class="navbar-user">
           <img
@@ -33,7 +33,7 @@
         </span>
       </a>
       <a (click)="onLogout()" style="cursor: pointer">
-        <i class="fas fa-sign-out-alt me-2" aria-label="Logout"></i> Logout
+        <i class="fas fa-sign-out-alt me-2" aria-label="Logout"></i>
       </a>
     </ng-container>
     <ng-template #guestLinks>

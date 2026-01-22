@@ -30,7 +30,7 @@
                   <span class="badge bg-secondary mb-2 fs-6">{{ getCategoryName() }}</span>
                   <p class="card-text text-white mb-3">{{ product.description }}</p>
                   <p class="price mb-1">
-                    Price: <span class="text-primary fw-bold fs-4" data-test="product-price">€{{ product.price }}</span>
+                    Price: <span class="text-primary fw-bold fs-4" data-test="product-price">€{{ product.price }}</span> (incl. VAT)
                   </p>
                   <p class="mb-1"><span class="fw-semibold">Quantity:</span> {{ product.quantity }}</p>
                   <p class="mb-4">
@@ -48,7 +48,6 @@
                           {{ seller.name }}
                         </a>
 
-                        <!-- <span class="fw seller-name">{{ seller.name }}</span> -->
                       </div>
                     </ng-container>
                   </p>
