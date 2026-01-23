@@ -8,13 +8,13 @@
       </div>
 
       <!-- Loop through items, each is a cart-item child -->
-      <app-cart-item 
+      <!-- <app-cart-item 
         *ngFor="let item of cartItems; trackBy: trackByProductId"
         [item]="item"
         [maxQuantity]="99"
         (quantityChange)="cartService.updateQuantity($event)"
         (remove)="cartService.removeItem($event)">
-      </app-cart-item>
+      </app-cart-item> -->
 
       <!-- Empty state -->
       <div *ngIf="!cartItems.length" class="text-center py-5">

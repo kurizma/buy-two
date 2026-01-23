@@ -47,8 +47,14 @@
 .product-table { 
     overflow-x: auto; 
     border-radius: 5px;
-
 }  
+
+.product-table td { 
+    width: 100%; 
+    border-collapse: collapse; 
+    background-color: transparent;
+    color: var(--text-primary);
+}
 
 .table-head  th{ 
     background: var(--primary-dark) !important; 
