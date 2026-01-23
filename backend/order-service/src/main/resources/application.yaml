@@ -31,6 +31,11 @@ app:
     tax-rate: 0.1
   kafka:
     topic:
+      order-created: order.created
+      order-updated: order.updated
+      order-cancelled: order.cancelled
+      order-shipped: order.shipped
+      order-delivered: order.delivered
 
 logging:
   level:
