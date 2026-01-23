@@ -1,4 +1,5 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ChartData, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
@@ -12,7 +13,7 @@ import { AnalyticsItem } from '../../models/profile/analytics-item';
   styleUrls: ['./profile-analytics.component.css'],
 })
 export class ProfileAnalyticsComponent implements OnChanges {
-  @Input() role!: 'user' | 'seller';
+  @Input() role!: 'client' | 'seller';
   @Input() totalAmount = 0;
   @Input() items: AnalyticsItem[] = [];
   @Input() categories?: string[];
@@ -22,6 +23,7 @@ export class ProfileAnalyticsComponent implements OnChanges {
   barType: ChartType = 'bar';
   pieType: ChartType = 'pie';
   bestLabel = '';
+  private readonly router = inject(Router);
 
   private readonly CATEGORY_MAP: Record<string, string> = {
     'CAT-001': 'code-nerd',
@@ -35,6 +37,12 @@ export class ProfileAnalyticsComponent implements OnChanges {
   getCategorySlug(categoryId: string | string[]): string {
     const id = Array.isArray(categoryId) ? categoryId[0] : categoryId;
     return this.CATEGORY_MAP[id] || id || 'uncategorized';
+  }
+
+  addFirstProduct(): void {
+    if (this.role === 'seller') {
+      this.router.navigate(['/seller-dashboard']);
+    }
   }
 
   barOptions: ChartOptions<'bar'> = {
@@ -86,7 +94,7 @@ export class ProfileAnalyticsComponent implements OnChanges {
       sortedItems.map((i) => `${i.name}(${i.count})`),
     ); // ⭐
 
-    this.bestLabel = this.role === 'user' ? 'Most bought item' : 'Best seller';
+    this.bestLabel = this.role === 'client' ? 'Most bought item' : 'Best seller';
 
     // update bar title CLIENT vs. SELLER
     this.barOptions = {
@@ -95,7 +103,7 @@ export class ProfileAnalyticsComponent implements OnChanges {
         ...this.barOptions.plugins,
         title: {
           display: true,
-          text: this.role === 'user' ? 'Most Bought Items' : 'Best Selling Products',
+          text: this.role === 'client' ? 'Most Bought Items' : 'Best Selling Products',
         },
         datalabels: {
           display: (context: any) => context.dataIndex === maxIdx,
