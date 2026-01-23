@@ -1,16 +1,19 @@
 package com.buyone.orderservice.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.mongodb.MongoDatabaseFactory;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
+/**
+ * MongoDB auto-configuration. Spring Boot handles MongoTemplate.
+ * DB name from application.yml: spring.data.mongodb.database=orders
+ */
 @Configuration
-public class DatabaseConfig {
-    @Bean
-    @Primary
-    public MongoTemplate mongoTemplate(MongoDatabaseFactory factory) {
-        return new MongoTemplate(factory, "orders");  // Explicit DB name
+@EnableMongoRepositories(basePackages = "com.buyone.orderservice.repository")
+public class DatabaseConfig extends AbstractMongoClientConfiguration {
+    
+    @Override
+    protected String getDatabaseName() {
+        return "orders";  // Your DB name
     }
 }
