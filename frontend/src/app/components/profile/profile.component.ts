@@ -69,6 +69,7 @@ export class ProfileComponent implements OnInit {
           { name: 'Code Wizard Tee', categories: 'CAT-001', count: 4, amount: 110 },
           { name: 'Pop Code Queen Tee', categories: 'CAT-003', count: 2, amount: 150 },
           { name: 'Classic Portrait Tee', categories: 'CAT-006', count: 10, amount: 450 },
+          { name: 'Why Dark Mode Tee', categories: 'CAT-005', count: 1, amount: 35 },
         ];
 
       default:

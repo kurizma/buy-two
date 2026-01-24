@@ -83,12 +83,11 @@
     font-weight: 600;
 }
 
-
 @media (min-width: 750px) { 
     .best-seller-label i {
         font-size: 1.5rem;
         top: 30px; 
-        left: 85%;
+        left: 90%;
     }
 }
 
@@ -102,6 +101,14 @@
     .best-seller-label i {
         font-size: 1.5rem;
         top: 30px; 
-        left: 85%;
+        left: 90%;
+    }
+}
+
+@media (min-width: 1400px) { 
+    .best-seller-label i {
+        font-size: 2rem;
+        top: 25px; 
+        left: 88%;
     }
 }
