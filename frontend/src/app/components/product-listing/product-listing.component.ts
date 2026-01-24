@@ -10,7 +10,6 @@ import { UserService } from '../../services/user.service';
 import { UserResponse } from '../../models/users/user-response.model';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/categories/category.model';
-import { CartItem } from '../../models/cart-item/cart-item.model';
 import { CartService } from '../../services/cart.service';
 
 @Component({
@@ -25,7 +24,7 @@ export class ProductListingComponent implements OnInit {
   private readonly productService = inject(ProductService);
   private readonly userService = inject(UserService);
   private readonly categoryService = inject(CategoryService);
-  private readonly CartService = inject(CartService);
+  private readonly cartService = inject(CartService);
 
   products: ProductResponse[] = [];
   filteredProducts: ProductResponse[] = [];
@@ -140,15 +139,14 @@ export class ProductListingComponent implements OnInit {
     this.router.navigate(['/product', productId]);
   }
 
-  onAddToCart(cartItemData: Partial<CartItem>): void {
-    this.CartService.addToCart(
-      cartItemData.productId!,
-      cartItemData.productName!,
-      cartItemData.sellerId!,
-      cartItemData.price!,
-      cartItemData.categoryId!,
-      cartItemData.imageUrl,
-    );
+  addToCart(product: any): void {
+    this.cartService.addProductToCart(product);
+    // Show success message/toast
+    alert(`${product.name} added to cart!`);
+  }
+
+  isInCart(productId: string): boolean {
+    return this.cartService.isInCart(productId);
   }
 
   onSearchChange() {

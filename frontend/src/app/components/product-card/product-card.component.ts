@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProductImageCarouselComponent } from '../ui/product-image-carousel/product-image-carousel.component';
@@ -9,7 +9,7 @@ import { UserService } from '../../services/user.service';
 import { UserResponse } from '../../models/users/user-response.model';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/categories/category.model';
-import { CartItem } from '../../models/cart-item/cart-item.model';
+import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-product-card',
@@ -22,13 +22,22 @@ export class ProductCardComponent implements OnInit {
   private readonly productService: ProductService = inject(ProductService);
   private readonly userService: UserService = inject(UserService);
   private readonly categoryService: CategoryService = inject(CategoryService);
+  private readonly cartService: CartService = inject(CartService);
 
   product!: ProductResponse; // non-null after load
   seller: UserResponse | undefined;
   category: Category | undefined;
   errorMessage: string | null = null;
 
-  @Output() addToCartClick = new EventEmitter<Partial<CartItem>>();
+  addToCart(product: any): void {
+    this.cartService.addProductToCart(product);
+    // Show success message/toast
+    alert(`${product.name} added to cart!`);
+  }
+
+  isInCart(productId: string): boolean {
+    return this.cartService.isInCart(productId);
+  }
 
   isFading = false;
 
@@ -64,18 +73,6 @@ export class ProductCardComponent implements OnInit {
 
   getCategoryName(): string {
     return this.category ? this.category.name : '';
-  }
-
-  onAddToCart(): void {
-    this.addToCartClick.emit({
-      productId: this.product.id,
-      productName: this.product.name,
-      sellerId: this.product.userId,
-      price: this.product.price,
-      categoryId: this.product.categoryId,
-      imageUrl: this.product.images[0],
-      quantity: 1, // Default quantity when adding to cart
-    });
   }
 
   goBack() {

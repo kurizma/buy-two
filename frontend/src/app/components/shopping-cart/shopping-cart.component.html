@@ -3,25 +3,95 @@
     <!-- Left: Cart Items List -->
     <div class="col-lg-8">
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Shopping Cart</h2>
-        <span class="badge bg-primary fs-6">{{ cartItems.length }} items</span>
+        <h2 class="shopping-cart-title">Shopping Cart
+          <i class="fas fa-shopping-cart ms-2"></i>
+        </h2>
+        <span class="badge fs-6">{{ itemCount }} items</span>
       </div>
 
-      <!-- Loop through items, each is a cart-item child -->
-      <!-- <app-cart-item 
-        *ngFor="let item of cartItems; trackBy: trackByProductId"
-        [item]="item"
-        [maxQuantity]="99"
-        (quantityChange)="cartService.updateQuantity($event)"
-        (remove)="cartService.removeItem($event)">
-      </app-cart-item> -->
+      <!-- Cart Items -->
+      <div *ngIf="!isEmpty">
+        <div 
+          *ngFor="let item of cartItems; trackBy: trackByProductId"
+          class="card mb-3">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <!-- Product Image -->
+              <div class="col-md-2">
+                <img 
+                  [src]="item.imageUrl" 
+                  [alt]="item.productName" 
+                  class="img-fluid rounded"
+                  style="max-height: 100px; object-fit: cover;">
+              </div>
+
+              <!-- Product Details -->
+              <div class="col-md-4">
+                <h5 class="mb-1">{{ item.productName }}</h5>
+                <!-- <p class="text small mb-1">"{{ item.productDescription }}"</p> -->
+                <p class="mb-0">
+                  <small class="text">Seller: <strong>{{ item.sellerName }}</strong></small>
+                </p>
+                <p class="mb-0">
+                  <small class="text">Category: {{ item.categoryId }}</small>
+                </p>
+              </div>
+
+              <!-- Quantity Controls -->
+              <div class="col-md-3">
+                <label class="form-label small" for="quantity">Quantity</label>
+                <div class="input-group" style="max-width: 140px;">
+                  <button 
+                    class="btn btn-outline-secondary btn-sm" 
+                    type="button"
+                    (click)="decreaseQuantity(item.productId)">
+                    -
+                  </button>
+                  <input 
+                    type="number" 
+                    class="form-control form-control-sm text-white text-center" 
+                    [value]="item.quantity"
+                    (change)="updateQuantity(item.productId, +$any($event.target).value)"
+                    min="1"
+                    style="max-width: 60px;">
+                  <button 
+                    class="btn btn-outline-secondary btn-sm" 
+                    type="button"
+                    (click)="increaseQuantity(item.productId)">
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <!-- Price -->
+              <div class="col-md-2 text-end">
+                <p class="mb-1 text small">Unit Price</p>
+                <p class="mb-1 fw-bold">{{ item.price | currency:'EUR' }}</p>
+                <p class="mb-0 text-primary fw-bold">
+                  Subtotal: {{ item.price * item.quantity | currency:'EUR' }}
+                </p>
+              </div>
+
+              <!-- Remove Button -->
+              <div class="col-md-1 text-end">
+                <button 
+                  class="btn btn-outline-danger btn-sm" 
+                  (click)="removeItem(item.productId)"
+                  title="Remove item">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Empty state -->
-      <div *ngIf="!cartItems.length" class="text-center py-5">
+      <div *ngIf="isEmpty" class="text-center py-5">
         <i class="fas fa-shopping-bag fa-3x text-muted mb-3"></i>
         <h4>Your cart is empty</h4>
         <p class="text-muted">Add some products to get started</p>
-        <a routerLink="/products" class="btn btn-outline-primary">Continue Shopping</a>
+        <a routerLink="/product-listing" class="btn btn-outline-primary">Continue Shopping</a>
       </div>
     </div>
 
@@ -29,30 +99,56 @@
     <div class="col-lg-4">
       <div class="card sticky-top" style="top: 20px;">
         <div class="card-body">
-          <h4 class="card-title">Order Summary</h4>
+          <h4 class="card-title mb-4">Order Summary</h4>
           
-          <div class="d-flex justify-content-between mb-3">
-            <span>Subtotal</span>
-            <strong>{{ totalExclVat | currency:'EUR' }}</strong>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text">Subtotal (excl. VAT)</span>
+            <span>{{ subtotal | currency:'EUR' }}</span>
           </div>
           
-          <div class="d-flex justify-content-between mb-3">
-            <span>VAT (20%)</span>
-            <strong>{{ vatAmount | currency:'EUR' }}</strong>
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text">VAT (24%)</span>
+            <span>{{ vatAmount | currency:'EUR' }}</span>
           </div>
-          
-          <hr>
-          
-          <div class="d-flex justify-content-between mb-4 fs-4 fw-bold">
-            <span>Total</span>
+
+          <div class="d-flex justify-content-between mb-3">
+            <span class="text fw-bold">Subtotal (incl. VAT)</span>
             <strong>{{ totalInclVat | currency:'EUR' }}</strong>
           </div>
           
-          <button class="btn btn-primary w-100 mb-2" routerLink="/checkout">
+          <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+            <span class="text">Shipping</span>
+            <span *ngIf="shippingCost === 0" class="text-success fw-bold">FREE</span>
+            <span *ngIf="shippingCost > 0">{{ shippingCost | currency:'EUR' }}</span>
+          </div>
+
+          <!-- Free Shipping Notice -->
+          <div *ngIf="shippingCost > 0" class="alert alert-info small mb-3">
+            💡 Add <strong>{{ 50 - totalInclVat | currency:'EUR' }}</strong> more for free shipping!
+          </div>
+          
+          <div class="d-flex justify-content-between mb-4 fs-4 fw-bold">
+            <span>Total</span>
+            <strong class="text-primary">{{ total | currency:'EUR' }}</strong>
+          </div>
+          
+          <button 
+            class="btn btn-primary w-100 mb-2" 
+            (click)="proceedToCheckout()"
+            [disabled]="isEmpty">
             Proceed to Checkout
           </button>
           
-          <button class="btn btn-outline-secondary w-100" (click)="clearCart()">
+          <button 
+            class="btn btn-outline-secondary w-100 mb-2" 
+            routerLink="/product-listing">
+            Continue Shopping
+          </button>
+
+          <button 
+            class="btn btn-outline-danger w-100" 
+            (click)="clearCart()"
+            [disabled]="isEmpty">
             Clear Cart
           </button>
         </div>
