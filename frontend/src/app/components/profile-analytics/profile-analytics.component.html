@@ -4,7 +4,7 @@
     <div class="row mb-4">
         <div class="col-12 text-center">
         <h2 class="total-amount">
-            {{ role === 'client' ? 'Total Spent' : 'Revenue' }}: {{ totalAmount | currency:'EUR' }}
+            {{ role === 'client' ? 'Total Spend' : 'Revenue' }}: {{ totalAmount | currency:'EUR' }}
         </h2>
         </div>
     </div>
@@ -18,16 +18,16 @@
             'Your revenue charts and best sellers will show once customers buy your products.' }}
         </p>
         <div class="d-flex gap-3 justify-content-center flex-wrap">
-        <a *ngIf="role === 'client'" 
-            routerLink="/product-listing" 
-            class="btn btn-primary btn-lg px-4">
-            <i class="fas fa-shopping-bag me-2"></i>Start Shopping
-        </a>
-        <button *ngIf="role === 'seller'" 
-                class="btn btn-warning btn-lg px-4" 
-                (click)="addFirstProduct()">
-            <i class="fas fa-plus me-2"></i>List First Product
-        </button>
+            <a *ngIf="role === 'client'" 
+                routerLink="/product-listing" 
+                class="btn btn-primary btn-lg px-4">
+                <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+            </a>
+            <a *ngIf="role === 'seller'" 
+                routerLink="/seller-dashboard" 
+                class="btn btn-primary btn-lg px-4">
+                <i class="fas fa-cogs me-2"></i>Seller Dashboard
+            </a>
         </div>
     </div>
     <div *ngIf="items.length">

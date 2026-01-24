@@ -48,23 +48,37 @@ export class ProfileComponent implements OnInit {
 
   // ************* Mock analytics data *****************
   getAnalyticsItems(role: 'client' | 'seller'): AnalyticsItem[] {
-    if (role === 'client') {
-      return [
-        { name: 'Code Wizard Tee', categories: 'CAT-001', count: 2, amount: 58 },
-        { name: 'Keep Coding Tee', categories: 'CAT-001', count: 1, amount: 28 },
-        { name: 'Action Noir Tee', categories: 'CAT-006', count: 1, amount: 45 },
-      ];
-    } else {
-      return [
-        { name: 'Code Wizard Tee', categories: 'CAT-001', count: 4, amount: 110 },
-        { name: 'Pop Code Queen Tee', categories: 'CAT-003', count: 2, amount: 150 },
-        { name: 'Classic Portrait Tee', categories: 'CAT-006', count: 10, amount: 450 },
-      ];
+    if (!this.currentUser?.email) return [];
+
+    const key = `${role}-${this.currentUser.email}`;
+
+    switch (key) {
+      case 'client-dada@dee.com':
+        return [
+          { name: 'Code Wizard Tee', categories: 'CAT-001', count: 2, amount: 58 },
+          { name: 'Keep Coding Tee', categories: 'CAT-001', count: 1, amount: 28 },
+          { name: 'Action Noir Tee', categories: 'CAT-006', count: 1, amount: 45 },
+        ];
+
+      case 'client-john@doe.com':
+      case 'seller-angu@readme.md':
+        return [];
+
+      case 'seller-joon@kim.kr':
+        return [
+          { name: 'Code Wizard Tee', categories: 'CAT-001', count: 4, amount: 110 },
+          { name: 'Pop Code Queen Tee', categories: 'CAT-003', count: 2, amount: 150 },
+          { name: 'Classic Portrait Tee', categories: 'CAT-006', count: 10, amount: 450 },
+        ];
+
+      default:
+        return [];
     }
   }
 
   getTotalAmount(role: 'client' | 'seller'): number {
-    return role === 'client' ? 131 : 710;
+    const items = this.getAnalyticsItems(role);
+    return items.reduce((sum, item) => sum + item.amount, 0);
   }
 
   constructor() {

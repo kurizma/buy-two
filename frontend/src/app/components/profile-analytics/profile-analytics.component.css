@@ -69,11 +69,17 @@
 }
 
 .empty-state i {
-    opacity: 0.5;
+    color: var(--text-primary) !important;
 }
 
+.empty-state p {
+    color: var(--text-primary) !important;
+    font-size: 1rem;
+}
+
+
 .empty-state h3 {
-    color: var(--text-primary);
+    color: var(--text-primary) !important;
     font-weight: 600;
 }
 

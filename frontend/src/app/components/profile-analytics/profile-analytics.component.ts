@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ChartData, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
@@ -8,7 +8,7 @@ import { AnalyticsItem } from '../../models/profile/analytics-item';
 @Component({
   selector: 'app-profile-analytics',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective],
+  imports: [CommonModule, BaseChartDirective, RouterLink],
   templateUrl: './profile-analytics.component.html',
   styleUrls: ['./profile-analytics.component.css'],
 })
@@ -37,12 +37,6 @@ export class ProfileAnalyticsComponent implements OnChanges {
   getCategorySlug(categoryId: string | string[]): string {
     const id = Array.isArray(categoryId) ? categoryId[0] : categoryId;
     return this.CATEGORY_MAP[id] || id || 'uncategorized';
-  }
-
-  addFirstProduct(): void {
-    if (this.role === 'seller') {
-      this.router.navigate(['/seller-dashboard']);
-    }
   }
 
   barOptions: ChartOptions<'bar'> = {
