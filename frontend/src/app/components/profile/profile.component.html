@@ -74,12 +74,12 @@
       <div class="col-md-6">
         <form [formGroup]="profileForm" class="row g-3" (ngSubmit)="saveProfile()">
           <div class="row-md-5">
-            <label class="form-label">Full Name</label>
-            <input type="text" class="form-control custom-width" formControlName="name" />
+            <label for="fullName" class="form-label">Full Name</label>
+            <input id="fullName" type="text" class="form-control custom-width" formControlName="name" />
           </div>
           <div class="row-md-5">
-            <label class="form-label">Email<small class="text-white"> (Cannot be changed)</small></label>
-            <input type="email" readonly class="form-control custom-width" formControlName="email" />
+            <label for="email" class="form-label">Email<small class="text-white"> (Cannot be changed)</small></label>
+            <input id="email" type="email" readonly class="form-control custom-width" formControlName="email" />
           </div>
           <div class="col-12 d-flex justify-content-end">
             <button 
@@ -100,7 +100,7 @@
           <div class="card-body">
             <form *ngIf="passwordForm" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
               <div class="mb-3">
-                <label class="form-label">Current Password</label>
+                <label for="currentPassword" class="form-label">Current Password</label>
                 <input
                   type="password"
                   class="form-control custom-width"
@@ -108,16 +108,18 @@
                 />
               </div>
               <div class="mb-3">
-                <label class="form-label">New Password</label>
+                <label for="newPassword" class="form-label">New Password</label>
                 <input
+                  id="newPassword"
                   type="password"
                   class="form-control custom-width"
                   formControlName="newPassword"
                 />
               </div>
               <div class="mb-3">
-                <label class="form-label">Confirm Password</label>
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
                 <input
+                  id="confirmPassword"
                   type="password"
                   class="form-control custom-width"
                   formControlName="confirmPassword"

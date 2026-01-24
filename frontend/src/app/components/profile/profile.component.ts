@@ -24,9 +24,9 @@ import { AnalyticsItem } from '../../models/profile/analytics-item';
 })
 export class ProfileComponent implements OnInit {
   currentUser: UserResponse | null = null;
-  get userRole(): 'user' | 'seller' | null {
+  get userRole(): 'client' | 'seller' | null {
     if (!this.currentUser?.role) return null;
-    return this.currentUser.role === 'CLIENT' ? 'user' : 'seller';
+    return this.currentUser.role === 'CLIENT' ? 'client' : 'seller';
   }
 
   profileForm: FormGroup;
@@ -47,8 +47,8 @@ export class ProfileComponent implements OnInit {
   fb = inject(FormBuilder);
 
   // ************* Mock analytics data *****************
-  getAnalyticsItems(role: 'user' | 'seller'): AnalyticsItem[] {
-    if (role === 'user') {
+  getAnalyticsItems(role: 'client' | 'seller'): AnalyticsItem[] {
+    if (role === 'client') {
       return [
         { name: 'Code Wizard Tee', categories: 'CAT-001', count: 2, amount: 58 },
         { name: 'Keep Coding Tee', categories: 'CAT-001', count: 1, amount: 28 },
@@ -63,8 +63,8 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  getTotalAmount(role: 'user' | 'seller'): number {
-    return role === 'user' ? 131 : 710;
+  getTotalAmount(role: 'client' | 'seller'): number {
+    return role === 'client' ? 131 : 710;
   }
 
   constructor() {

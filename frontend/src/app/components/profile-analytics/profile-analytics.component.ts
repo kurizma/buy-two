@@ -119,7 +119,7 @@ export class ProfileAnalyticsComponent implements OnChanges {
       labels: sortedItems.map((i) => i.name),
       datasets: [
         {
-          label: 'Units',
+          label: 'Qty',
           data: sortedItems.map((i) => i.count),
           backgroundColor: sortedItems.map((_, i) => (i === maxIdx ? 'gold' : '#0aeb7e')),
         },
