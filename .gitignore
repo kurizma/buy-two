@@ -1,13 +1,30 @@
-# IDE files
-.idea/
+/.angular/cache/
+/node_modules/
+/dist/
+/out-tsc/
+/*.log
 *.iml
+
+
+# Essentials
+node_modules/
+dist/
+.out-tsc/
+coverage/
+.eslintcache
+
+# Editor/OS
 .vscode/
-
-# Environment variables
-.env
-
-# Other common ignores (from your past setups)
-target/
+.idea/
 .DS_Store
+Thumbs.db
+target/
+
+# Environment files
+.env
+.env.*
+
+# Husky (optional Git hooks)
+.husky/
 
 ./notebook_files
