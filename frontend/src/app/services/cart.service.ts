@@ -49,7 +49,7 @@ export class CartService {
       categoryId,
       imageUrl,
       productDescription,
-      availableStock,
+      // availableStock,
     } = params;
 
     const currentCart = this.cartItemsSubject.value;
@@ -57,10 +57,10 @@ export class CartService {
 
     if (existingItem) {
       // Check stock limit
-      if (availableStock && existingItem.quantity >= availableStock) {
-        console.warn('Cannot add more items. Stock limit reached.');
-        return;
-      }
+      // if (availableStock && existingItem.quantity >= availableStock) {
+      //   console.warn('Cannot add more items. Stock limit reached.');
+      //   return;
+      // }
       // Update quantity
       existingItem.quantity++;
       this.cartItemsSubject.next([...currentCart]);

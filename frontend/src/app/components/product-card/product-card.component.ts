@@ -1,8 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ProductImageCarouselComponent } from '../ui/product-image-carousel/product-image-carousel.component';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
+import { ProductImageCarouselComponent } from '../ui/product-image-carousel/product-image-carousel.component';
 import { ProductService } from '../../services/product.service';
 import { ProductResponse } from '../../models/products/product-response.model';
 import { UserService } from '../../services/user.service';
@@ -15,7 +16,7 @@ import { CartService } from '../../services/cart.service';
   selector: 'app-product-card',
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.css'],
-  imports: [CommonModule, ProductImageCarouselComponent, RouterLink],
+  imports: [CommonModule, ProductImageCarouselComponent, RouterLink, MatSnackBarModule],
 })
 export class ProductCardComponent implements OnInit {
   private readonly route: ActivatedRoute = inject(ActivatedRoute);
@@ -23,6 +24,8 @@ export class ProductCardComponent implements OnInit {
   private readonly userService: UserService = inject(UserService);
   private readonly categoryService: CategoryService = inject(CategoryService);
   private readonly cartService: CartService = inject(CartService);
+  private readonly router: Router = inject(Router);
+  private readonly snackBar: MatSnackBar = inject(MatSnackBar);
 
   product!: ProductResponse; // non-null after load
   seller: UserResponse | undefined;
@@ -32,7 +35,15 @@ export class ProductCardComponent implements OnInit {
   addToCart(product: any): void {
     this.cartService.addProductToCart(product);
     // Show success message/toast
-    alert(`${product.name} added to cart!`);
+    this.snackBar.open(`${product.name} added to cart!`, '', {
+      duration: 2000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+    });
+
+    setTimeout(() => {
+      this.router.navigate(['/shopping-cart']);
+    }, 500);
   }
 
   isInCart(productId: string): boolean {
@@ -92,7 +103,7 @@ export class ProductCardComponent implements OnInit {
         const nextIndex = (currentIndex + 1) % products.length;
         const nextProductId = products[nextIndex].id;
         // Navigate to the next product
-        globalThis.location.href = `/product/${nextProductId}`;
+        this.router.navigate([`/product/${nextProductId}`]);
       });
     }, 350);
   }
