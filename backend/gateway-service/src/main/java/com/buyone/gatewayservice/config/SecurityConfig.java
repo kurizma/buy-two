@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.Customizer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,29 +17,35 @@ import java.util.List;
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
-
+    
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Allow CORS preflight
-                        .pathMatchers("/auth/**").permitAll() // allow login/register
-                        .pathMatchers(HttpMethod.GET, "/products/**").permitAll() // public GET products
-                        .pathMatchers("/products/**").authenticated()
-                        .pathMatchers("/actuator/health").permitAll()
+                        .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .pathMatchers("/auth/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/products/**").permitAll()
+                        .pathMatchers(HttpMethod.GET, "/categories/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/media/images/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/users/**").permitAll()
-                        .pathMatchers(HttpMethod.GET, "/categories/**").permitAll()  // Public categories
-                        .anyExchange().authenticated() // require JWT for all others
+                        
+                        // NEW: Secure Cart, Orders, and Analytics
+                        .pathMatchers("/api/cart/**").authenticated()
+                        .pathMatchers("/api/orders/**").authenticated()
+                        .pathMatchers("/api/analytics/**").authenticated()
+                        
+                        .pathMatchers("/actuator/health").permitAll()
+                        .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt() // Spring Security will validate JWT
+                        .jwt(Customizer.withDefaults())
                 );
+        
         return http.build();
     }
-
+    
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -52,10 +59,9 @@ public class SecurityConfig {
         config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
-
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
 }
-
