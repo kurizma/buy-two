@@ -45,23 +45,11 @@ public class ProductServiceImpl implements ProductService {
     // Create Product (seller only, enforce at controller)
     @Override
     public ProductResponse createProduct(CreateProductRequest request, String sellerId) {
-        // BUSINESS RULE:
-        // Only seller can create - enforced at controller/gateway using JWT.
-        // Example for business validation:
-        if (request.getPrice() != null && request.getPrice() < 0) {
-            throw new BadRequestException("Price must be non-negative.");
-        }
-        if (request.getQuantity() != null && request.getQuantity() < 0) {
-            throw new BadRequestException("Quantity must be zero or greater.");
-        }
         
         // Example conflict check (duplicate product name for seller)
-        List<Product> existing = productRepository.findByUserId(sellerId)
-                .stream()
-                .filter(p -> p.getName().equalsIgnoreCase(request.getName()))
-                .collect(Collectors.toList());
-        if (!existing.isEmpty()) {
-            throw new ConflictException("Product with name already exists for seller.");
+        if (productRepository.findByUserId(sellerId).stream()
+                .anyMatch(p -> p.getName().equalsIgnoreCase(request.getName()))) {
+            throw new ConflictException("Product name already exists for seller.");
         }
         
         Product product = Product.builder()
@@ -75,12 +63,12 @@ public class ProductServiceImpl implements ProductService {
                 .build();
         
         Product savedProduct = productRepository.save(product);
-        ProductCreatedEvent event = ProductCreatedEvent.builder()
-                .productId(savedProduct.getId())
-                .sellerId(sellerId)
-                .name(savedProduct.getName())
-                .price(savedProduct.getPrice())
-                .build();
+//        ProductCreatedEvent event = ProductCreatedEvent.builder()
+//                .productId(savedProduct.getId())
+//                .sellerId(sellerId)
+//                .name(savedProduct.getName())
+//                .price(savedProduct.getPrice())
+//                .build();
         // Publish event
         // kafkaTemplate.send(productCreatedTopic, event)
         //         .whenComplete((result, ex) -> {
@@ -127,13 +115,13 @@ public class ProductServiceImpl implements ProductService {
             throw new ForbiddenException("Unauthorized: You do not own this product");
         }
         
-        // Validate business logic on incoming changes
-        if (request.getPrice() != null && request.getPrice() < 0) {
-            throw new BadRequestException("Price must be non-negative.");
-        }
-        if (request.getQuantity() != null && request.getQuantity() < 0) {
-            throw new BadRequestException("Quantity must be zero or greater.");
-        }
+//        // Validate business logic on incoming changes
+//        if (request.getPrice() != null && request.getPrice() < 0) {
+//            throw new BadRequestException("Price must be non-negative.");
+//        }
+//        if (request.getQuantity() != null && request.getQuantity() < 0) {
+//            throw new BadRequestException("Quantity must be zero or greater.");
+//        }
         
         // Prevent changing to a name that already exists for same seller (conflict)
         if (request.getName() != null && !request.getName().equals(product.getName())) {
@@ -155,12 +143,12 @@ public class ProductServiceImpl implements ProductService {
         if (request.getImages() != null) product.setImages(request.getImages());
 
         Product updatedProduct = productRepository.save(product);
-        ProductUpdatedEvent event = ProductUpdatedEvent.builder()
-                .productId(updatedProduct.getId())
-                .sellerId(sellerId)
-                .name(updatedProduct.getName())
-                .price(updatedProduct.getPrice())
-                .build();
+//        ProductUpdatedEvent event = ProductUpdatedEvent.builder()
+//                .productId(updatedProduct.getId())
+//                .sellerId(sellerId)
+//                .name(updatedProduct.getName())
+//                .price(updatedProduct.getPrice())
+//                .build();
         // kafkaTemplate.send(productUpdatedTopic, event)
         //         .whenComplete((result, ex) -> {
         //             if (ex != null) {

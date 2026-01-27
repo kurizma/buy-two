@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,7 +21,7 @@ public class UpdateProductRequest {
     private String description;
     
     @DecimalMin(value = "0.0", inclusive = true, message = "Price must be non-negative")
-    private Double price;
+    private BigDecimal price;
     
     @Min(value = 0, message = "Quantity must be zero or greater")
     private Integer quantity;

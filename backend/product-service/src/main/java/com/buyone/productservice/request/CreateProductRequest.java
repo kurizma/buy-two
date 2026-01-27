@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
+
 /**
  * DTO for product creation, validates all required/optional fields.
  */
@@ -24,7 +26,7 @@ public class CreateProductRequest {
     
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.0", inclusive = true, message = "Price must be non-negative")
-    private Double price;
+    private BigDecimal price;
     
     @NotNull(message = "Quantity is required")
     @Min(value = 0, message = "Quantity must be zero or greater")

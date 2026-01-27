@@ -18,17 +18,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
 @Slf4j
-@SecurityRequirement(name = "bearerAuth")
 public class CartController {
     
+    private static final String CLIENT_ROLE = "CLIENT";
     private final CartService cartService;
     
     @PostMapping("/items")
     @Operation(summary = "Add item to cart", description = "Merge if same product+seller")
-    @PreAuthorize("hasRole('CLIENT')")
-    public ResponseEntity<Cart> addItem(Authentication auth,
-                                        @Valid @RequestBody CartItem item) {
-        String userId = getUserIdFromAuth(auth);
+    public ResponseEntity<Cart> addItem(
+            @RequestHeader("X-USER-ID") String userId,
+            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role,
+            @Valid @RequestBody CartItem item) {
+        validateRole(role, CLIENT_ROLE);
         log.debug("Adding item to cart for user: {}", userId);
         Cart cart = cartService.addItem(userId, item);
         return ResponseEntity.ok(cart);
@@ -36,9 +37,10 @@ public class CartController {
     
     @GetMapping
     @Operation(summary = "Get current cart")
-    @PreAuthorize("hasRole('CLIENT')")
-    public ResponseEntity<Cart> getCart(Authentication auth) {
-        String userId = getUserIdFromAuth(auth);
+    public ResponseEntity<Cart> getCart(
+            @RequestHeader("X-USER-ID") String userId,
+            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+        validateRole(role, CLIENT_ROLE);
         return cartService.getCart(userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.noContent().build());
@@ -46,39 +48,42 @@ public class CartController {
     
     @PutMapping("/items/{productId}/quantity/{quantity}")
     @Operation(summary = "Update item quantity")
-    @PreAuthorize("hasRole('CLIENT')")
-    public ResponseEntity<Cart> updateQuantity(Authentication auth,
-                                               @PathVariable String productId,
-                                               @PathVariable int quantity) {
-        String userId = getUserIdFromAuth(auth);
+    public ResponseEntity<Cart> updateQuantity(
+            @RequestHeader("X-USER-ID") String userId,
+            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role,
+            @PathVariable String productId,
+            @PathVariable int quantity) {
+        validateRole(role, CLIENT_ROLE);
         Cart cart = cartService.updateQuantity(userId, productId, quantity);
         return ResponseEntity.ok(cart);
     }
     
     @DeleteMapping("/items/{productId}")
     @Operation(summary = "Remove item from cart")
-    @PreAuthorize("hasRole('CLIENT')")
-    public ResponseEntity<Void> removeItem(Authentication auth,
-                                           @PathVariable String productId) {
-        String userId = getUserIdFromAuth(auth);
+    public ResponseEntity<Void> removeItem(
+            @RequestHeader("X-USER-ID") String userId,
+            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role,
+            @PathVariable String productId) {
+        validateRole(role, CLIENT_ROLE);
         cartService.removeItem(userId, productId);
         return ResponseEntity.noContent().build();
     }
     
     @DeleteMapping
     @Operation(summary = "Clear entire cart")
-    @PreAuthorize("hasRole('CLIENT')")
-    public ResponseEntity<Void> clearCart(Authentication auth) {
-        String userId = getUserIdFromAuth(auth);
+    public ResponseEntity<Void> clearCart(
+            @RequestHeader("X-USER-ID") String userId,
+            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+        validateRole(role, CLIENT_ROLE);
         cartService.clearCart(userId);
         return ResponseEntity.noContent().build();
     }
     
-    private String getUserIdFromAuth(Authentication auth) {
-        String userId = (String) auth.getPrincipal();
-        if (userId == null || userId.trim().isEmpty()) {
-            throw new BadRequestException("User ID not found in authentication");
+    private void validateRole(String role, String requiredRole) {
+        if (!requiredRole.equals(role)) {
+            throw new BadRequestException("Required role: " + requiredRole + ", got: " + role);
         }
-        return userId;
     }
 }
+    
+

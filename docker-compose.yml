@@ -112,6 +112,23 @@ services:
     volumes:
       - maven-repo:/root/.m2
 
+  order-service:
+    build: ./backend/order-service
+    image: order-service:${IMAGE_TAG:-latest}
+    container_name: order-service-${IMAGE_TAG:-latest}
+    ports: [ "8789:8789" ]
+    depends_on:
+      - discovery-service
+      - kafka
+    env_file:
+      - .env
+    environment:
+      <<: *common-env
+      SPRING_DATA_MONGODB_DATABASE: ${ORDER_DB:-orderdb}
+      SERVER_PORT: 8789
+    volumes:
+      - maven-repo:/root/.m2
+
   # === FRONTEND ===
   frontend:
     build: ./frontend
