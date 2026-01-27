@@ -59,8 +59,13 @@ spring:
           uri: lb://PRODUCT-SERVICE  # Assuming categories in product-service
           predicates:
             - Path=/categories/**
-           # NO filters needed - path matches perfectly
 
+        - id: order-service
+          uri: lb://ORDER-SERVICE  # Via discovery-service
+          predicates:
+            - Path=/api/orders/**, /api/cart/**
+          filters:
+            - JwtHeader
 
 eureka:
   client:

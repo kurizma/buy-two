@@ -1,4 +1,4 @@
-package com.buyone.productservice.model;
+package com.buyone.orderservice.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
