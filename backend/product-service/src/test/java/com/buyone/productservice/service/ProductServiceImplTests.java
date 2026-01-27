@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.kafka.core.KafkaTemplate;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -53,7 +54,7 @@ class ProductServiceImplTests {
         CreateProductRequest req = CreateProductRequest.builder()
                 .name("Prod A")
                 .description("desc")
-                .price(10.0)
+                .price(BigDecimal.valueOf(10.0))
                 .quantity(5)
                 .categoryId("cat-1")
                 .images(List.of("img1", "img2"))
@@ -64,7 +65,7 @@ class ProductServiceImplTests {
                 .id("p1")
                 .name("Prod A")
                 .description("desc")
-                .price(10.0)
+                .price(BigDecimal.valueOf(10.0))
                 .quantity(5)
                 .userId(sellerId)
                 .categoryId("cat-1")
@@ -81,14 +82,14 @@ class ProductServiceImplTests {
         assertThat(toSave.getUserId()).isEqualTo(sellerId);
         assertThat(toSave.getName()).isEqualTo("Prod A");
         assertThat(result.getId()).isEqualTo("p1");
-        assertThat(result.getPrice()).isEqualTo(10.0);
+        assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(10.0));
     }
     
     @Test
     void createProduct_throwsBadRequest_whenNegativePrice() {
         CreateProductRequest req = CreateProductRequest.builder()
                 .name("Prod A")
-                .price(-1.0)
+                .price(BigDecimal.valueOf(-1.0))
                 .quantity(1)
                 .build();
         
@@ -101,7 +102,7 @@ class ProductServiceImplTests {
     void createProduct_throwsBadRequest_whenNegativeQuantity() {
         CreateProductRequest req = CreateProductRequest.builder()
                 .name("Prod A")
-                .price(1.0)
+                .price(BigDecimal.valueOf(1.0))
                 .quantity(-1)
                 .build();
         
@@ -116,7 +117,7 @@ class ProductServiceImplTests {
         
         CreateProductRequest req = CreateProductRequest.builder()
                 .name("Prod A")
-                .price(1.0)
+                .price(BigDecimal.valueOf(1.0))
                 .quantity(1)
                 .build();
         
@@ -135,7 +136,7 @@ class ProductServiceImplTests {
     @Test
     void getProductById_returnsResponse_whenFound() {
         Product p = Product.builder()
-                .id("p1").name("Prod A").price(10.0)
+                .id("p1").name("Prod A").price(BigDecimal.valueOf(10.0))
                 .userId("seller-1")
                 .build();
         when(productRepository.findById("p1")).thenReturn(Optional.of(p));
@@ -187,7 +188,7 @@ class ProductServiceImplTests {
                 .id("p1")
                 .name("Old")
                 .description("old")
-                .price(10.0)
+                .price(BigDecimal.valueOf(10.0))
                 .quantity(5)
                 .userId(sellerId)
                 .categoryId("cat-1")
@@ -197,7 +198,7 @@ class ProductServiceImplTests {
         UpdateProductRequest req = UpdateProductRequest.builder()
                 .name("New")
                 .description("new")
-                .price(20.0)
+                .price(BigDecimal.valueOf(20.0))
                 .quantity(10)
                 .categoryId("cat-2")
                 .images(List.of("new-img"))
@@ -209,7 +210,7 @@ class ProductServiceImplTests {
                 .id("p1")
                 .name("New")
                 .description("new")
-                .price(20.0)
+                .price(BigDecimal.valueOf(20.0))
                 .quantity(10)
                 .userId(sellerId)
                 .categoryId("cat-2")
@@ -220,7 +221,7 @@ class ProductServiceImplTests {
         ProductResponse result = productService.updateProduct("p1", req, sellerId);
         
         assertThat(result.getName()).isEqualTo("New");
-        assertThat(result.getPrice()).isEqualTo(20.0);
+        assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(20.0));
         assertThat(result.getQuantity()).isEqualTo(10);
         assertThat(result.getCategoryId()).isEqualTo("cat-2");
     }
@@ -259,7 +260,7 @@ class ProductServiceImplTests {
                 .build();
         
         UpdateProductRequest req = UpdateProductRequest.builder()
-                .price(-1.0)
+                .price(BigDecimal.valueOf(-1.0))
                 .build();
         
         when(productRepository.findById("p1")).thenReturn(Optional.of(existing));
