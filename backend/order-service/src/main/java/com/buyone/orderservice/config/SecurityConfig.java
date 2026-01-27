@@ -20,16 +20,15 @@ public class SecurityConfig {
     
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        logger.info("!!! Order-service SecurityConfig loaded with OAuth2 JWT !!!");
+        logger.info("!!! Order-service SecurityConfig loaded - gateway headers trusted !!!");
         http
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+                        .requestMatchers("/actuator/**").permitAll()
+                        .anyRequest().permitAll()  // Trust gateway headers
+                );
         return http.build();
     }
 }
+
 
