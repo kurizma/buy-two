@@ -157,6 +157,14 @@ body {
   background-color: var(--text-secondary);
 }
 
+.btn-primary:disabled,
+.btn-primary.disabled {
+  background-color: var(--link-complementary) !important;
+  border-color: var(--link-complementary) !important;
+  color: white !important;
+  opacity: 0.65 !important;  /* Keep disabled look */
+}
+
 /* Reusable hover-lift style */
 .hover-lift {
   transition:
@@ -233,4 +241,8 @@ body {
 
 .custom-snackbar {
   margin-top: 50px !important;
+}
+
+.btn-secondary {
+  background-color: rgba(0, 0, 0, 0.58);
 }

@@ -12,12 +12,13 @@
 }
 
 .card-body {
+    margin: 20px 0;
     color: var(--text-primary);
 }
 
 .total-section {
     text-align: right;
-    margin: 20px;
+    margin: 20px 0;
     font-size: 1.2em;
     font-weight: bold;
 }
@@ -31,3 +32,10 @@
     color: var(--link-hover);
 }
 
+.text-qty {
+    color: var(--text-secondary);
+}
+
+.items-badge {
+    margin-top: 25px;
+}

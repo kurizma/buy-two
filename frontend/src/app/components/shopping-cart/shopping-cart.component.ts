@@ -78,9 +78,7 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
   }
 
   clearCart(): void {
-    if (confirm('Are you sure you want to clear your cart?')) {
-      this.cartService.clearCart();
-    }
+    this.cartService.clearCart();
   }
 
   proceedToCheckout(): void {
