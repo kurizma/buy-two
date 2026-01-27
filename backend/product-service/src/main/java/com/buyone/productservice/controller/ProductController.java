@@ -6,6 +6,7 @@ import com.buyone.productservice.response.ProductResponse;
 import com.buyone.productservice.response.ApiResponse;
 import com.buyone.productservice.exception.ForbiddenException;
 import com.buyone.productservice.service.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -17,21 +18,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/products")
 @Validated
+@RequiredArgsConstructor
 public class ProductController {
     
     private final ProductService productService;
-    
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
-    
-    // GET /products (public)
-    // @GetMapping
-    // public ResponseEntity<ApiResponse<List<ProductResponse>>> getAllProducts() {
-    //     List<ProductResponse> products = productService.getAllProducts();
-    //     return ResponseEntity.ok(okResponse("Products fetched successfully", products));
-    // }
-
     
     // GET /products (public) or GET /products?sellerId=... (public)
     @GetMapping
