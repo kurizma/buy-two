@@ -1,10 +1,29 @@
+nav.navbar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 999999 !important;
+  width: 100% !important;
+}
+
 .navbar {
+  background: #020617;
   border-bottom: 1px solid #eee;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1.5rem;
 }
+
+/* Scrolled state */
+.navbar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
 .logo-link {
   font-weight: bold;
   font-size: 1.5rem;

@@ -21,8 +21,17 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+/* 🔥 FIX PARENT OVERFLOW */
+app-root, main, .main-content, router-outlet {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+/* Body must scroll */
+html, body {
+  overflow-x: hidden;  /* Only X */
+  overflow-y: visible !important;  /* Y = visible */
+  height: 100%;
   overscroll-behavior: none;
 }
 
@@ -50,6 +59,7 @@ body {
   border: 1px solid var(--border);
   position: relative;
 }
+
 
 /* Override Material theme colors */
 .mat-mdc-card {
