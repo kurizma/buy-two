@@ -164,8 +164,4 @@ export class CategoriesComponent {
   viewProductDetail(productId: string) {
     this.router.navigate(['/product', productId]);
   }
-
-  addToCart() {
-    alert('Add to Cart feature coming soon!');
-  }
 }

@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { CartItem, mockCartItems } from '../../models/cart/cart-item.model';
+import { CartItem } from '../../models/cart/cart-item.model';
 import { CartService } from '../../services/cart.service';
+import { CategoryService } from '../../services/category.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -15,58 +16,45 @@ import { Subscription } from 'rxjs';
 export class ShoppingCartComponent implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];
   private subscription: Subscription | null = null; // Remove 'readonly' here
-  private readonly cartService = inject(CartService);
+  public readonly cartService = inject(CartService);
+  private readonly router = inject(Router);
+  private readonly categoryService = inject(CategoryService);
 
   ngOnInit() {
     // For styling purposes, load mock data
     // Later replace this with actual service call
-    this.cartItems = mockCartItems;
-    console.log('Loaded mock cart items:', this.cartItems);
+    // this.cartItems = mockCartItems;
+    // console.log('Loaded mock cart items:', this.cartItems);
 
     // Uncomment when service is ready
-    /*
+
     this.subscription = this.cartService.cartItems$.subscribe((items) => {
       this.cartItems = items || [];
     });
-    */
+
+    this.categoryService.loadCategories();
+
+    this.categoryService.categories$.subscribe((cats) => {
+      console.log(
+        'Categories loaded:',
+        cats.length,
+        'Cache size:',
+        this.categoryService.categoryMap.size,
+      );
+    });
   }
 
-  // Getters for cart calculations (all as getters for consistency)
-  get totalInclVat(): number {
-    // Sum of all items (prices already include VAT)
-    return this.cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  ngOnDestroy() {
+    this.subscription?.unsubscribe();
   }
 
-  get subtotal(): number {
-    // Calculate subtotal without VAT (reverse calculation)
-    // Price includes VAT, so: subtotal = totalInclVat / 1.24
-    return this.totalInclVat / 1.24;
-  }
-
-  get vatAmount(): number {
-    // VAT is the difference between total and subtotal
-    return this.totalInclVat - this.subtotal;
-  }
-
-  get shippingCost(): number {
-    // Free shipping over €50 (based on totalInclVat)
-    return this.totalInclVat >= 50 ? 0 : 4.9;
-  }
-
-  get total(): number {
-    // Total is totalInclVat + shipping (VAT already included in items)
-    return this.totalInclVat + this.shippingCost;
-  }
-
-  get itemCount(): number {
-    return this.cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  }
-
-  get isEmpty(): boolean {
-    return this.cartItems.length === 0;
-  }
+  // delegate all cart calculations to CartService
 
   // Cart item actions
+  getCategorySlug(categoryId: string): string {
+    return this.categoryService.getCategorySlug(categoryId) || '';
+  }
+
   updateQuantity(productId: string, newQuantity: number): void {
     this.cartService.updateQuantity(productId, newQuantity);
   }
@@ -98,15 +86,10 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
   proceedToCheckout(): void {
     // Navigate to checkout page
     console.log('Proceeding to checkout...');
-    // Later: this.router.navigate(['/checkout']);
+    this.router.navigate(['/checkout']);
   }
 
-  // Performance optimization for *ngFor
   trackByProductId(index: number, item: CartItem): string {
     return item.productId;
-  }
-
-  ngOnDestroy() {
-    this.subscription?.unsubscribe();
   }
 }

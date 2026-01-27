@@ -1,5 +1,4 @@
 .navbar {
-  /* background: #fff; */
   border-bottom: 1px solid #eee;
   display: flex;
   align-items: center;
@@ -35,10 +34,9 @@
   color: var(--link, #69f0ae);
   margin: 0 0.5rem;
 }
-.navbar-user {
+.navbar-user{
   align-items: center;
   gap: 0.6rem;
-  text-decoration: none !important;
 }
 
 .navbar-avatar {
@@ -49,10 +47,21 @@
   margin-right: 5px;
 }
 
+/* REMOVE text-decoration from the entire profile link */
+.nav-actions a[href="/profile"] {
+  text-decoration: none !important;
+}
+
+/* Also remove on hover */
+.nav-actions a[href="/profile"]:hover {
+  text-decoration: none !important;
+}
+
+
 /* Both icons use same base styles */
 .cart-link, .dashboard-link {
   color: inherit;
-  text-decoration: none;
+  text-decoration: none !important;
   font-size: 1.2em;
   padding: 0.5rem;
   display: inline-flex;

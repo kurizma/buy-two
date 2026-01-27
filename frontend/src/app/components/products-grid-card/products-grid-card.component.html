@@ -51,10 +51,15 @@
       </button>
       <button 
         class="btn btn-outline-secondary w-50 hover-lift"
-        (click)="onAddToCart(); 
+        [class.btn-secondary]="isInCart(product.id)"
+        (click)="addToCart(product); 
         $event.stopPropagation()"
         >
-        <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+        <i class="fas me-2"
+          [class.fa-shopping-cart] ="!isInCart(product.id)"
+          [class.fa-check] ="isInCart(product.id)">
+        </i>
+        {{isInCart(product.id) ? 'In Cart' : 'Add to Cart'}}
       </button>
     </div>
   </div>

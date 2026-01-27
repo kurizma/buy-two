@@ -221,3 +221,6 @@ body {
   color: var(--link);
 }
 
+.custom-snackbar {
+  margin-top: 50px !important;
+}

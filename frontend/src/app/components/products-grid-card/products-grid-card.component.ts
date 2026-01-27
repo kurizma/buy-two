@@ -1,16 +1,18 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductResponse } from '../../models/products/product-response.model';
 import { UserResponse } from '../../models/users/user-response.model';
 import { ProductImageCarouselComponent } from '../ui/product-image-carousel/product-image-carousel.component';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-product-grid-card',
   standalone: true,
   templateUrl: './products-grid-card.component.html',
   styleUrls: ['./products-grid-card.component.css'],
-  imports: [CommonModule, ProductImageCarouselComponent, RouterLink],
+  imports: [CommonModule, ProductImageCarouselComponent, RouterLink, MatSnackBarModule],
 })
 export class ProductGridCardComponent {
   // One product per card – passed in from parent
@@ -30,18 +32,35 @@ export class ProductGridCardComponent {
   @Output() view = new EventEmitter<string>();
   @Output() addToCartClick = new EventEmitter<any>();
 
+  private router = inject(Router);
+  private snackBar = inject(MatSnackBar);
+  private cartService = inject(CartService);
+
   onView(): void {
     this.view.emit(this.product.id);
   }
 
-  onAddToCart(): void {
-    this.addToCartClick.emit({
-      productId: this.product.id,
-      productName: this.product.name,
-      sellerId: this.product.userId,
-      price: this.product.price,
-      categoryId: this.product.categoryId,
-      imageUrl: this.product.images[0],
+  addToCart(product: any): void {
+    const cartProduct = {
+      ...product,
+      sellerName: this.seller?.name || 'Unknown Seller',
+      sellerAvatarUrl: this.seller?.avatar || undefined,
+    };
+
+    console.log('Adding to cart:', cartProduct.sellerName);
+    this.cartService.addProductToCart(cartProduct);
+
+    this.snackBar.open(`${product.name} added to cart!`, '', {
+      duration: 2000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
+      panelClass: ['custom-snackbar'],
     });
+
+    // setTimeout(() => this.router.navigate(['/shopping-cart']), 500);
+  }
+
+  isInCart(productId: string): boolean {
+    return this.cartService.isInCart(productId);
   }
 }

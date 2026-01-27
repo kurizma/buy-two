@@ -22,3 +22,12 @@
     font-weight: bold;
 }
 
+.text-seller-name {
+    color: var(--link);
+}
+
+.text-seller-name:hover {
+    cursor: pointer;
+    color: var(--link-hover);
+}
+

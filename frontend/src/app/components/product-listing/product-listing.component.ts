@@ -139,16 +139,6 @@ export class ProductListingComponent implements OnInit {
     this.router.navigate(['/product', productId]);
   }
 
-  addToCart(product: any): void {
-    this.cartService.addProductToCart(product);
-    // Show success message/toast
-    alert(`${product.name} added to cart!`);
-  }
-
-  isInCart(productId: string): boolean {
-    return this.cartService.isInCart(productId);
-  }
-
   onSearchChange() {
     this.updateFilteredProducts();
   }

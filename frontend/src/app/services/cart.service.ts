@@ -23,6 +23,8 @@ export class CartService {
       productId: product._id || product.id,
       productName: product.name,
       sellerId: product.userId,
+      sellerName: product.seller?.name || product.sellerName || 'Unknown Seller', // Placeholder, ideally fetch from user service
+      sellerAvatarUrl: product.seller?.avatarUrl || product.sellerAvatarUrl,
       price: product.price,
       categoryId: product.categoryId,
       imageUrl: product.images?.[0] || '', // Use first image
@@ -40,6 +42,8 @@ export class CartService {
     imageUrl?: string;
     productDescription?: string;
     availableStock?: number;
+    sellerName: string;
+    sellerAvatarUrl?: string;
   }): void {
     const {
       productId,
@@ -49,7 +53,9 @@ export class CartService {
       categoryId,
       imageUrl,
       productDescription,
-      // availableStock,
+      availableStock,
+      sellerName,
+      sellerAvatarUrl,
     } = params;
 
     const currentCart = this.cartItemsSubject.value;
@@ -57,10 +63,10 @@ export class CartService {
 
     if (existingItem) {
       // Check stock limit
-      // if (availableStock && existingItem.quantity >= availableStock) {
-      //   console.warn('Cannot add more items. Stock limit reached.');
-      //   return;
-      // }
+      if (availableStock && existingItem.quantity >= availableStock) {
+        console.warn('Cannot add more items. Stock limit reached.');
+        return;
+      }
       // Update quantity
       existingItem.quantity++;
       this.cartItemsSubject.next([...currentCart]);
@@ -72,11 +78,12 @@ export class CartService {
         productName,
         productDescription,
         sellerId,
-        sellerName: 'Loading...', // Fetch seller name from user service
+        sellerName,
         price,
         quantity: 1,
         categoryId,
         imageUrl: imageUrl || '/assets/placeholder.jpg',
+        sellerAvatarUrl,
       };
       this.cartItemsSubject.next([...currentCart, newItem]);
     }
@@ -148,6 +155,14 @@ export class CartService {
   getProductQuantity(productId: string): number {
     const item = this.cartItemsSubject.value.find((item) => item.productId === productId);
     return item ? item.quantity : 0;
+  }
+
+  get isEmpty(): boolean {
+    return this.cartItemsSubject.value.length === 0;
+  }
+
+  get cartItems(): CartItem[] {
+    return this.cartItemsSubject.value;
   }
 
   // LocalStorage methods

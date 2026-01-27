@@ -33,17 +33,24 @@ export class ProductCardComponent implements OnInit {
   errorMessage: string | null = null;
 
   addToCart(product: any): void {
-    this.cartService.addProductToCart(product);
+    const cartProduct = {
+      ...product,
+      sellerName: this.seller ? this.seller.name : 'Unknown Seller',
+      sellerAvatarUrl: this.seller?.avatar || undefined,
+    };
+    console.log('Adding to cart:', cartProduct.sellerName);
+    this.cartService.addProductToCart(cartProduct);
     // Show success message/toast
     this.snackBar.open(`${product.name} added to cart!`, '', {
       duration: 2000,
-      horizontalPosition: 'center',
+      horizontalPosition: 'end',
       verticalPosition: 'top',
+      panelClass: ['custom-snackbar'],
     });
 
-    setTimeout(() => {
-      this.router.navigate(['/shopping-cart']);
-    }, 500);
+    // setTimeout(() => {
+    //   this.router.navigate(['/shopping-cart']);
+    // }, 500);
   }
 
   isInCart(productId: string): boolean {

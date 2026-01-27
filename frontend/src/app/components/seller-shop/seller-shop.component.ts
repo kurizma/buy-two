@@ -65,7 +65,7 @@ export class SellerShopComponent implements OnInit {
   private loadSeller(sellerId: string) {
     this.userService.getUserById(sellerId).subscribe({
       next: (user) => {
-        if (user && user.role === 'SELLER') {
+        if (user?.role === 'SELLER') {
           this.seller = user;
         } else {
           this.errorMessage = '';
@@ -107,10 +107,6 @@ export class SellerShopComponent implements OnInit {
 
   viewProductDetail(productId: string) {
     this.router.navigate(['/product', productId]);
-  }
-
-  addToCart() {
-    alert('Add to Cart feature coming soon!');
   }
 
   sendMessage() {
