@@ -32,10 +32,12 @@ pipeline {
 		NPM_CONFIG_CACHE = "${env.JENKINS_HOME}/.npm"
 	}
 
-	tools {
-		maven 'maven-3.9'
-		nodejs 'node-20.19.6'
-	}
+	// Tools section commented out - using system Maven/Node instead
+	// Uncomment and configure in Jenkins if you want managed tool versions
+	// tools {
+	// 	maven 'maven-3.9'
+	// 	nodejs 'node-20.19.6'
+	// }
 
 	stages {
 
