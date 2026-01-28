@@ -47,7 +47,6 @@ export class ProductGridCardComponent {
       sellerAvatarUrl: this.seller?.avatar || undefined,
     };
 
-    console.log('Adding to cart:', cartProduct.sellerName);
     this.cartService.addProductToCart(cartProduct);
 
     this.snackBar.open(`${product.name} added to cart!`, '', {

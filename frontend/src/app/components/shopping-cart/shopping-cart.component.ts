@@ -33,15 +33,6 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
     });
 
     this.categoryService.loadCategories();
-
-    this.categoryService.categories$.subscribe((cats) => {
-      console.log(
-        'Categories loaded:',
-        cats.length,
-        'Cache size:',
-        this.categoryService.categoryMap.size,
-      );
-    });
   }
 
   ngOnDestroy() {
