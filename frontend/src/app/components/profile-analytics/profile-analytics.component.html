@@ -1,0 +1,85 @@
+<div class="analytics-container">
+
+    <!-- Total Amount Header -->
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+        <h2 class="total-amount">
+            {{ role === 'client' ? 'Total Spend' : 'Revenue' }}: {{ totalAmount | currency:'EUR' }}
+        </h2>
+        </div>
+    </div>
+    <!-- ⭐ EMPTY STATE when no data -->
+    <div *ngIf="!items.length" class="empty-state text-center py-5">
+        <i class="fas fa-chart-line fa-4x text-muted mb-4"></i>
+        <h3 class="mb-3">No {{ role === 'client' ? 'Purchases' : 'Sales' }} Yet</h3>
+        <p class="text-muted mb-4 lead">
+        {{ role === 'client' ? 
+            'Your spending analytics and charts will appear here after your first purchase.' : 
+            'Your revenue charts and best sellers will show once customers buy your products.' }}
+        </p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a *ngIf="role === 'client'" 
+                routerLink="/product-listing" 
+                class="btn btn-primary btn-lg px-4">
+                <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+            </a>
+            <a *ngIf="role === 'seller'" 
+                routerLink="/seller-dashboard" 
+                class="btn btn-primary btn-lg px-4">
+                <i class="fas fa-cogs me-2"></i>Seller Dashboard
+            </a>
+        </div>
+    </div>
+    <div *ngIf="items.length">
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <!-- Pie Chart (Categories) -->
+            <div class="col-md-6 mb-3">
+            <div class="chart-card-pie">
+                <canvas baseChart
+                        [data]="pieChartData"
+                        [type]="'pie'"
+                        [options]="pieOptions">
+                </canvas>
+            </div>
+            </div>
+
+            <!-- Bar Chart (Items) -->
+            <div class="col-md-6 mb-3">
+            <div class="chart-card-bar position-relative">
+                <canvas baseChart
+                        [data]="barChartData"
+                        [type]="'bar'"
+                        [options]="barOptions">
+                </canvas>
+                <div class="best-seller-label d-inline-flex align-items-center gap-1">
+                    <i class="fas fa-crown"></i>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <div class="table-responsive product-table">
+            <table class="table table-striped">
+            <thead class ="table-head">
+                <tr>
+                <th>Product</th>
+                <th>Categories</th>
+                <th>{{ role === 'client' ? 'Bought(qty)' : 'Sold(qty)' }}</th>
+                <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of items">
+                <td>{{ item.name }}</td>
+                <td>{{ getCategorySlug(item.categories) }}</td>
+                <td>{{ item.count }}</td>
+                <td>{{ item.amount | currency:'EUR' }}</td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
