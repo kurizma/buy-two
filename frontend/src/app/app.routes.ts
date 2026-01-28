@@ -11,6 +11,7 @@ import { SellerShopComponent } from './components/seller-shop/seller-shop.compon
 import { AboutComponent } from './components/about/about.component';
 import { SellerGuard } from './guards/seller.guard';
 import { AuthGuard } from './guards/auth.guard';
+import { ClientOnlyGuard } from './guards/client-only.guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },

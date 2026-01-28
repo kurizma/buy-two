@@ -61,6 +61,10 @@ export class AuthService {
     return this.currentUserValue?.role === 'SELLER';
   }
 
+  isClient(): boolean {
+    return this.currentUserValue?.role === 'CLIENT';
+  }
+
   login(credentials: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, credentials).pipe(
       tap((response) => {
