@@ -10,7 +10,7 @@
 </div>
 <!-- Main content -->
 <div *ngIf="!isLoading && !errorMessage">
-  <div class="container py-3 categories-page">
+  <div class="container py-5 categories-page">
       <div class="row">
         <!-- Mobile nav -->
         <nav 
@@ -85,7 +85,8 @@
                 [showSeller]="true"
                 [showCategory]="true"
                 [categoryName]="getCategoryName(product.categoryId)"
-                (view)="viewProductDetail($event)">
+                (view)="viewProductDetail($event)"
+                (addToCartClick)="addToCart()">
               </app-product-grid-card>
             </div>
           </div>

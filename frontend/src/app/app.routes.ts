@@ -11,7 +11,6 @@ import { SellerShopComponent } from './components/seller-shop/seller-shop.compon
 import { AboutComponent } from './components/about/about.component';
 import { SellerGuard } from './guards/seller.guard';
 import { AuthGuard } from './guards/auth.guard';
-import { ShoppingCartComponent } from './components/shopping-cart/shopping-cart.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -25,6 +24,5 @@ export const routes: Routes = [
   { path: 'seller-dashboard', component: SellerDashboardComponent, canActivate: [SellerGuard] },
   { path: 'seller-shop/:id', component: SellerShopComponent },
   { path: 'about', component: AboutComponent },
-  { path: 'shopping-cart', component: ShoppingCartComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '' },
 ];
