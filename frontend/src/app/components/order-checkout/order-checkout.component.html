@@ -1,0 +1,45 @@
+<div class="container py-4">
+    <mat-horizontal-stepper [linear]="true" #stepper>
+        <!-- Step 1: Address -->
+        <mat-step>
+            <ng-template matStepLabel>Delivery Address</ng-template>
+            <form [formGroup]="checkoutForm" (ngSubmit)="goToNext(stepper)">
+            <mat-form-field>
+                <input matInput formControlName="street" placeholder="Street">
+                <mat-error *ngIf="checkoutForm.get('street')?.hasError('required')">
+                Street is required.
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field>
+                <input matInput formControlName="city" placeholder="City">
+            </mat-form-field>
+            <mat-form-field>
+                <input matInput formControlName="zip" placeholder="ZIP Code">
+            </mat-form-field>
+            <div>
+                <button mat-button matStepperNext>Next</button>
+            </div>
+            </form>
+        </mat-step>
+
+        <!-- Step 2: Review -->
+        <mat-step>
+            <ng-template matStepLabel>Review Order</ng-template>
+            <div *ngFor="let item of cartItems">
+            {{item.productName}} x {{item.quantity}} - ${{item.price * item.quantity}}
+            </div>
+            <p>Total: ${{total}}</p>
+            <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button matStepperNext>Confirm</button>
+            </div>
+        </mat-step>
+
+        <!-- Step 3: Confirm -->
+        <mat-step>
+            <ng-template matStepLabel>Complete</ng-template>
+            <p>Order confirmed! Pay on Delivery selected.</p>
+            <button mat-raised-button color="primary" (click)="placeOrder()">Place Order</button>
+        </mat-step>
+    </mat-horizontal-stepper>
+</div>
