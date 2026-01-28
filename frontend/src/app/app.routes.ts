@@ -25,6 +25,6 @@ export const routes: Routes = [
   { path: 'seller-dashboard', component: SellerDashboardComponent, canActivate: [SellerGuard] },
   { path: 'seller-shop/:id', component: SellerShopComponent },
   { path: 'about', component: AboutComponent },
-  { path: 'shopping-cart', component: ShoppingCartComponent },
+  { path: 'shopping-cart', component: ShoppingCartComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '' },
 ];
