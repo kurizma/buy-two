@@ -18,8 +18,8 @@ pipeline {
 	}
 
 	environment {
-		// Credentials
-		SLACK_WEBHOOK = credentials('slack-webhook')
+		// Credentials (optional - add 'slack-webhook' credential in Jenkins if you want notifications)
+		// SLACK_WEBHOOK = credentials('slack-webhook')
 		BRANCH = "${env.BRANCH_NAME ?: env.GIT_BRANCH ?: params.BRANCH ?: 'main'}"
 
 		// Image versioning
@@ -46,14 +46,10 @@ pipeline {
 		 ************/
 		stage('Checkout') {
 			steps {
-				checkout([
-					$class: 'GitSCM',
-					branches: [[name: "*/${params.BRANCH}"]],
-					userRemoteConfigs: [[
-						url: 'https://github.com/kurizma/safe-zone.git',
-						credentialsId: 'safe-zone'
-					]]
-				])
+				// Checkout is handled automatically by Jenkins Pipeline from SCM
+				// This stage is here for clarity in the UI
+				echo "Code already checked out by Jenkins"
+				sh 'git rev-parse HEAD'
 			}
 		}
 
@@ -200,8 +196,8 @@ pipeline {
 							dir('backend/discovery-service') {
 								sh '''
                                     sonar-scanner \
-                                        -Dsonar.projectKey=safe-zone-discovery-service \
-                                        -Dsonar.projectName="Safe Zone - Discovery Service" \
+                                        -Dsonar.projectKey=buy-two-discovery-service \
+                                        -Dsonar.projectName="Buy-Two - Discovery Service" \
                                         -Dsonar.sources=src \
                                         -Dsonar.java.binaries=target/classes \
                                         -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
@@ -212,8 +208,8 @@ pipeline {
 							dir('backend/gateway-service') {
 								sh '''
                                     sonar-scanner \
-                                        -Dsonar.projectKey=safe-zone-gateway-service \
-                                        -Dsonar.projectName="Safe Zone - Gateway Service" \
+                                        -Dsonar.projectKey=buy-two-gateway-service \
+                                        -Dsonar.projectName="Buy-Two - Gateway Service" \
                                         -Dsonar.sources=src \
                                         -Dsonar.java.binaries=target/classes \
                                         -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
@@ -224,8 +220,8 @@ pipeline {
 							dir('backend/user-service') {
 								sh '''
                                     sonar-scanner \
-                                        -Dsonar.projectKey=safe-zone-user-service \
-                                        -Dsonar.projectName="Safe Zone - User Service" \
+                                        -Dsonar.projectKey=buy-two-user-service \
+                                        -Dsonar.projectName="Buy-Two - User Service" \
                                         -Dsonar.sources=src \
                                         -Dsonar.java.binaries=target/classes \
                                         -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
@@ -236,8 +232,8 @@ pipeline {
 							dir('backend/product-service') {
 								sh '''
                                     sonar-scanner \
-                                        -Dsonar.projectKey=safe-zone-product-service \
-                                        -Dsonar.projectName="Safe Zone - Product Service" \
+                                        -Dsonar.projectKey=buy-two-product-service \
+                                        -Dsonar.projectName="Buy-Two - Product Service" \
                                         -Dsonar.sources=src \
                                         -Dsonar.java.binaries=target/classes \
                                         -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
@@ -248,8 +244,8 @@ pipeline {
 							dir('backend/media-service') {
 								sh '''
                                     sonar-scanner \
-                                        -Dsonar.projectKey=safe-zone-media-service \
-                                        -Dsonar.projectName="Safe Zone - Media Service" \
+                                        -Dsonar.projectKey=buy-two-media-service \
+                                        -Dsonar.projectName="Buy-Two - Media Service" \
                                         -Dsonar.sources=src \
                                         -Dsonar.java.binaries=target/classes \
                                         -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
@@ -411,7 +407,7 @@ pipeline {
 					sh """
                         curl -sS -X POST \\
                             -H 'Content-type: application/json' \\
-                            -d '{"text":"${emoji} *${buildState.toUpperCase()}*\\nJob: ${JOB_NAME}\\nBuild: #${BUILD_NUMBER}\\nBranch: ${cleanBranch}\\nCommit: <https://github.com/kurizma/safe-zone/commit/${GIT_COMMIT}|${GIT_COMMIT[0..7]}>"}' \\
+                            -d '{"text":"${emoji} *${buildState.toUpperCase()}*\\nJob: ${JOB_NAME}\\nBuild: #${BUILD_NUMBER}\\nBranch: ${cleanBranch}\\nCommit: <https://github.com/kurizma/buy-two/commit/${GIT_COMMIT}|${GIT_COMMIT[0..7]}>"}' \\
                             \$SLACK_WEBHOOK || true
                     """
 				}
@@ -424,19 +420,19 @@ pipeline {
 				junit allowEmptyResults: true, testResults: '**/test-results/junit/*.xml'
 
 				if (env.GIT_COMMIT) {
-					withCredentials([string(credentialsId: 'safe-zone', variable: 'GITHUB_TOKEN')]) {
+					withCredentials([string(credentialsId: 'buy-two-pat', variable: 'GITHUB_TOKEN')]) {
 						sh """
 							set +e
 
 							curl -s -H "Authorization: token ${GITHUB_TOKEN}" \\
 							  -X POST -H "Accept: application/vnd.github.v3+json" \\
-							  -d '{"state":"${ghState}", "context":"safezone", "description":"Jenkins ${buildState}", "target_url":"${BUILD_URL}"}' \\
-							  https://api.github.com/repos/kurizma/safe-zone/statuses/${GIT_COMMIT} || true
+							  -d '{"state":"${ghState}", "context":"buy-two", "description":"Jenkins ${buildState}", "target_url":"${BUILD_URL}"}' \\
+							  https://api.github.com/repos/kurizma/buy-two/statuses/${GIT_COMMIT} || true
 
 							curl -s -H "Authorization: token ${GITHUB_TOKEN}" \\
 							  -X POST -H "Accept: application/vnd.github.v3+json" \\
-							  -d '{"state":"${ghState}", "context":"safe-quality-gate", "description":"Quality gate ${buildState}"}' \\
-							  https://api.github.com/repos/kurizma/safe-zone/statuses/${GIT_COMMIT} || true
+							  -d '{"state":"${ghState}", "context":"buy-two-quality-gate", "description":"Quality gate ${buildState}"}' \\
+							  https://api.github.com/repos/kurizma/buy-two/statuses/${GIT_COMMIT} || true
 
 							exit 0
 						"""
