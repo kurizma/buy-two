@@ -21,17 +21,8 @@
   box-sizing: border-box;
 }
 
-/* 🔥 FIX PARENT OVERFLOW */
-app-root, main, .main-content, router-outlet {
-  overflow: visible !important;
-  height: auto !important;
-}
-
-/* Body must scroll */
-html, body {
-  overflow-x: hidden;  /* Only X */
-  overflow-y: visible !important;  /* Y = visible */
-  height: 100%;
+html,
+body {
   overscroll-behavior: none;
 }
 
@@ -59,7 +50,6 @@ body {
   border: 1px solid var(--border);
   position: relative;
 }
-
 
 /* Override Material theme colors */
 .mat-mdc-card {
@@ -157,14 +147,6 @@ body {
   background-color: var(--text-secondary);
 }
 
-.btn-primary:disabled,
-.btn-primary.disabled {
-  background-color: var(--link-complementary) !important;
-  border-color: var(--link-complementary) !important;
-  color: white !important;
-  opacity: 0.65 !important;  /* Keep disabled look */
-}
-
 /* Reusable hover-lift style */
 .hover-lift {
   transition:
@@ -239,10 +221,3 @@ body {
   color: var(--link);
 }
 
-.custom-snackbar {
-  margin-top: 50px !important;
-}
-
-.btn-secondary {
-  background-color: rgba(0, 0, 0, 0.58);
-}

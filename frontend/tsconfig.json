@@ -3,8 +3,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./dist/out-tsc",
-    "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -13,12 +11,9 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "experimentalDecorators": true,
-    "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
-    "lib": ["ES2022", "dom"],
-    "module": "esnext",
-    "allowSyntheticDefaultImports": true,
+    "module": "preserve"
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
