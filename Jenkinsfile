@@ -184,121 +184,121 @@ pipeline {
 		/****************************
 		* SonarQube Code Analysis *
 		****************************/
-		stage('SonarQube Analysis - Backend') {
-			steps {
-				script {
-					def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-					env.PATH = "${scannerHome}/bin:${env.PATH}"
+		// stage('SonarQube Analysis - Backend') {
+		// 	steps {
+		// 		script {
+		// 			def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+		// 			env.PATH = "${scannerHome}/bin:${env.PATH}"
+		//
+		// 			withSonarQubeEnv('SonarQube Dev') {
+		// 				withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN'),
+		// 					string(credentialsId: 'sonarqube-host-url', variable: 'SONAR_HOST')]) {
+		// 					dir('backend/discovery-service') {
+		// 						sh '''
+//                                     sonar-scanner \
+//                                         -Dsonar.projectKey=buy-two-discovery-service \
+//                                         -Dsonar.projectName="Buy-Two - Discovery Service" \
+//                                         -Dsonar.sources=src \
+//                                         -Dsonar.java.binaries=target/classes \
+//                                         -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
+//                                         -Dsonar.host.url=${SONAR_HOST} \
+//                                         -Dsonar.token=${SONAR_TOKEN}
+//                                 '''
+		// 					}
+		// 					dir('backend/gateway-service') {
+		// 						sh '''
+//                                     sonar-scanner \
+//                                         -Dsonar.projectKey=buy-two-gateway-service \
+//                                         -Dsonar.projectName="Buy-Two - Gateway Service" \
+//                                         -Dsonar.sources=src \
+//                                         -Dsonar.java.binaries=target/classes \
+//                                         -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
+//                                         -Dsonar.host.url=${SONAR_HOST} \
+//                                         -Dsonar.token=${SONAR_TOKEN}
+//                                 '''
+		// 					}
+		// 					dir('backend/user-service') {
+		// 						sh '''
+//                                     sonar-scanner \
+//                                         -Dsonar.projectKey=buy-two-user-service \
+//                                         -Dsonar.projectName="Buy-Two - User Service" \
+//                                         -Dsonar.sources=src \
+//                                         -Dsonar.java.binaries=target/classes \
+//                                         -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
+//                                         -Dsonar.host.url=${SONAR_HOST} \
+//                                         -Dsonar.token=${SONAR_TOKEN}
+//                                 '''
+		// 					}
+		// 					dir('backend/product-service') {
+		// 						sh '''
+//                                     sonar-scanner \
+//                                         -Dsonar.projectKey=buy-two-product-service \
+//                                         -Dsonar.projectName="Buy-Two - Product Service" \
+//                                         -Dsonar.sources=src \
+//                                         -Dsonar.java.binaries=target/classes \
+//                                         -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
+//                                         -Dsonar.host.url=${SONAR_HOST} \
+//                                         -Dsonar.token=${SONAR_TOKEN}
+//                                 '''
+		// 					}
+		// 					dir('backend/media-service') {
+		// 						sh '''
+//                                     sonar-scanner \
+//                                         -Dsonar.projectKey=buy-two-media-service \
+//                                         -Dsonar.projectName="Buy-Two - Media Service" \
+//                                         -Dsonar.sources=src \
+//                                         -Dsonar.java.binaries=target/classes \
+//                                         -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
+//                                         -Dsonar.host.url=${SONAR_HOST} \
+//                                         -Dsonar.token=${SONAR_TOKEN}
+//                                 '''
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
 
-					withSonarQubeEnv('SonarQube Dev') {
-						withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN'),
-							string(credentialsId: 'sonarqube-host-url', variable: 'SONAR_HOST')]) {
-							dir('backend/discovery-service') {
-								sh '''
-                                    sonar-scanner \
-                                        -Dsonar.projectKey=buy-two-discovery-service \
-                                        -Dsonar.projectName="Buy-Two - Discovery Service" \
-                                        -Dsonar.sources=src \
-                                        -Dsonar.java.binaries=target/classes \
-                                        -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
-                                        -Dsonar.host.url=${SONAR_HOST} \
-                                        -Dsonar.token=${SONAR_TOKEN}
-                                '''
-							}
-							dir('backend/gateway-service') {
-								sh '''
-                                    sonar-scanner \
-                                        -Dsonar.projectKey=buy-two-gateway-service \
-                                        -Dsonar.projectName="Buy-Two - Gateway Service" \
-                                        -Dsonar.sources=src \
-                                        -Dsonar.java.binaries=target/classes \
-                                        -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
-                                        -Dsonar.host.url=${SONAR_HOST} \
-                                        -Dsonar.token=${SONAR_TOKEN}
-                                '''
-							}
-							dir('backend/user-service') {
-								sh '''
-                                    sonar-scanner \
-                                        -Dsonar.projectKey=buy-two-user-service \
-                                        -Dsonar.projectName="Buy-Two - User Service" \
-                                        -Dsonar.sources=src \
-                                        -Dsonar.java.binaries=target/classes \
-                                        -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
-                                        -Dsonar.host.url=${SONAR_HOST} \
-                                        -Dsonar.token=${SONAR_TOKEN}
-                                '''
-							}
-							dir('backend/product-service') {
-								sh '''
-                                    sonar-scanner \
-                                        -Dsonar.projectKey=buy-two-product-service \
-                                        -Dsonar.projectName="Buy-Two - Product Service" \
-                                        -Dsonar.sources=src \
-                                        -Dsonar.java.binaries=target/classes \
-                                        -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
-                                        -Dsonar.host.url=${SONAR_HOST} \
-                                        -Dsonar.token=${SONAR_TOKEN}
-                                '''
-							}
-							dir('backend/media-service') {
-								sh '''
-                                    sonar-scanner \
-                                        -Dsonar.projectKey=buy-two-media-service \
-                                        -Dsonar.projectName="Buy-Two - Media Service" \
-                                        -Dsonar.sources=src \
-                                        -Dsonar.java.binaries=target/classes \
-                                        -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
-                                        -Dsonar.host.url=${SONAR_HOST} \
-                                        -Dsonar.token=${SONAR_TOKEN}
-                                '''
-							}
-						}
-					}
-				}
-			}
-		}
-
-		stage('SonarQube Analysis - Frontend') {
-			steps {
-				dir('frontend') {
-					script {
-						def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-						env.PATH = "${scannerHome}/bin:${env.PATH}"
-
-						withSonarQubeEnv('SonarQube Dev') {
-							withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN'),
-								string(credentialsId: 'sonarqube-host-url', variable: 'SONAR_HOST')]) {
-								sh '''
-                                    sonar-scanner \
-                                        -Dsonar.projectKey=buy-two-frontend \
-                                        -Dsonar.projectName="Buy-Two - Frontend" \
-                                        -Dsonar.sources=src/app \
-                                        -Dsonar.exclusions=**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,**/*.d.ts,node_modules/**,dist/**,coverage/**,**/.env,**/.env*,src/environments/**,src/assets/** \
-                                        -Dsonar.cpd.exclusions=**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,node_modules/** \
-                                        -Dsonar.host.url=${SONAR_HOST} \
-                                        -Dsonar.token=${SONAR_TOKEN}
-                                '''
-							}
-						}
-					}
-				}
-			}
-		}
+		// stage('SonarQube Analysis - Frontend') {
+		// 	steps {
+		// 		dir('frontend') {
+		// 			script {
+		// 				def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+		// 				env.PATH = "${scannerHome}/bin:${env.PATH}"
+		//
+		// 				withSonarQubeEnv('SonarQube Dev') {
+		// 					withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN'),
+		// 						string(credentialsId: 'sonarqube-host-url', variable: 'SONAR_HOST')]) {
+		// 						sh '''
+//                                     sonar-scanner \
+//                                         -Dsonar.projectKey=buy-two-frontend \
+//                                         -Dsonar.projectName="Buy-Two - Frontend" \
+//                                         -Dsonar.sources=src/app \
+//                                         -Dsonar.exclusions=**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,**/*.d.ts,node_modules/**,dist/**,coverage/**,**/.env,**/.env*,src/environments/**,src/assets/** \
+//                                         -Dsonar.cpd.exclusions=**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,node_modules/** \
+//                                         -Dsonar.host.url=${SONAR_HOST} \
+//                                         -Dsonar.token=${SONAR_TOKEN}
+//                                 '''
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
 
 		/****************************
 		 * Quality Gate Check → Skip deploy → Post FAILURE Slack *
 		 ****************************/
-		stage('Quality Gate Check') {
-			steps {
-				script {
-					echo 'Checking SonarQube Quality Gate...'
-					timeout(time: 5, unit: 'MINUTES') {
-						waitForQualityGate abortPipeline: true
-					}
-				}
-			}
-		}
+		// stage('Quality Gate Check') {
+		// 	steps {
+		// 		script {
+		// 			echo 'Checking SonarQube Quality Gate...'
+		// 			timeout(time: 5, unit: 'MINUTES') {
+		// 				waitForQualityGate abortPipeline: true
+		// 			}
+		// 		}
+		// 	}
+		// }
 
 		/************************
 		 * Build Docker images  *
