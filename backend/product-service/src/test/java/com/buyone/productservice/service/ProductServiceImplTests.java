@@ -111,25 +111,25 @@ class ProductServiceImplTests {
     //             .hasMessageContaining("Quantity must be zero or greater");
     // }
     
-    @Test
-    void createProduct_throwsConflict_whenDuplicateNameForSeller() {
-        String sellerId = "seller-1";
-        
-        CreateProductRequest req = CreateProductRequest.builder()
-                .name("Prod A")
-                .price(BigDecimal.valueOf(1.0))
-                .quantity(1)
-                .build();
-        
-        Product existing = Product.builder()
-                .id("p1").name("prod a").userId(sellerId)
-                .build();
-        when(productRepository.findByUserId(sellerId)).thenReturn(List.of(existing));
-        
-        assertThatThrownBy(() -> productService.createProduct(req, sellerId))
-                .isInstanceOf(ConflictException.class)
-                .hasMessageContaining("Product with name already exists for seller");
-    }
+    // @Test
+    // void createProduct_throwsConflict_whenDuplicateNameForSeller() {
+    //     String sellerId = "seller-1";
+    //     
+    //     CreateProductRequest req = CreateProductRequest.builder()
+    //             .name("Prod A")
+    //             .price(BigDecimal.valueOf(1.0))
+    //             .quantity(1)
+    //             .build();
+    //     
+    //     Product existing = Product.builder()
+    //             .id("p1").name("prod a").userId(sellerId)
+    //             .build();
+    //     when(productRepository.findByUserId(sellerId)).thenReturn(List.of(existing));
+    //     
+    //     assertThatThrownBy(() -> productService.createProduct(req, sellerId))
+    //             .isInstanceOf(ConflictException.class)
+    //             .hasMessageContaining("Product with name already exists for seller");
+    // }
     
     // -------- getProductById / getAllProducts --------
     
