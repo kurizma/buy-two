@@ -39,8 +39,7 @@
     <!-- Description -->
     <p class="card-text mb-2 flex-grow-1 product-description">{{ product.description }}</p>
     <!-- Price -->
-    <p class="vat-text mb-1"><span class="text-primary mb-2 fw-bold text-end price-text">€{{ product.price }}</span> (incl. VAT)</p>
-    
+    <p class="text-primary mb-2 fw-bold text-end price-text">€{{ product.price }}</p>
     <!-- Buttons -->
     <div class="mt-auto d-flex gap-2">
       <button
@@ -51,15 +50,10 @@
       </button>
       <button 
         class="btn btn-outline-secondary w-50 hover-lift"
-        [class.btn-secondary]="isInCart(product.id)"
-        (click)="addToCart(product); 
+        (click)="onAddToCart(); 
         $event.stopPropagation()"
         >
-        <i class="fas me-2"
-          [class.fa-shopping-cart] ="!isInCart(product.id)"
-          [class.fa-check] ="isInCart(product.id)">
-        </i>
-        {{isInCart(product.id) ? 'In Cart' : 'Add to Cart'}}
+        <i class="fas fa-shopping-cart me-2"></i>Add to Cart
       </button>
     </div>
   </div>

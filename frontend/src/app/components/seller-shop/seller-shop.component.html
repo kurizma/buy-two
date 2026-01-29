@@ -70,7 +70,8 @@
           [showSeller]="true"
           [categoryName]="getCategoryName(product.categoryId)"
           [showCategory]="true"
-          (view)="viewProductDetail($event)">
+          (view)="viewProductDetail($event)"
+          (addToCartClick)="addToCart()">
         </app-product-grid-card>      
       </div>
     </div>

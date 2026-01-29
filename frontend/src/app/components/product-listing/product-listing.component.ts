@@ -3,14 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { ProductGridCardComponent } from '../products-grid-card/products-grid-card.component';
+import { ProductGridCardComponent } from '../product-grid-card/product-grid-card.component';
 import { ProductService } from '../../services/product.service';
 import { ProductResponse } from '../../models/products/product-response.model';
 import { UserService } from '../../services/user.service';
 import { UserResponse } from '../../models/users/user-response.model';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/categories/category.model';
-import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-product-listing',
@@ -20,11 +19,10 @@ import { CartService } from '../../services/cart.service';
   imports: [CommonModule, FormsModule, ProductGridCardComponent],
 })
 export class ProductListingComponent implements OnInit {
-  private readonly router = inject(Router);
-  private readonly productService = inject(ProductService);
-  private readonly userService = inject(UserService);
-  private readonly categoryService = inject(CategoryService);
-  private readonly cartService = inject(CartService);
+  private router = inject(Router);
+  private productService = inject(ProductService);
+  private userService = inject(UserService);
+  private categoryService = inject(CategoryService);
 
   products: ProductResponse[] = [];
   filteredProducts: ProductResponse[] = [];
@@ -122,7 +120,7 @@ export class ProductListingComponent implements OnInit {
       if (!this.sellers.has(id)) {
         this.userService.getUserById(id).subscribe({
           next: (user) => {
-            if (user?.role === 'SELLER') {
+            if (user && user.role === 'SELLER') {
               this.sellers.set(id, user);
             }
           },
@@ -137,6 +135,11 @@ export class ProductListingComponent implements OnInit {
 
   viewProductDetail(productId: string) {
     this.router.navigate(['/product', productId]);
+  }
+
+  addToCart(productId: string) {
+    alert('Add to Cart feature coming soon!');
+    console.log('add to cart', productId);
   }
 
   onSearchChange() {
