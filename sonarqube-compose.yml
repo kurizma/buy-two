@@ -1,3 +1,5 @@
+# version: '3.8' # (optional) Modern Docker Compose (v2+) defaults to a recent version automatically.
+
 services:
   sonarqube-db:
     image: postgres:15-alpine
@@ -12,7 +14,7 @@ services:
     volumes:
       - sonarqube-db:/var/lib/postgresql/data
     networks:
-      - buy-two-net
+      - java-jenk_sonarnet
 
   sonarqube:
     image: sonarqube:community
@@ -33,7 +35,7 @@ services:
       - sonarqube-data:/opt/sonarqube/data
       - sonarqube-logs:/opt/sonarqube/logs
     networks:
-      - buy-two-net
+      - buy-two_java-jenk_sonarnet
 
 volumes:
   sonarqube-db:
@@ -41,6 +43,5 @@ volumes:
   sonarqube-logs:
 
 networks:
-  buy-two-net:
-    external: true
-    name: buy-two_java-jenk_sonarnet
+  buy-two_java-jenk_sonarnet:
+    driver: bridge

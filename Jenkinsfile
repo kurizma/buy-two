@@ -271,8 +271,8 @@ pipeline {
 								string(credentialsId: 'sonarqube-host-url', variable: 'SONAR_HOST')]) {
 								sh '''
                                     sonar-scanner \
-                                        -Dsonar.projectKey=safe-zone-frontend \
-                                        -Dsonar.projectName="Safe Zone - Frontend" \
+                                        -Dsonar.projectKey=buy-two-frontend \
+                                        -Dsonar.projectName="Buy-Two - Frontend" \
                                         -Dsonar.sources=src/app \
                                         -Dsonar.exclusions=**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,**/*.d.ts,node_modules/**,dist/**,coverage/**,**/.env,**/.env*,src/environments/**,src/assets/** \
                                         -Dsonar.cpd.exclusions=**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,node_modules/** \
