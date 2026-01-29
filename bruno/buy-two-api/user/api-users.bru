@@ -1,16 +1,15 @@
 meta {
-  name: /api/users/sellers
+  name: /api/users
   type: http
-  seq: 1
+  seq: 5
 }
 
 get {
-  url: {{userUrl}}/api/users/sellers
+  url: {{userUrl}}/api/users
   body: none
   auth: inherit
 }
 
 settings {
   encodeUrl: true
-  timeout: 0
 }
