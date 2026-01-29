@@ -73,9 +73,12 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
   }
 
   proceedToCheckout(): void {
+    if (this.cartService.getItemCount() === 0) {
+      return; // Do not proceed if cart is empty
+    }
     // Navigate to checkout page
     console.log('Proceeding to checkout...');
-    this.router.navigate(['/checkout']);
+    this.router.navigate(['/order-checkout']);
   }
 
   trackByProductId(index: number, item: CartItem): string {
