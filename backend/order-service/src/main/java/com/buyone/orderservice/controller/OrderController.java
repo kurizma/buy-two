@@ -9,7 +9,6 @@ import com.buyone.orderservice.model.order.OrderStatus;
 import com.buyone.orderservice.service.OrderService;
 import com.buyone.orderservice.exception.BadRequestException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,8 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,18 +26,17 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 @Slf4j
-@SecurityRequirement(name = "bearerAuth")
 public class OrderController {
     
     private final OrderService orderService;
     
     @PostMapping("/checkout")
     @Operation(summary = "Create order from cart", description = "Pay on Delivery")
-    @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<Order> createOrderFromCart(
             @Valid @RequestBody CreateOrderRequest req,
-            Authentication auth) {
-        String userId = getUserIdFromAuth(auth);
+            @RequestHeader("X-USER-ID") String userId,
+            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+        validateRole(role, "CLIENT");
         log.info("Client {} checking out with address", userId);
         Order order = orderService.createOrderFromCart(userId, req.getShippingAddress());
         return ResponseEntity.status(HttpStatus.CREATED).body(order);
@@ -48,9 +44,10 @@ public class OrderController {
     
     @GetMapping("/buyer")
     @Operation(summary = "Get buyer orders")
-    @PreAuthorize("hasRole('CLIENT')")
-    public ResponseEntity<List<OrderResponse>> getBuyerOrders(Authentication auth) {
-        String userId = getUserIdFromAuth(auth);
+    public ResponseEntity<List<OrderResponse>> getBuyerOrders(
+            @RequestHeader("X-USER-ID") String userId,
+            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+        validateRole(role, "CLIENT");
         List<OrderResponse> orders = orderService.getBuyerOrders(userId)
                 .stream()
                 .map(this::mapToOrderResponse)
@@ -69,33 +66,37 @@ public class OrderController {
     
     @PutMapping("/{orderNumber}/status")
     @Operation(summary = "Update order status", description = "Seller: PENDING→CONFIRMED→SHIPPED→DELIVERED")
-    @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<OrderResponse> updateStatus(
             @PathVariable String orderNumber,
             @RequestParam OrderStatus status,
-            Authentication auth) {
-        String sellerId = getUserIdFromAuth(auth);
+            @RequestHeader("X-USER-ID") String sellerId,
+            @RequestHeader(value = "X-USER-ROLE", defaultValue = "SELLER") String role) {
+        validateRole(role, "SELLER");
         log.info("Seller {} updating order {} to {}", sellerId, orderNumber, status);
         OrderResponse updated = orderService.updateStatus(orderNumber, sellerId, status)
                 .map(this::mapToOrderResponse)
                 .orElseThrow(() -> new BadRequestException("Order not found or update failed: " + orderNumber));
-        return ResponseEntity.ok(updated);  // No .get() needed
+        return ResponseEntity.ok(updated);
     }
     
     @PostMapping("/{orderNumber}/cancel")
     @Operation(summary = "Cancel PENDING order")
-    @PreAuthorize("hasRole('CLIENT')")
-    public ResponseEntity<Void> cancelOrder(@PathVariable String orderNumber, Authentication auth) {
-        String userId = getUserIdFromAuth(auth);
+    public ResponseEntity<Void> cancelOrder(
+            @PathVariable String orderNumber,
+            @RequestHeader("X-USER-ID") String userId,
+            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+        validateRole(role, "CLIENT");
         orderService.cancelOrder(orderNumber, userId);
         return ResponseEntity.noContent().build();
     }
     
     @PostMapping("/{orderNumber}/redo")
     @Operation(summary = "Redo CANCELLED order")
-    @PreAuthorize("hasRole('CLIENT')")
-    public ResponseEntity<OrderResponse> redoOrder(@PathVariable String orderNumber, Authentication auth) {
-        String userId = getUserIdFromAuth(auth);
+    public ResponseEntity<OrderResponse> redoOrder(
+            @PathVariable String orderNumber,
+            @RequestHeader("X-USER-ID") String userId,
+            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+        validateRole(role, "CLIENT");
         OrderResponse newOrder = orderService.redoOrder(orderNumber, userId)
                 .map(this::mapToOrderResponse)
                 .orElseThrow(() -> new BadRequestException("Order not found: " + orderNumber));
@@ -104,11 +105,11 @@ public class OrderController {
     
     @GetMapping("/buyer/search")
     @Operation(summary = "Search buyer orders")
-    @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<Page<OrderResponse>> searchMyOrders(
             @Valid @ModelAttribute OrderSearchRequest req,
-            Authentication auth) {
-        String userId = getUserIdFromAuth(auth);
+            @RequestHeader("X-USER-ID") String userId,
+            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+        validateRole(role, "CLIENT");
         Page<OrderResponse> orders = orderService.searchBuyerOrders(userId, req)
                 .map(this::mapToOrderResponse);
         return ResponseEntity.ok(orders);
@@ -116,16 +117,22 @@ public class OrderController {
     
     @GetMapping("/seller")
     @Operation(summary = "Get seller orders", description = "Paginated dashboard")
-    @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<Page<OrderResponse>> getSellerOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            Authentication auth) {
-        String sellerId = getUserIdFromAuth(auth);
+            @RequestHeader("X-USER-ID") String sellerId,
+            @RequestHeader(value = "X-USER-ROLE", defaultValue = "SELLER") String role) {
+        validateRole(role, "SELLER");
         Pageable pageable = PageRequest.of(page, size);
         Page<OrderResponse> orders = orderService.getSellerOrders(sellerId, pageable)
                 .map(this::mapToOrderResponse);
         return ResponseEntity.ok(orders);
+    }
+    
+    private void validateRole(String role, String requiredRole) {
+        if (!requiredRole.equals(role)) {
+            throw new BadRequestException("Required role: " + requiredRole + ", got: " + role);
+        }
     }
     
     private OrderResponse mapToOrderResponse(com.buyone.orderservice.model.order.Order order) {
@@ -150,11 +157,4 @@ public class OrderController {
                 .build();
     }
     
-    private String getUserIdFromAuth(Authentication auth) {
-        String userId = (String) auth.getPrincipal();
-        if (userId == null || userId.trim().isEmpty()) {
-            throw new BadRequestException("User ID not found in authentication");
-        }
-        return userId;
-    }
 }

@@ -28,3 +28,4 @@ target/
 .husky/
 
 ./notebook_files
+./bruno

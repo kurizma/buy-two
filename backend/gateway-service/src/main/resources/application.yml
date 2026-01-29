@@ -30,7 +30,6 @@ spring:
           predicates:
             - Path=/api/users/**
             - Method=GET
-          # IMPORTANT: no JwtHeader filter here
 
         - id: user-service-api
           uri: lb://USER-SERVICE
@@ -39,7 +38,6 @@ spring:
           filters:
             - JwtHeader
 
-        # Existing secured user API route (for non-GET, admin, etc.)
         - id: product-service
           uri: lb://PRODUCT-SERVICE
           predicates:
@@ -53,17 +51,16 @@ spring:
             - Path=/media/**
           filters:
             - JwtHeader
-        
-           # NEW: Public categories route (no JWT required)
+
         - id: categories-service
-          uri: lb://PRODUCT-SERVICE  # Assuming categories in product-service
+          uri: lb://PRODUCT-SERVICE
           predicates:
             - Path=/categories/**
 
         - id: order-service
-          uri: lb://ORDER-SERVICE  # Via discovery-service
+          uri: lb://ORDER-SERVICE
           predicates:
-            - Path=/api/orders/**, /api/cart/**
+            - Path=/api/orders/**, /api/cart/**, /api/analytics/**
           filters:
             - JwtHeader
 
