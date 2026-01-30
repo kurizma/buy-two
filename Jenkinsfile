@@ -436,12 +436,14 @@ EOF
                     """
 				}
 
-				cleanWs notFailBuild: true
-
+				// Archive artifacts BEFORE cleaning workspace
 				archiveArtifacts artifacts: 'backend/*/target/surefire-reports/*.xml', allowEmptyArchive: true
 				archiveArtifacts artifacts: 'frontend/test-results/junit/*.xml', allowEmptyArchive: true
 				junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
 				junit allowEmptyResults: true, testResults: '**/test-results/junit/*.xml'
+
+				// Clean workspace LAST
+				cleanWs notFailBuild: true
 
 				if (env.GIT_COMMIT) {
 					withCredentials([string(credentialsId: 'buy-two-pat', variable: 'GITHUB_TOKEN')]) {
