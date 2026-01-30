@@ -50,7 +50,7 @@
                 <label class="form-label small" for="quantity">Quantity</label>
                 <div class="input-group" style="max-width: 140px;">
                   <button 
-                    class="btn btn-outline-secondary btn-sm" 
+                    class="btn btn-outline-primary btn-sm" 
                     type="button"
                     (click)="decreaseQuantity(item.productId)">
                     -
@@ -63,7 +63,7 @@
                     min="1"
                     style="max-width: 60px;">
                   <button 
-                    class="btn btn-outline-secondary btn-sm" 
+                    class="btn btn-outline-primary btn-sm" 
                     type="button"
                     (click)="increaseQuantity(item.productId)">
                     +
@@ -132,7 +132,8 @@
 
           <!-- Free Shipping Notice -->
           <div *ngIf="cartService.getShippingCost() > 0" class="alert alert-info small mb-3">
-            ✨ Add <strong>{{ 50 - cartService.getTotalInclVat() | currency:'EUR' }}</strong> more for free shipping!
+            <i class="fas fa-truck me-2"></i>
+            Add <strong>{{ 50 - cartService.getTotalInclVat() | currency:'EUR' }}</strong> more for free shipping!
           </div>
           
           <div class="d-flex justify-content-between mb-4 fs-4 fw-bold">
@@ -148,7 +149,7 @@
           </button>
           
           <button 
-            class="btn btn-outline-secondary w-100 mb-2" 
+            class="btn btn-outline-primary w-100 mb-2" 
             routerLink="/product-listing">
             Continue Shopping
           </button>

@@ -1,5 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormsModule,
+} from '@angular/forms';
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -7,11 +13,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { CartService } from '../../services/cart.service';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
+import { MatRadioModule } from '@angular/material/radio';
+import { RouterLink, Router } from '@angular/router';
 
 @Component({
-  selector: 'app-order-checkout',
-  templateUrl: './order-checkout.component.html',
-  styleUrls: ['./order-checkout.component.css'],
+  selector: 'app-checkout',
+  templateUrl: './checkout.component.html',
+  styleUrls: ['./checkout.component.css'],
   imports: [
     MatStepper,
     MatStepperModule,
@@ -21,16 +29,22 @@ import { MatIcon } from '@angular/material/icon';
     MatButtonModule, // for mat-button
     MatIcon, // for mat-icon
     CommonModule, // for ngIf and ngFor
+    RouterLink, // for routerLink
+    MatRadioModule, // for mat-radio-button
+    FormsModule, // for ngModel
   ],
 })
-export class OrderCheckoutComponent implements OnInit {
+export class CheckoutComponent implements OnInit {
   checkoutForm: FormGroup;
   cartItems: any[] = [];
   total = 0;
   formSubmitted = false;
 
   public cartService: CartService = inject(CartService);
+  private readonly router = inject(Router);
   private fb: FormBuilder = inject(FormBuilder);
+  reviewForm: FormGroup = this.fb.group({}); // Dummy form for step control
+  selectedPayment: string = 'PAY_ON_DELIVERY';
 
   constructor() {
     this.checkoutForm = this.fb.group({
@@ -58,8 +72,22 @@ export class OrderCheckoutComponent implements OnInit {
   }
 
   placeOrder() {
-    // Call orders API with form value + cart
-    console.log('Order placed with Pay on Delivery');
-    // Navigate to orders or clear cart
+    // Mock order creation (no service needed)
+    const mockOrderId = 'order-' + Date.now();
+    const orderData = {
+      id: mockOrderId,
+      address: this.checkoutForm.value,
+      items: this.cartService.cartItems,
+      total: this.cartService.getTotal(),
+      paymentMethod: this.selectedPayment,
+    };
+
+    console.log('✅ Order created:', orderData);
+
+    // Clear cart
+    this.cartService.clearCart();
+
+    // Navigate to mock orders page
+    this.router.navigate(['/orders', mockOrderId]);
   }
 }

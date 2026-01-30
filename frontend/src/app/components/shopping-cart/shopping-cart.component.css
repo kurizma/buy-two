@@ -33,7 +33,7 @@
 }
 
 .text-qty {
-    color: var(--text-secondary);
+    color: var(--link);
 }
 
 .items-badge {
