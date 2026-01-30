@@ -1,12 +1,13 @@
 <div class="container py-4 d-flex flex-column flex-md-row justify-content-between">
-  <!-- LEFT: Vertical Steps (60% width) -->
+
+  <!-- ************ LEFT: Vertical Steps (60% width) ************* -->
   <div class="steps-column">
     <h1 class="checkout-title">Order Checkout
       <i class="fas fa-check-circle ms-2"></i>
     </h1>
 
     <mat-vertical-stepper class="vertical-stepper" [linear]="true" #stepper>
-      <!-- Step 1: Address -->
+      <!-- ************ Step 1: Address ************* -->
       <mat-step>
         <ng-template matStepLabel>Shipping Address</ng-template>
 
@@ -50,34 +51,98 @@
           </mat-form-field>
 
           <div>
-            <button class="cont-button" mat-button matStepperNext>Continue to Review</button>
+            <button class="cont-button" mat-button matStepperNext>Continue</button>
           </div>
         </form>
       </mat-step>
 
-      <!-- Step 2: Review -->
-      <mat-step>
+      <!-- ************ Step 2: Review ************* -->
+      <mat-step [stepControl]="reviewForm">
         <ng-template matStepLabel>Review Order</ng-template>
-        <div *ngFor="let item of cartItems">
-          {{item.productName}} x {{item.quantity}} - €{{item.price * item.quantity}}
+        
+        <!-- Cart Items Table (Compact) -->
+        <div *ngFor="let item of cartItems" class="review-item mb-3 p-3 border rounded">
+          <div class="d-flex align-items-center">
+            <img [src]="item.imageUrl" alt="{{item.productName}}" class="rounded me-3" style="width:60px;height:60px;object-fit:cover">
+            <div class="flex-grow-1">
+              <h6 class="mb-1">{{item.productName}}</h6>
+              <small class="text">Seller: {{item.sellerName}} | Qty: {{item.quantity}}</small>
+            </div>
+            <div class="text-end ms-3">
+              <div class="fw-bold">{{item.price | currency:'EUR'}} x {{item.quantity}}</div>
+              <div class="text-primary">{{(item.price * item.quantity) | currency:'EUR'}}</div>
+            </div>
+          </div>
         </div>
-        <p>Total: €{{total}}</p>
-        <div class="action-btn">
-          <button class="cont-button"mat-button matStepperPrevious>Back</button>
-          <button class="cont-button" mat-button matStepperNext>Confirm</button>
+
+        <!-- Totals -->
+        <div class="border-top pt-3 mt-3">
+          <div class="d-flex fw-bold justify-content-between mb-2">
+            <span>Total:</span> <strong>{{cartService.getTotal() | currency:'EUR'}}</strong>
+          </div>
         </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 mt-4">
+          <a routerLink="/shopping-cart" class="btn btn-outline-primary">
+            <i class="fas fa-edit me-1"></i>Edit Cart
+          </a>
+          <button mat-button matStepperNext class="btn cont-button ms-auto">
+            Continue to Payment
+          </button>
+        </div>
+        <form [formGroup]="reviewForm" style="display:none"></form>
       </mat-step>
 
-      <!-- Step 3: Confirm -->
+      <!-- ************ Step 3: Confirm ************* -->
       <mat-step>
-        <ng-template matStepLabel>Complete</ng-template>
-        <p>Order confirmed! Pay on Delivery selected.</p>
-        <button class="cont-button" mat-raised-button color="primary" (click)="placeOrder()">Place Order</button>
+        <ng-template matStepLabel>Payment</ng-template>
+        
+        <div class="payment-section">
+          <h5>Select Payment Method</h5>
+          
+          <!-- Pay on Delivery (Only Option) -->
+          <mat-radio-group [(ngModel)]="selectedPayment" class="payment-option">
+            <mat-radio-button value="PAY_ON_DELIVERY" checked>
+              <div class="payment-card">
+                <i class="fas fa-truck me-2"></i>
+                <strong>Pay on Delivery</strong>
+                <div>
+                  <small class="text-primary"> (Pay cash/card to delivery person)</small>
+                </div>
+              </div>
+            </mat-radio-button>
+          </mat-radio-group>
+          
+          <!-- Order Summary -->
+          <div class="order-preview mt-4 p-3 bg-light rounded">
+            <h6>Final Order</h6>
+            <div class="d-flex justify-content-between">
+              <span>Total Amount:</span>
+              <strong>{{cartService.getTotal() | currency:'EUR'}}</strong>
+            </div>
+            <div class="text-success">
+              <small><i class="fas fa-shipping-fast me-1"></i>Free shipping eligible</small>
+            </div>
+          </div>
+          
+          <!-- Confirm Button -->
+          <div class="mt-4">
+            <button 
+              class="cont-button w-100" 
+              mat-raised-button 
+              color="primary" 
+              (click)="placeOrder()"
+              [disabled]="selectedPayment !== 'PAY_ON_DELIVERY'">
+              Confirm & Place Order
+            </button>
+          </div>
+        </div>
       </mat-step>
     </mat-vertical-stepper>
   </div>
 
-  <!-- RIGHT: Order Summary (40% width) -->
+  <!-- ************ RIGHT: Order Summary (40% width) ************* -->
   <div class="order-summary-card">
     <h4 class="summary-title">Order Summary</h4>
     
@@ -115,6 +180,13 @@
         <strong>Total</strong>
         <strong>€{{cartService.getTotal().toFixed(2)}}</strong>
       </div>
+    </div>
+
+    <!-- Back to Shopping Cart -->
+    <div class="back-to-cart">
+      <a routerLink="/shopping-cart" class="btn btn-outline-primary w-100 mb-3">
+        <i class="fas fa-arrow-left me-2"></i> Back to Shopping Cart
+      </a>
     </div>
 
     <!-- Trust Indicators -->
