@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CartService } from '../../services/cart.service';
 import { CommonModule } from '@angular/common';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-order-checkout',
@@ -18,6 +19,7 @@ import { CommonModule } from '@angular/common';
     MatFormFieldModule, // for mat-form-field
     MatInputModule, // for matInput
     MatButtonModule, // for mat-button
+    MatIcon, // for mat-icon
     CommonModule, // for ngIf and ngFor
   ],
 })
@@ -25,13 +27,16 @@ export class OrderCheckoutComponent implements OnInit {
   checkoutForm: FormGroup;
   cartItems: any[] = [];
   total = 0;
+  formSubmitted = false;
 
-  private cartService: CartService = inject(CartService);
+  public cartService: CartService = inject(CartService);
   private fb: FormBuilder = inject(FormBuilder);
 
   constructor() {
     this.checkoutForm = this.fb.group({
-      street: ['', Validators.required],
+      firstname: ['', Validators.required],
+      lastname: ['', Validators.required],
+      address: ['', Validators.required],
       city: ['', Validators.required],
       zip: ['', Validators.required],
     });
@@ -43,6 +48,7 @@ export class OrderCheckoutComponent implements OnInit {
   }
 
   goToNext(stepper: MatStepper) {
+    this.formSubmitted = true;
     // Mark form as touched  to show errors
     this.checkoutForm.markAllAsTouched();
 
