@@ -18,8 +18,6 @@ pipeline {
 	}
 
 	environment {
-		// Credentials (optional - add 'slack-webhook' credential in Jenkins if you want notifications)
-		// SLACK_WEBHOOK = credentials('slack-webhook')
 		BRANCH = "${env.BRANCH_NAME ?: env.GIT_BRANCH ?: params.BRANCH ?: 'main'}"
 
 		// Image versioning
@@ -329,6 +327,33 @@ pipeline {
 						dir("${env.WORKSPACE}") {
 							def cleanBranch = "${BRANCH ?: GIT_BRANCH ?: 'main'}".replaceAll(/^origin\//, '')
 
+							// Create .env from Jenkins credentials
+							withCredentials([
+								string(credentialsId: 'atlas-uri', variable: 'ATLAS_URI'),
+								string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET'),
+								string(credentialsId: 'keystore-password', variable: 'KEYSTORE_PASSWORD'),
+								string(credentialsId: 'r2-endpoint', variable: 'R2_ENDPOINT'),
+								string(credentialsId: 'r2-access-key', variable: 'R2_ACCESS_KEY'),
+								string(credentialsId: 'r2-secret-key', variable: 'R2_SECRET_KEY')
+							]) {
+								sh '''
+									cat > .env << EOF
+ATLAS_URI=${ATLAS_URI}
+SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_SECRET=${JWT_SECRET}
+KEY_STORE_PASSWORD=${KEYSTORE_PASSWORD}
+R2_ENDPOINT=${R2_ENDPOINT}
+R2_ACCESS_KEY=${R2_ACCESS_KEY}
+R2_SECRET_KEY=${R2_SECRET_KEY}
+USER_DB=buy-two
+PRODUCT_DB=buy-two
+MEDIA_DB=buy-two
+ORDER_DB=buy-two
+SPRING_SECURITY_USER_NAME=user
+SPRING_SECURITY_USER_PASSWORD=password
+EOF
+								'''
+							}
+
 							// Cleanup old containers
 							sh 'docker compose down || true'
 							sleep 3
@@ -336,19 +361,17 @@ pipeline {
 							try {
 								echo "Building and tagging ${VERSION} as potential stable"
 
-								// Build ALL services, tag as VERSION and STABLE
 								withEnv(["IMAGE_TAG=${VERSION}"]) {
-									// Fail fast if frontend can't build/pull
 									sh 'docker compose build frontend || exit 1'
 									sh 'docker compose build --pull --parallel --progress=plain'
 									sh '''
-                                    docker tag frontend:${VERSION} frontend:${STABLE_TAG} frontend:build-${BUILD_NUMBER} || true
-                                    docker tag discovery-service:${VERSION} discovery-service:${STABLE_TAG} discovery-service:build-${BUILD_NUMBER} || true
-                                    docker tag gateway-service:${VERSION} gateway-service:${STABLE_TAG} gateway-service:build-${BUILD_NUMBER} || true
-                                    docker tag user-service:${VERSION} user-service:${STABLE_TAG} user-service:build-${BUILD_NUMBER} || true
-                                    docker tag product-service:${VERSION} product-service:${STABLE_TAG} product-service:build-${BUILD_NUMBER} || true
-                                    docker tag media-service:${VERSION} media-service:${STABLE_TAG} media-service:build-${BUILD_NUMBER} || true
-                                '''
+                                        docker tag frontend:${VERSION} frontend:${STABLE_TAG} frontend:build-${BUILD_NUMBER} || true
+                                        docker tag discovery-service:${VERSION} discovery-service:${STABLE_TAG} discovery-service:build-${BUILD_NUMBER} || true
+                                        docker tag gateway-service:${VERSION} gateway-service:${STABLE_TAG} gateway-service:build-${BUILD_NUMBER} || true
+                                        docker tag user-service:${VERSION} user-service:${STABLE_TAG} user-service:build-${BUILD_NUMBER} || true
+                                        docker tag product-service:${VERSION} product-service:${STABLE_TAG} product-service:build-${BUILD_NUMBER} || true
+                                        docker tag media-service:${VERSION} media-service:${STABLE_TAG} media-service:build-${BUILD_NUMBER} || true
+                                    '''
 
 									// Deploy new version for verification
 									sh 'docker compose up -d'
@@ -356,10 +379,11 @@ pipeline {
 
 									// Strong health check
 									sh '''
-                                    timeout 30 bash -c "until docker compose ps | grep -q Up && curl -f http://localhost:4200 || curl -f http://localhost:8080/health; do sleep 2; done" || exit 1
-                                    if docker compose ps | grep -q "Exit"; then exit 1; fi
-                                '''
+                                        timeout 30 bash -c "until docker compose ps | grep -q Up && curl -f http://localhost:4200 || curl -f http://localhost:8080/health; do sleep 2; done" || exit 1
+                                        if docker compose ps | grep -q "Exit"; then exit 1; fi
+                                    '''
 								}
+								echo "✅ New deploy verified - promoted build-${BUILD_NUMBER} to stable"
 								echo "✅ New deploy verified - promoted build-${BUILD_NUMBER} to stable"
 								currentBuild.result = 'SUCCESS'
 
