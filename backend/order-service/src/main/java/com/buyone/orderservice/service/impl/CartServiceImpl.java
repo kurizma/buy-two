@@ -5,6 +5,8 @@ import com.buyone.orderservice.exception.BadRequestException;
 import com.buyone.orderservice.model.Product;
 import com.buyone.orderservice.model.cart.Cart;
 import com.buyone.orderservice.model.cart.CartItem;
+import com.buyone.orderservice.dto.response.ProductResponse;
+import com.buyone.orderservice.dto.response.ApiResponse;
 import com.buyone.orderservice.repository.CartRepository;
 import com.buyone.orderservice.service.CartService;
 import lombok.RequiredArgsConstructor;
@@ -49,16 +51,36 @@ public class CartServiceImpl implements CartService {
         if (existing.isPresent()) {
             existing.get().setQuantity(existing.get().getQuantity() + item.getQuantity());
         } else {
-            Product product = productClient.getById(item.getProductId());
-             if (product.getQuantity() < item.getQuantity()) {
-                 throw new BadRequestException("Insufficient stock");
-             }
+            // Production integration - Full ApiResponse handling
+            ApiResponse<ProductResponse> response = productClient.getById(item.getProductId());
             
-            // Populate snapshot
+            if (!response.isSuccess() || response.getData() == null) {
+                log.warn("Product not found: {}", item.getProductId());
+                throw new BadRequestException("Product not found: " + item.getProductId());
+            }
+            
+            ProductResponse product = response.getData();
+            
+            // Debug logs (keep for now)
+            log.info("Product: {} quantity={}, request qty={}",
+                    product.getId(),
+                    product.getQuantity(),
+                    item.getQuantity());
+            
+            int availableStock = Optional.ofNullable(product.getQuantity()).orElse(0);
+            log.info("Available: {}, requested: {}", availableStock, item.getQuantity());
+            
+            if (availableStock < item.getQuantity()) {
+                throw new BadRequestException("Insufficient stock: " + item.getQuantity() +
+                        " requested, " + availableStock + " available");
+            }
+            
+            // Populate cart item snapshot
             item.setProductName(product.getName());
             item.setPrice(product.getPrice());
             item.setImageUrl(product.getImages() != null && !product.getImages().isEmpty()
                     ? product.getImages().get(0) : null);
+            
             cart.getItems().add(item);
         }
         return recalculateTotals(cart);

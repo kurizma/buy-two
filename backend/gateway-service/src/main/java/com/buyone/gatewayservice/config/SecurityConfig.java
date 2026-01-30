@@ -33,9 +33,16 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/media/images/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                         
-                        // ✅ PERFECT: Secure endpoints require JWT
-                        .pathMatchers("/api/cart/**").authenticated()
+                        // Cart
+                        .pathMatchers(HttpMethod.GET, "/api/cart").permitAll()
+                        .pathMatchers(HttpMethod.POST,  "/api/cart/**").permitAll()
+                        .pathMatchers(HttpMethod.PUT,   "/api/cart/**").permitAll()
+                        .pathMatchers(HttpMethod.DELETE, "/api/cart/**").permitAll()
+                        
+                        // Order
                         .pathMatchers("/api/orders/**").authenticated()
+                        
+                        // Analyrics
                         .pathMatchers("/api/analytics/**").authenticated()
                         
                         .pathMatchers("/actuator/health").permitAll()

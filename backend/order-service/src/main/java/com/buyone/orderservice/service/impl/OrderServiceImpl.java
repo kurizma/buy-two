@@ -14,6 +14,8 @@ import com.buyone.orderservice.model.order.PaymentMethod;
 import com.buyone.orderservice.repository.OrderRepository;
 import com.buyone.orderservice.service.CartService;
 import com.buyone.orderservice.service.OrderService;
+import com.buyone.orderservice.dto.response.ProductResponse;
+import com.buyone.orderservice.dto.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -101,17 +103,25 @@ public class OrderServiceImpl implements OrderService {
      * Guarantees accuracy even if seller changed price/name since cart add.
      */
     private OrderItem fetchFreshProductSnapshot(CartItem cartItem) {
-        Product product = productClient.getById(cartItem.getProductId());
+        ApiResponse<ProductResponse> response = productClient.getById(cartItem.getProductId());
+        
+        if (!response.isSuccess() || response.getData() == null) {
+            log.warn("Product not found for order snapshot: {}", cartItem.getProductId());
+            throw new ResourceNotFoundException("Product not found: " + cartItem.getProductId());
+        }
+        
+        ProductResponse product = response.getData();
         
         return OrderItem.builder()
                 .productId(product.getId())
-                .productName(product.getName())     // Fresh for receipts
-                .sellerId(product.getUserId())      // Fresh for seller analytics
-                .price((product.getPrice())) // Fresh for billing
-                .quantity(cartItem.getQuantity())   // User choice from cart
-                .imageUrl(safeFirstImage(product.getImages()))  // Fresh for UI
+                .productName(product.getName())
+                .sellerId(product.getUserId())  // Maps userId → sellerId
+                .price(product.getPrice())
+                .quantity(cartItem.getQuantity())
+                .imageUrl(safeFirstImage(product.getImages()))
                 .build();
     }
+
     
     /**
      * Safely extracts first image URL - null-safe.
