@@ -1,0 +1,32 @@
+meta {
+  name: /api/users/me
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{userUrl}}/api/users/me
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Authorization: Bearer {{clientToken}}
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb29uQGNsaWVudC5rciIsImlkIjoiNjk3YjdjN2M0NjU3MmQ3MDAzZjQxMmExIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc2OTcwMTYyNSwiZXhwIjoxNzY5Nzg4MDI1fQ.wHS77xs4ioBRhLT4OZkZTCicCATzg9OMKqHxrT9plWY
+}
+
+body:json {
+  {
+    "name": "Updated Client Name",
+    "avatar": null
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

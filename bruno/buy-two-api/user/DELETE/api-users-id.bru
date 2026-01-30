@@ -1,0 +1,15 @@
+meta {
+  name: /api/users/id
+  type: http
+  seq: 1
+}
+
+delete {
+  url: {{userUrl}}/api/users/id
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}

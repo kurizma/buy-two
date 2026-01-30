@@ -13,10 +13,7 @@ spring:
     user:
       name: ${SPRING_SECURITY_USER_NAME:user}
       password: ${SPRING_SECURITY_USER_PASSWORD}
-    oauth2:
-      resourceserver:
-        jwt:
-          secret: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_SECRET}
+
   cloud:
     loadbalancer:
       ribbon:

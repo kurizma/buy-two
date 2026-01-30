@@ -36,7 +36,7 @@ public class CartServiceImpl implements CartService {
     
     @Override
     @Transactional  // Consistency guarantee
-    public Cart addItem(@NotBlank String userId, CartItem item) {
+    public Cart addItem(String userId, CartItem item) {
         validateCartItem(item);
         Cart cart = getOrCreateCart(userId);
         
@@ -71,8 +71,8 @@ public class CartServiceImpl implements CartService {
     
     @Override
     @Transactional
-    public Cart updateQuantity(@NotBlank String userId, @NotBlank String productId,
-                               @Min(1) int quantity) {  // ✅ Validation
+    public Cart updateQuantity(String userId, String productId,
+                               int quantity) {
         Cart cart = getOrCreateCart(userId);
         boolean updated = cart.getItems().stream()
                 .filter(ci -> ci.getProductId().equals(productId))
@@ -92,7 +92,7 @@ public class CartServiceImpl implements CartService {
     
     @Override
     @Transactional
-    public Cart removeItem(@NotBlank String userId, @NotBlank String productId) {
+    public Cart removeItem(String userId, String productId) {
         Cart cart = getOrCreateCart(userId);
         boolean removed = cart.getItems().removeIf(ci -> ci.getProductId().equals(productId));
         if (!removed) {
@@ -103,7 +103,7 @@ public class CartServiceImpl implements CartService {
     
     @Override
     @Transactional
-    public Cart clearCart(@NotBlank String userId) {
+    public Cart clearCart(String userId) {
         return cartRepository.save(Cart.builder()
                 .id(userId)
                 .userId(userId)
