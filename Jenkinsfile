@@ -446,22 +446,26 @@ EOF
 				cleanWs notFailBuild: true
 
 				if (env.GIT_COMMIT) {
-					withCredentials([string(credentialsId: 'buy-two-pat', variable: 'GITHUB_TOKEN')]) {
-						sh """
-							set +e
+					try {
+						withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+							sh """
+								set +e
 
-							curl -s -H "Authorization: token ${GITHUB_TOKEN}" \\
-							  -X POST -H "Accept: application/vnd.github.v3+json" \\
-							  -d '{"state":"${ghState}", "context":"buy-two", "description":"Jenkins ${buildState}", "target_url":"${BUILD_URL}"}' \\
-							  https://api.github.com/repos/kurizma/buy-two/statuses/${GIT_COMMIT} || true
+								curl -s -H "Authorization: token ${GITHUB_TOKEN}" \\
+								  -X POST -H "Accept: application/vnd.github.v3+json" \\
+								  -d '{"state":"${ghState}", "context":"buy-two", "description":"Jenkins ${buildState}", "target_url":"${BUILD_URL}"}' \\
+								  https://api.github.com/repos/kurizma/buy-two/statuses/${GIT_COMMIT} || true
 
-							curl -s -H "Authorization: token ${GITHUB_TOKEN}" \\
-							  -X POST -H "Accept: application/vnd.github.v3+json" \\
-							  -d '{"state":"${ghState}", "context":"buy-two-quality-gate", "description":"Quality gate ${buildState}"}' \\
-							  https://api.github.com/repos/kurizma/buy-two/statuses/${GIT_COMMIT} || true
+								curl -s -H "Authorization: token ${GITHUB_TOKEN}" \\
+								  -X POST -H "Accept: application/vnd.github.v3+json" \\
+								  -d '{"state":"${ghState}", "context":"buy-two-quality-gate", "description":"Quality gate ${buildState}"}' \\
+								  https://api.github.com/repos/kurizma/buy-two/statuses/${GIT_COMMIT} || true
 
-							exit 0
-						"""
+								exit 0
+							"""
+						}
+					} catch (Exception e) {
+						echo "⚠️ Could not update GitHub status: ${e.message}"
 					}
 				}
 
