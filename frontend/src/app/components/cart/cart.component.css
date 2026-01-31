@@ -1,0 +1,41 @@
+.shopping-cart-title {
+    margin-top: 20px;
+    margin-left: 10px;
+}
+
+.card-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px;
+}
+
+.card-body {
+    margin: 20px 0;
+    color: var(--text-primary);
+}
+
+.total-section {
+    text-align: right;
+    margin: 20px 0;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.text-seller-name {
+    color: var(--link);
+}
+
+.text-seller-name:hover {
+    cursor: pointer;
+    color: var(--link-hover);
+}
+
+.text-qty {
+    color: var(--link);
+}
+
+.items-badge {
+    margin-top: 25px;
+}
