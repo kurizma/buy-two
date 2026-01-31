@@ -57,7 +57,7 @@ pipeline {
 		stage('Backend Build - discovery-service') {
 			steps {
 				dir('backend/discovery-service') {
-					sh "mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} clean package -DskipTests"
+					sh "JAVA_TOOL_OPTIONS='-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400' mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} clean package -DskipTests"
 				}
 			}
 		}
@@ -65,7 +65,7 @@ pipeline {
 		stage('Backend Build - gateway-service') {
 			steps {
 				dir('backend/gateway-service') {
-					sh "mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} clean package -DskipTests"
+					sh "JAVA_TOOL_OPTIONS='-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400' mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} clean package -DskipTests"
 				}
 			}
 		}
@@ -73,7 +73,7 @@ pipeline {
 		stage('Backend Build - user-service') {
 			steps {
 				dir('backend/user-service') {
-					sh "mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} clean package -DskipTests"
+					sh "JAVA_TOOL_OPTIONS='-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400' mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} clean package -DskipTests"
 				}
 			}
 		}
@@ -81,7 +81,7 @@ pipeline {
 		stage('Backend Build - product-service') {
 			steps {
 				dir('backend/product-service') {
-					sh "mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} clean package -DskipTests"
+					sh "JAVA_TOOL_OPTIONS='-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400' mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} clean package -DskipTests"
 				}
 			}
 		}
@@ -89,7 +89,7 @@ pipeline {
 		stage('Backend Build - media-service') {
 			steps {
 				dir('backend/media-service') {
-					sh "mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} clean package -DskipTests"
+					sh "JAVA_TOOL_OPTIONS='-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400' mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} clean package -DskipTests"
 				}
 			}
 		}
@@ -100,7 +100,7 @@ pipeline {
 		stage('Backend Tests - discovery-service') {
 			steps {
 				dir('backend/discovery-service') {
-					sh "mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} test"
+					sh "JAVA_TOOL_OPTIONS='-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400' mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} test"
 				}
 			}
 		}
@@ -108,7 +108,7 @@ pipeline {
 		stage('Backend Tests - gateway-service') {
 			steps {
 				dir('backend/gateway-service') {
-					sh "mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} test"
+					sh "JAVA_TOOL_OPTIONS='-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400' mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} test"
 				}
 			}
 		}
@@ -116,7 +116,7 @@ pipeline {
 		stage('Backend Tests - user-service') {
 			steps {
 				dir('backend/user-service') {
-					sh "mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} test"
+					sh "JAVA_TOOL_OPTIONS='-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400' mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} test"
 				}
 			}
 		}
@@ -124,7 +124,7 @@ pipeline {
 		stage('Backend Tests - product-service') {
 			steps {
 				dir('backend/product-service') {
-					sh "mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} test"
+					sh "JAVA_TOOL_OPTIONS='-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400' mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} test"
 				}
 			}
 		}
@@ -132,7 +132,7 @@ pipeline {
 		stage('Backend Tests - media-service') {
 			steps {
 				dir('backend/media-service') {
-					sh "mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} test"
+					sh "JAVA_TOOL_OPTIONS='-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400' mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} test"
 				}
 			}
 		}
