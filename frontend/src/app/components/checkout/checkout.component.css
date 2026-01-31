@@ -51,6 +51,11 @@
   background-color: var(--primary);
 }
 
+.cont-button:hover {
+  background-color: var(--link-hover);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 /* Payment section */
 .payment-section {
   display: flex;
