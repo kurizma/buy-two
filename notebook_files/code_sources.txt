@@ -61,7 +61,6 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,6 +73,7 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers("/auth/**").permitAll()
@@ -82,17 +82,18 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/media/images/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                         
-                        // NEW: Secure Cart, Orders, and Analytics
+                        // Cart
                         .pathMatchers("/api/cart/**").authenticated()
+                        
+                        // Order
                         .pathMatchers("/api/orders/**").authenticated()
+                        
+                        // Analyrics
                         .pathMatchers("/api/analytics/**").authenticated()
                         
                         .pathMatchers("/actuator/health").permitAll()
                         .anyExchange().authenticated()
                 )
-//                .oauth2ResourceServer(oauth2 -> oauth2
-//                        .jwt(Customizer.withDefaults())
-                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(Customizer.withDefaults())
                 );
@@ -1444,6 +1445,27 @@ public class ApiResponse<T> {
 -e 
 --- END FILE: backend/order-service/src/main/java/com/buyone/orderservice/dto/response/ApiResponse.java ---
 
+--- FILE: backend/order-service/src/main/java/com/buyone/orderservice/dto/response/ProductResponse.java ---
+package com.buyone.orderservice.dto.response;
+
+import lombok.Data;
+import java.math.BigDecimal;
+import java.util.List;
+
+@Data
+public class ProductResponse {
+    private String id;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private Integer quantity;
+    private String userId;      // Maps to sellerId
+    private String categoryId;
+    private List<String> images;
+}
+-e 
+--- END FILE: backend/order-service/src/main/java/com/buyone/orderservice/dto/response/ProductResponse.java ---
+
 --- FILE: backend/order-service/src/main/java/com/buyone/orderservice/dto/response/cart/CartItemResponse.java ---
 // CartItemResponse.java
 package com.buyone.orderservice.dto.response.cart;
@@ -1942,7 +1964,7 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderResponse>> createOrderFromCart(
             @Valid @RequestBody CreateOrderRequest req,
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "CLIENT");
         log.info("Client {} checking out with address", userId);
         Order order = orderService.createOrderFromCart(userId, req.getShippingAddress());
@@ -1954,13 +1976,12 @@ public class OrderController {
                         .data(orderResp)
                         .build());
     }
-
     
     @GetMapping("/buyer")
     @Operation(summary = "Get buyer orders")
     public ResponseEntity<ApiResponse<List<OrderResponse>>> getBuyerOrders(
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "CLIENT");
         List<OrderResponse> orders = orderService.getBuyerOrders(userId)
                 .stream()
@@ -1992,7 +2013,7 @@ public class OrderController {
             @PathVariable String orderNumber,
             @RequestParam OrderStatus status,
             @RequestHeader("X-USER-ID") String sellerId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "SELLER") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "SELLER");
         log.info("Seller {} updating order {} to {}", sellerId, orderNumber, status);
         OrderResponse updated = orderService.updateStatus(orderNumber, sellerId, status)
@@ -2010,7 +2031,7 @@ public class OrderController {
     public ResponseEntity<ApiResponse<Void>> cancelOrder(
             @PathVariable String orderNumber,
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "CLIENT");
         orderService.cancelOrder(orderNumber, userId);
         return ResponseEntity.ok(ApiResponse.<Void>builder()
@@ -2024,7 +2045,7 @@ public class OrderController {
     public ResponseEntity<ApiResponse<OrderResponse>> redoOrder(
             @PathVariable String orderNumber,
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "CLIENT");
         OrderResponse newOrder = orderService.redoOrder(orderNumber, userId)
                 .map(this::mapToOrderResponse)
@@ -2042,7 +2063,7 @@ public class OrderController {
     public ResponseEntity<ApiResponse<Page<OrderResponse>>> searchMyOrders(
             @Valid @ModelAttribute OrderSearchRequest req,
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "CLIENT");
         Page<OrderResponse> orders = orderService.searchBuyerOrders(userId, req)
                 .map(this::mapToOrderResponse);
@@ -2059,7 +2080,7 @@ public class OrderController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestHeader("X-USER-ID") String sellerId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "SELLER") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "SELLER");
         Pageable pageable = PageRequest.of(page, size);
         Page<OrderResponse> orders = orderService.getSellerOrders(sellerId, pageable)
@@ -2077,7 +2098,7 @@ public class OrderController {
         }
     }
     
-    private OrderResponse mapToOrderResponse(com.buyone.orderservice.model.order.Order order) {
+    private OrderResponse mapToOrderResponse(Order order) {
         List<OrderItemResponse> items = order.getItems().stream()
                 .map(item -> OrderItemResponse.builder()
                         .productName(item.getProductName())
@@ -2098,7 +2119,6 @@ public class OrderController {
                 .items(items)
                 .build();
     }
-    
 }
 -e 
 --- END FILE: backend/order-service/src/main/java/com/buyone/orderservice/controller/OrderController.java ---
@@ -2117,8 +2137,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -2136,7 +2154,7 @@ public class CartController {
     @Operation(summary = "Add item to cart", description = "Merge if same product+seller")
     public ResponseEntity<ApiResponse<Cart>> addItem(
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role,
+            @RequestHeader("X-USER-ROLE") String role,
             @Valid @RequestBody CartItem item) {
         validateRole(role, CLIENT_ROLE);
         log.debug("Adding item to cart for user: {}", userId);
@@ -2152,7 +2170,7 @@ public class CartController {
     @Operation(summary = "Get current cart")
     public ResponseEntity<ApiResponse<Optional<Cart>>> getCart(
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, CLIENT_ROLE);
         Optional<Cart> cartOpt = cartService.getCart(userId);
         if (cartOpt.isEmpty()) {
@@ -2173,7 +2191,7 @@ public class CartController {
     @Operation(summary = "Update item quantity")
     public ResponseEntity<ApiResponse<Cart>> updateQuantity(
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role,
+            @RequestHeader("X-USER-ROLE") String role,
             @PathVariable String productId,
             @PathVariable int quantity) {
         validateRole(role, CLIENT_ROLE);
@@ -2189,7 +2207,7 @@ public class CartController {
     @Operation(summary = "Remove item from cart")
     public ResponseEntity<ApiResponse<Void>> removeItem(
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role,
+            @RequestHeader("X-USER-ROLE") String role,
             @PathVariable String productId) {
         validateRole(role, CLIENT_ROLE);
         cartService.removeItem(userId, productId);
@@ -2203,7 +2221,7 @@ public class CartController {
     @Operation(summary = "Clear entire cart")
     public ResponseEntity<ApiResponse<Void>> clearCart(
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, CLIENT_ROLE);
         cartService.clearCart(userId);
         return ResponseEntity.ok(ApiResponse.<Void>builder()
@@ -2551,6 +2569,8 @@ import com.buyone.orderservice.model.order.PaymentMethod;
 import com.buyone.orderservice.repository.OrderRepository;
 import com.buyone.orderservice.service.CartService;
 import com.buyone.orderservice.service.OrderService;
+import com.buyone.orderservice.dto.response.ProductResponse;
+import com.buyone.orderservice.dto.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -2638,17 +2658,25 @@ public class OrderServiceImpl implements OrderService {
      * Guarantees accuracy even if seller changed price/name since cart add.
      */
     private OrderItem fetchFreshProductSnapshot(CartItem cartItem) {
-        Product product = productClient.getById(cartItem.getProductId());
+        ApiResponse<ProductResponse> response = productClient.getById(cartItem.getProductId());
+        
+        if (!response.isSuccess() || response.getData() == null) {
+            log.warn("Product not found for order snapshot: {}", cartItem.getProductId());
+            throw new ResourceNotFoundException("Product not found: " + cartItem.getProductId());
+        }
+        
+        ProductResponse product = response.getData();
         
         return OrderItem.builder()
                 .productId(product.getId())
-                .productName(product.getName())     // Fresh for receipts
-                .sellerId(product.getUserId())      // Fresh for seller analytics
-                .price((product.getPrice())) // Fresh for billing
-                .quantity(cartItem.getQuantity())   // User choice from cart
-                .imageUrl(safeFirstImage(product.getImages()))  // Fresh for UI
+                .productName(product.getName())
+                .sellerId(product.getUserId())  // Maps userId → sellerId
+                .price(product.getPrice())
+                .quantity(cartItem.getQuantity())
+                .imageUrl(safeFirstImage(product.getImages()))
                 .build();
     }
+
     
     /**
      * Safely extracts first image URL - null-safe.
@@ -2799,6 +2827,8 @@ import com.buyone.orderservice.exception.BadRequestException;
 import com.buyone.orderservice.model.Product;
 import com.buyone.orderservice.model.cart.Cart;
 import com.buyone.orderservice.model.cart.CartItem;
+import com.buyone.orderservice.dto.response.ProductResponse;
+import com.buyone.orderservice.dto.response.ApiResponse;
 import com.buyone.orderservice.repository.CartRepository;
 import com.buyone.orderservice.service.CartService;
 import lombok.RequiredArgsConstructor;
@@ -2843,16 +2873,36 @@ public class CartServiceImpl implements CartService {
         if (existing.isPresent()) {
             existing.get().setQuantity(existing.get().getQuantity() + item.getQuantity());
         } else {
-            Product product = productClient.getById(item.getProductId());
-             if (product.getQuantity() < item.getQuantity()) {
-                 throw new BadRequestException("Insufficient stock");
-             }
+            // Production integration - Full ApiResponse handling
+            ApiResponse<ProductResponse> response = productClient.getById(item.getProductId());
             
-            // Populate snapshot
+            if (!response.isSuccess() || response.getData() == null) {
+                log.warn("Product not found: {}", item.getProductId());
+                throw new BadRequestException("Product not found: " + item.getProductId());
+            }
+            
+            ProductResponse product = response.getData();
+            
+            // Debug logs (keep for now)
+            log.info("Product: {} quantity={}, request qty={}",
+                    product.getId(),
+                    product.getQuantity(),
+                    item.getQuantity());
+            
+            int availableStock = Optional.ofNullable(product.getQuantity()).orElse(0);
+            log.info("Available: {}, requested: {}", availableStock, item.getQuantity());
+            
+            if (availableStock < item.getQuantity()) {
+                throw new BadRequestException("Insufficient stock: " + item.getQuantity() +
+                        " requested, " + availableStock + " available");
+            }
+            
+            // Populate cart item snapshot
             item.setProductName(product.getName());
             item.setPrice(product.getPrice());
             item.setImageUrl(product.getImages() != null && !product.getImages().isEmpty()
                     ? product.getImages().get(0) : null);
+            
             cart.getItems().add(item);
         }
         return recalculateTotals(cart);
@@ -3210,15 +3260,16 @@ public class BadRequestException extends RuntimeException {
 --- FILE: backend/order-service/src/main/java/com/buyone/orderservice/client/ProductClient.java ---
 package com.buyone.orderservice.client;
 
-import com.buyone.orderservice.model.Product;
+import com.buyone.orderservice.dto.response.ProductResponse;
+import com.buyone.orderservice.dto.response.ApiResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "product-service")  // Calls http://product-service:8567
+@FeignClient(name = "product-service")
 public interface ProductClient {
-    @GetMapping("/api/products/{id}")  // GET /api/products/PROD123
-    Product getById(@PathVariable("id") String id);
+    @GetMapping("/products/{id}")
+    ApiResponse<ProductResponse> getById(@PathVariable("id") String id);
 }
 -e 
 --- END FILE: backend/order-service/src/main/java/com/buyone/orderservice/client/ProductClient.java ---

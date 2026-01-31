@@ -1,5 +1,6 @@
 meta {
   name: cart:   /api/cart/
+  seq: 1
 }
 
 headers {
@@ -10,5 +11,9 @@ headers {
 }
 
 auth {
-  mode: inherit
+  mode: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb29uQGNsaWVudC5rciIsImlkIjoiNjk3YjdjN2M0NjU3MmQ3MDAzZjQxMmExIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc2OTg0OTcwMywiZXhwIjoxNzY5OTM2MTAzfQ.SjVeUnSSZyzGJ5IUtwls3WYbWORemhFGGajgYjnMeuo
 }

@@ -11,6 +11,8 @@ import com.buyone.orderservice.model.order.Order;
 import com.buyone.orderservice.model.order.OrderItem;
 import com.buyone.orderservice.model.order.OrderStatus;
 import com.buyone.orderservice.model.order.PaymentMethod;
+import static com.buyone.orderservice.model.order.OrderStatus.*;
+import static com.buyone.orderservice.model.order.PaymentMethod.PAY_ON_DELIVERY;
 import com.buyone.orderservice.repository.OrderRepository;
 import com.buyone.orderservice.service.CartService;
 import com.buyone.orderservice.service.OrderService;
@@ -231,13 +233,15 @@ public class OrderServiceImpl implements OrderService {
                             .items(newItems)
                             .build();
                     cartService.saveCart(newCart);
-                    return createOrderFromCart(userId, null);  // refresh prices if changed
+                    return createOrderFromCart(userId, oldOrder.getShippingAddress());  // Reuse original
                 });
     }
     
     @Override
     public Page<Order> searchBuyerOrders(String userId, OrderSearchRequest req) {
-        OrderStatus status = req.getStatus() != null ? OrderStatus.valueOf(req.getStatus()) : null;
+        OrderStatus status = req.getStatus() != null
+                ? OrderStatus.valueOf(req.getStatus().toUpperCase())
+                : null;
         Pageable pageable = PageRequest.of(req.getPage(), req.getSize());
         return orderRepository.findBuyerOrdersSearch(userId, req.getKeyword(), status, pageable);
     }

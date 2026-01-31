@@ -7,7 +7,7 @@ meta {
 post {
   url: {{baseUrl}}/api/cart/items
   body: json
-  auth: inherit
+  auth: bearer
 }
 
 headers {
@@ -17,12 +17,16 @@ headers {
   Content-Type: application/json
 }
 
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb29uQGNsaWVudC5rciIsImlkIjoiNjk3YjdjN2M0NjU3MmQ3MDAzZjQxMmExIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc2OTg0OTcwMywiZXhwIjoxNzY5OTM2MTAzfQ.SjVeUnSSZyzGJ5IUtwls3WYbWORemhFGGajgYjnMeuo
+}
+
 body:json {
   {
     "productId": "693ebc3f832bec1689f8af76",
     "sellerId": "693eb7a3fb20333f7f227080",
     "productName": "Bim! Coder Win Tee",
-    "quantity": 2
+    "quantity": 5
   }
   
 }

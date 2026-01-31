@@ -33,16 +33,8 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/media/images/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                         
-                        // Cart
-                        .pathMatchers(HttpMethod.GET, "/api/cart").permitAll()
-                        .pathMatchers(HttpMethod.POST,  "/api/cart/**").permitAll()
-                        .pathMatchers(HttpMethod.PUT,   "/api/cart/**").permitAll()
-                        .pathMatchers(HttpMethod.DELETE, "/api/cart/**").permitAll()
-                        
-                        // Order
+                        .pathMatchers("/api/cart/**").authenticated()
                         .pathMatchers("/api/orders/**").authenticated()
-                        
-                        // Analyrics
                         .pathMatchers("/api/analytics/**").authenticated()
                         
                         .pathMatchers("/actuator/health").permitAll()
@@ -61,6 +53,7 @@ public class SecurityConfig {
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:4200",
                 "https://localhost:4200",
+                    "https://79.133.14.85:4200",
                 "http://localhost:*"  // Allow any local port during development
         ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
