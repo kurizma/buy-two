@@ -13,21 +13,23 @@
 
         <form class="checkout-form" [formGroup]="checkoutForm" (ngSubmit)="goToNext(stepper)">
 
-          <mat-form-field>
-            <input matInput formControlName="firstname" placeholder="First Name">
-            <mat-error *ngIf="(formSubmitted || checkoutForm.get('firstname')?.touched) && checkoutForm.get('firstname')?.hasError('required')">
-              First Name is required.
-            </mat-error>
-          </mat-form-field>
+          <div class="form-row">
+            <mat-form-field class="form-field-half">
+              <input matInput formControlName="firstname" placeholder="First Name">
+              <mat-error *ngIf="(formSubmitted || checkoutForm.get('firstname')?.touched) && checkoutForm.get('firstname')?.hasError('required')">
+                First Name is required.
+              </mat-error>
+            </mat-form-field>
 
-          <mat-form-field>
-            <input matInput formControlName="lastname" placeholder="Last Name">
-          <mat-error *ngIf="(formSubmitted || checkoutForm.get('lastname')?.touched) && checkoutForm.get('lastname')?.hasError('required')">
-              Last Name is required.
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field>
+            <mat-form-field class="form-field-half">
+              <input matInput formControlName="lastname" placeholder="Last Name">
+            <mat-error *ngIf="(formSubmitted || checkoutForm.get('lastname')?.touched) && checkoutForm.get('lastname')?.hasError('required')">
+                Last Name is required.
+              </mat-error>
+            </mat-form-field>
+          </div>
+          
+          <mat-form-field >
             <input matInput formControlName="address" placeholder="Address">
             <mat-error *ngIf="(formSubmitted || checkoutForm.get('address')?.touched) && checkoutForm.get('address')?.hasError('required')">
               Address is required.
@@ -42,11 +44,32 @@
             </mat-error>
           </mat-form-field>
 
+          <div class="form-row">
+            <mat-form-field class="form-field-half">
+              <input matInput formControlName="zip" placeholder="ZIP Code">
+              <mat-error *ngIf="(formSubmitted || checkoutForm.get('zip')?.touched)
+                                && checkoutForm.get('zip')?.hasError('required')">
+                ZIP Code is required.
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="form-field-half">
+              <input matInput formControlName="country" placeholder="Country">
+              <mat-error *ngIf="(formSubmitted || checkoutForm.get('country')?.touched)
+                                && checkoutForm.get('country')?.hasError('required')">
+                Country is required.
+              </mat-error>
+            </mat-form-field>
+          </div>
           <mat-form-field>
-            <input matInput formControlName="zip" placeholder="ZIP Code">
-            <mat-error *ngIf="(formSubmitted || checkoutForm.get('zip')?.touched)
-                              && checkoutForm.get('zip')?.hasError('required')">
-              ZIP Code is required.
+            <input matInput formControlName="phone" placeholder="Phone Number">
+            <mat-error *ngIf="(formSubmitted || checkoutForm.get('phone')?.touched)
+                              && checkoutForm.get('phone')?.hasError('required')">
+              Phone Number is required.
+            </mat-error>
+            <mat-error *ngIf="(formSubmitted || checkoutForm.get('phone')?.touched)
+                              && checkoutForm.get('phone')?.hasError('pattern')">
+              Phone Number must contain only digits.
             </mat-error>
           </mat-form-field>
 

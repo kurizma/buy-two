@@ -53,6 +53,8 @@ export class CheckoutComponent implements OnInit {
       address: ['', Validators.required],
       city: ['', Validators.required],
       zip: ['', Validators.required],
+      country: ['', Validators.required],
+      phone: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
     });
   }
 
