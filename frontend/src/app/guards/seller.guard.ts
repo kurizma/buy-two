@@ -12,6 +12,7 @@ export class SellerGuard implements CanActivate {
   constructor() {}
 
   canActivate(): boolean {
+    // Check auth + role
     if (this.authService.isSeller()) {
       return true;
     }

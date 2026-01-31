@@ -21,9 +21,7 @@
 
   </div>
   <div class="nav-actions">
-    <ng-container *ngIf="isAuthenticated; else guestLinks">
-<<<<<<< HEAD
-=======
+    @if (isAuthenticated) {
 
       <!-- Seller Dashboard or Shopping Cart -->
       @if (authService.isSeller()) {
@@ -57,10 +55,10 @@
       <a (click)="onLogout()" style="cursor: pointer">
         <i class="fas fa-sign-out-alt me-2" aria-label="Logout"></i> Logout
       </a>
-    </ng-container>
-    <ng-template #guestLinks>
+    } @else {
+      <!-- Guest Links (Public) -->
       <a routerLink="/signin">Sign In</a>
       <a routerLink="/signup">Sign Up</a>
-    </ng-template>
+    }
   </div>
 </nav>
