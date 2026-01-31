@@ -29,22 +29,22 @@ export const routes: Routes = [
   {
     path: 'profile',
     component: ProfileComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard], //Any logged-in user
   },
   {
     path: 'seller-dashboard',
     component: SellerDashboardComponent,
-    canActivate: [SellerGuard],
+    canActivate: [SellerGuard], //Only sellers
   },
   {
     path: 'cart',
     component: CartComponent,
-    canActivate: [ClientOnlyGuard, EmptyCartGuard],
+    canActivate: [ClientOnlyGuard, EmptyCartGuard], //Client + has items in cart
   },
   {
     path: 'checkout',
     component: CheckoutComponent,
-    canActivate: [ClientOnlyGuard, EmptyCartGuard],
+    canActivate: [ClientOnlyGuard, EmptyCartGuard], //Client + has items in cart
   },
   { path: '**', redirectTo: '' },
 ];

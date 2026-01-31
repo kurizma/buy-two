@@ -12,6 +12,7 @@ export class ClientOnlyGuard implements CanActivate {
   constructor() {}
 
   canActivate(): boolean {
+    // Check auth + role
     if (this.authService.isClient()) {
       return true;
     }
