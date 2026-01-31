@@ -55,8 +55,6 @@ export class ProductGridCardComponent {
       verticalPosition: 'top',
       panelClass: ['custom-snackbar'],
     });
-
-    // setTimeout(() => this.router.navigate(['/shopping-cart']), 500);
   }
 
   isInCart(productId: string): boolean {

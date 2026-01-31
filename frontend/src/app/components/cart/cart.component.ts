@@ -7,13 +7,13 @@ import { CategoryService } from '../../services/category.service';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-shopping-cart',
+  selector: 'app-cart',
   standalone: true,
   imports: [CommonModule, CurrencyPipe, RouterLink],
-  templateUrl: './shopping-cart.component.html',
-  styleUrls: ['./shopping-cart.component.css'],
+  templateUrl: './cart.component.html',
+  styleUrls: ['./cart.component.css'],
 })
-export class ShoppingCartComponent implements OnInit, OnDestroy {
+export class CartComponent implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];
   private subscription: Subscription | null = null; // Remove 'readonly' here
   public readonly cartService = inject(CartService);
