@@ -64,6 +64,11 @@ export class OrderListComponent implements OnInit {
 
     console.log('🔍 Current User ID:', this.currentUserId);
     console.log('🔍 Is Seller:', this.isSeller);
+    console.log('Seller ID:', this.currentUserId);
+    console.log(
+      'Order items sellerIds:',
+      this.orders.map((o) => o.items.map((i) => i.sellerId)),
+    );
 
     this.loadOrders();
 
@@ -192,12 +197,32 @@ export class OrderListComponent implements OnInit {
       return;
     }
 
-    if (confirm(`Cancel order ${order.orderNumber}?`)) {
+    const snackBarRef = this.snackBar.open(
+      `Are you sure you want to cancel order ${order.orderNumber}?`,
+      'Confirm',
+      {
+        duration: 5000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      },
+    );
+
+    // 👌 Confirm with snackbar action
+    snackBarRef.onAction().subscribe(() => {
       order.status = OrderStatus.CANCELLED;
       localStorage.setItem(`order_${order.id}`, JSON.stringify(order));
       this.loadOrders();
       this.applyFilters();
-    }
+
+      // ✅ Success message
+      this.snackBar.open('Order cancelled successfully.', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
+    });
   }
 
   removeOrder(order: Order, event: Event): void {
@@ -214,11 +239,31 @@ export class OrderListComponent implements OnInit {
       return;
     }
 
-    if (confirm(`Permanently remove order ${order.orderNumber}? This cannot be undone.`)) {
+    const snackBarRef = this.snackBar.open(
+      `Are you sure you want to remove order ${order.orderNumber}? This action cannot be undone.`,
+      'Confirm',
+      {
+        duration: 5000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      },
+    );
+
+    // 👌 Confirm with snackbar action
+    snackBarRef.onAction().subscribe(() => {
       localStorage.removeItem(`order_${order.id}`);
       this.loadOrders();
       this.applyFilters();
-    }
+
+      // ✅ Success message
+      this.snackBar.open('Order permanently removed.', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+        panelClass: ['custom-snackbar'],
+      });
+    });
   }
 
   redoOrder(order: Order, event: Event): void {
@@ -245,6 +290,7 @@ export class OrderListComponent implements OnInit {
       },
     );
 
+    // 👌 Confirm with snackbar action
     snackBarRef.onAction().subscribe(() => {
       let addedCount = 0;
 
@@ -272,7 +318,7 @@ export class OrderListComponent implements OnInit {
         addedCount++;
       });
 
-      // Show success message and navigate to cart
+      // ✅ Success message
       this.snackBar.open(`${addedCount} product(s) added to your cart!`, 'Close', {
         duration: 3000,
         horizontalPosition: 'center',
@@ -282,6 +328,7 @@ export class OrderListComponent implements OnInit {
       this.router.navigate(['/cart']);
     });
   }
+
   // Helper to show available actions based on status and role
   canCancel(order: Order): boolean {
     return order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED;

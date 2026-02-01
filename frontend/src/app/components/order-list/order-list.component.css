@@ -171,24 +171,23 @@ mat-chip {
 }
 
 .order-status {
-  color: var(--link) !important;
+  background-color: var(--link-hover) !important;
 }
 
 .status-confirmed {
-  color: var(--link) !important;
+  background-color: var(--link-hover) !important;
 }
 
 .status-shipped {
-  color: var(--link) !important;
+  background-color: var(--link-hover) !important;
 }
 
 .status-delivered {
-  color: var(--link) !important;
+  background-color: var(--link-hover) !important;
 }
 
 .status-cancelled {
-  color: var(--text-danger) !important;
-  background-color: rgba(114, 28, 36, 0.1);
+  background-color: var(--text-danger) !important;
 }
 
 /* ========== Order Items ========== */
@@ -342,6 +341,28 @@ mat-chip {
 .cdk-overlay-container {
   z-index: 9999 !important;
 }
+
+/* Cancelled order strikethrough */
+.cancelled-strike {
+  text-decoration: line-through;
+  opacity: 0.6;
+  color: var(--text-danger) !important;
+}
+
+.order-card:has(.cancelled-strike) {
+  opacity: 0.7;
+  background-color: rgba(255, 0, 0, 0.05);
+} 
+
+/* Optional: Dim the entire card for cancelled orders */
+.order-card:has(.cancelled-strike) .order-header {
+  opacity: 0.8;
+}
+
+.order-card:has(.cancelled-strike) mat-chip {
+  background-color: var(--text-danger) !important;
+}
+
 
 /* ========== Seller-Specific Styles ========== */
 .customer-info {

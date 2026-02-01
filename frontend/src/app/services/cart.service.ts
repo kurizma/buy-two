@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { BehaviorSubject } from 'rxjs';
 import { CartItem } from '../models/cart/cart-item.model';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -8,6 +10,8 @@ import { CartItem } from '../models/cart/cart-item.model';
 export class CartService {
   private readonly CART_STORAGE_KEY = 'shopping_cart';
   private readonly cartItemsSubject = new BehaviorSubject<CartItem[]>(this.loadCartFromStorage());
+  private snackBar = inject(MatSnackBar);
+  private authService = inject(AuthService);
   cartItems$ = this.cartItemsSubject.asObservable();
 
   constructor() {
@@ -22,9 +26,9 @@ export class CartService {
     this.addToCart({
       productId: product._id || product.id,
       productName: product.name,
-      sellerId: product.userId,
-      sellerName: product.seller?.name || product.sellerName || 'Unknown Seller', // Placeholder, ideally fetch from user service
-      sellerAvatarUrl: product.seller?.avatarUrl || product.sellerAvatarUrl,
+      sellerId: product.sellerId || product.userId || product.ownerId || 'Unknown Seller',
+      sellerName: product.sellerName || 'Unknown Seller',
+      sellerAvatarUrl: product.sellerAvatarUrl || '',
       price: product.price,
       categoryId: product.categoryId,
       imageUrl: product.images?.[0] || '', // Use first image
@@ -110,12 +114,10 @@ export class CartService {
     }
   }
 
-  // Keep the old method for backward compatibility
   updateItemQuantity(updatedItem: CartItem): void {
     this.updateQuantity(updatedItem.productId, updatedItem.quantity);
   }
 
-  // Get cart totals
   getTotalInclVat(): number {
     return this.cartItemsSubject.value.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }
@@ -141,9 +143,23 @@ export class CartService {
   }
 
   clearCart(): void {
-    if (confirm('Are you sure you want to clear your cart?')) {
+    const snackBarRef = this.snackBar.open('Are you sure you want to clear your cart?', 'Confirm', {
+      duration: 5000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ['custom-snackbar'],
+    });
+
+    snackBarRef.onAction().subscribe(() => {
       this.cartItemsSubject.next([]);
-    }
+      // ✅ Success feedback
+      this.snackBar.open('🛒 Cart cleared!', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
+    });
   }
 
   clearCartAfterOrder(): void {

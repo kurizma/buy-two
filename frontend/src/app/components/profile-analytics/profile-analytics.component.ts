@@ -81,13 +81,18 @@ export class ProfileAnalyticsComponent implements OnChanges {
     // ⭐ Bar chart highest → rightmost
     const sortedItems = [...this.items].sort((a, b) => a.count - b.count);
 
-    const maxIdx = sortedItems.length - 1;
+    const maxCount = sortedItems.at(-1)!.count;
+    const maxIndices: number[] = [];
+    sortedItems.forEach((item, idx) => {
+      if (item.count === maxCount) maxIndices.push(idx);
+    });
 
     console.log(
       'Sorted USER:',
       sortedItems.map((i) => `${i.name}(${i.count})`),
-    ); // ⭐
+    );
 
+    // ⭐ Bar chart best label
     this.bestLabel = this.role === 'client' ? 'Most bought item' : 'Best seller';
 
     // update bar title CLIENT vs. SELLER
@@ -100,7 +105,7 @@ export class ProfileAnalyticsComponent implements OnChanges {
           text: this.role === 'client' ? 'Most Bought Items' : 'Best Selling Products',
         },
         datalabels: {
-          display: (context: any) => context.dataIndex === maxIdx,
+          display: (context: any) => maxIndices.includes(context.dataIndex),
           anchor: 'end',
           align: 'top',
           font: { size: 12, weight: 'bold' },
@@ -115,7 +120,7 @@ export class ProfileAnalyticsComponent implements OnChanges {
         {
           label: 'Qty',
           data: sortedItems.map((i) => i.count),
-          backgroundColor: sortedItems.map((_, i) => (i === maxIdx ? 'gold' : '#0aeb7e')),
+          backgroundColor: sortedItems.map((_, i) => (maxIndices.includes(i) ? 'gold' : '#0aeb7e')),
         },
       ],
     };
@@ -128,7 +133,7 @@ export class ProfileAnalyticsComponent implements OnChanges {
         : item.categories || 'Uncategorized';
 
       const category = this.getCategorySlug(rawCategory); // use slug if known
-      catSpend[category] = (catSpend[category] || 0) + item.amount;
+      catSpend[category] = (catSpend[category] || 0) + item.count;
     });
 
     this.pieChartData = {

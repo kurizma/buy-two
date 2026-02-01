@@ -14,6 +14,7 @@ import {
 } from '@angular/forms';
 import { ProfileAnalyticsComponent } from '../profile-analytics/profile-analytics.component';
 import { AnalyticsItem } from '../../models/profile/analytics-item';
+import { Order, OrderStatus } from '../../models/order/order.model';
 
 @Component({
   selector: 'app-profile',
@@ -24,6 +25,7 @@ import { AnalyticsItem } from '../../models/profile/analytics-item';
 })
 export class ProfileComponent implements OnInit {
   currentUser: UserResponse | null = null;
+
   get userRole(): 'client' | 'seller' | null {
     if (!this.currentUser?.role) return null;
     return this.currentUser.role === 'CLIENT' ? 'client' : 'seller';
@@ -48,38 +50,95 @@ export class ProfileComponent implements OnInit {
 
   // ************* Mock analytics data *****************
   getAnalyticsItems(role: 'client' | 'seller'): AnalyticsItem[] {
-    if (!this.currentUser?.email) return [];
+    if (!this.currentUser) return [];
 
-    const key = `${role}-${this.currentUser.email}`;
+    const orders = this.getAllOrders();
+    const userId = this.currentUser.id;
 
-    switch (key) {
-      case 'client-dada@dee.com':
-        return [
-          { name: 'Code Wizard Tee', categories: 'CAT-001', count: 2, amount: 58 },
-          { name: 'Keep Coding Tee', categories: 'CAT-001', count: 1, amount: 28 },
-          { name: 'Action Noir Tee', categories: 'CAT-006', count: 1, amount: 45 },
-        ];
+    // Aggregate product data from orders
+    const productMap: Map<
+      string,
+      {
+        name: string;
+        categories: string;
+        count: number;
+        amount: number;
+      }
+    > = new Map();
 
-      case 'client-john@doe.com':
-      case 'seller-angu@readme.md':
-        return [];
+    orders.forEach((order) => {
+      // Skip cancelled orders
+      if (order.status === OrderStatus.CANCELLED) return;
 
-      case 'seller-joon@kim.kr':
-        return [
-          { name: 'Code Wizard Tee', categories: 'CAT-001', count: 4, amount: 110 },
-          { name: 'Pop Code Queen Tee', categories: 'CAT-003', count: 2, amount: 150 },
-          { name: 'Classic Portrait Tee', categories: 'CAT-006', count: 10, amount: 450 },
-          { name: 'Why Dark Mode Tee', categories: 'CAT-005', count: 1, amount: 35 },
-        ];
+      if (role === 'client') {
+        // For clients: only their own orders
+        if (order.userId !== userId) return;
 
-      default:
-        return [];
-    }
+        order.items.forEach((item) => {
+          const key = item.productId;
+          const existing = productMap.get(key);
+
+          if (existing) {
+            existing.count += item.quantity;
+            existing.amount += item.price * item.quantity;
+          } else {
+            productMap.set(key, {
+              name: item.productName,
+              categories: item.categoryId || 'Uncategorized',
+              count: item.quantity,
+              amount: item.price * item.quantity,
+            });
+          }
+        });
+      } else if (role === 'seller') {
+        // For sellers: only items they sold
+        order.items.forEach((item) => {
+          if (item.sellerId !== userId) return;
+
+          const key = item.productId;
+          const existing = productMap.get(key);
+
+          if (existing) {
+            existing.count += item.quantity;
+            existing.amount += item.price * item.quantity;
+          } else {
+            productMap.set(key, {
+              name: item.productName,
+              categories: item.categoryId || 'Uncategorized',
+              count: item.quantity,
+              amount: item.price * item.quantity,
+            });
+          }
+        });
+      }
+    });
+
+    return Array.from(productMap.values());
   }
 
   getTotalAmount(role: 'client' | 'seller'): number {
     const items = this.getAnalyticsItems(role);
     return items.reduce((sum, item) => sum + item.amount, 0);
+  }
+
+  private getAllOrders(): Order[] {
+    const orders: Order[] = [];
+
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key?.startsWith('order_')) continue;
+
+      try {
+        const orderData = localStorage.getItem(key);
+        if (orderData) {
+          orders.push(JSON.parse(orderData));
+        }
+      } catch (error) {
+        console.error('Error parsing order:', error);
+      }
+    }
+
+    return orders;
   }
 
   constructor() {
