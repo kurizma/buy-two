@@ -15,6 +15,8 @@ import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatRadioModule } from '@angular/material/radio';
 import { RouterLink, Router } from '@angular/router';
+import { OrderItem } from '../../models/order/order-item.model';
+import { Order, OrderStatus, PaymentMethod, Address } from '../../models/order/order.model';
 
 @Component({
   selector: 'app-checkout',
@@ -44,13 +46,13 @@ export class CheckoutComponent implements OnInit {
   private readonly router = inject(Router);
   private fb: FormBuilder = inject(FormBuilder);
   reviewForm: FormGroup = this.fb.group({}); // Dummy form for step control
-  selectedPayment: string = 'PAY_ON_DELIVERY';
+  selectedPayment: PaymentMethod = PaymentMethod.PAY_ON_DELIVERY;
 
   constructor() {
     this.checkoutForm = this.fb.group({
       firstname: ['', Validators.required],
       lastname: ['', Validators.required],
-      address: ['', Validators.required],
+      street: ['', Validators.required],
       city: ['', Validators.required],
       zip: ['', Validators.required],
       country: ['', Validators.required],
@@ -72,24 +74,37 @@ export class CheckoutComponent implements OnInit {
       stepper.next();
     }
   }
-
   placeOrder() {
-    // Mock order creation (no service needed)
-    const mockOrderId = 'order-' + Date.now();
-    const orderData = {
+    const mockOrderId = `ORD-${Date.now()}`;
+    const orderData: Order = {
       id: mockOrderId,
-      address: this.checkoutForm.value,
-      items: this.cartService.cartItems,
-      total: this.cartService.getTotal(),
-      paymentMethod: this.selectedPayment,
+      userId: 'user123',
+      orderNumber: mockOrderId,
+      items: this.cartService.cartItems as OrderItem[],
+      status: OrderStatus.CONFIRMED,
+      paymentMethod: PaymentMethod.PAY_ON_DELIVERY,
+      shippingAddress: this.makeAddress(), // Helper
+      subtotal: this.cartService.getSubtotal(),
+      tax: this.cartService.getVatAmount(),
+      total: this.cartService.getTotalInclVat(),
+      createdAt: new Date().toISOString(),
     };
 
-    console.log('✅ Order created:', orderData);
+    localStorage.setItem(`order_${orderData.id}`, JSON.stringify(orderData));
+    this.cartService.clearCartAfterOrder();
+    this.router.navigate(['/order-detail', orderData.id]);
+  }
 
-    // Clear cart
-    this.cartService.clearCart();
-
-    // Navigate to mock orders page
-    this.router.navigate(['/orders', mockOrderId]);
+  private makeAddress() {
+    const form = this.checkoutForm.value;
+    return {
+      firstname: form.firstname,
+      lastname: form.lastname,
+      street: form.street,
+      city: form.city,
+      zip: form.zip,
+      country: form.country,
+      phone: form.phone,
+    } as Address;
   }
 }

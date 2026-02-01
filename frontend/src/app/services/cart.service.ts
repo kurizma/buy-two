@@ -146,6 +146,11 @@ export class CartService {
     }
   }
 
+  clearCartAfterOrder(): void {
+    this.cartItemsSubject.next([]);
+    console.log('🛒 Cart cleared after order!');
+  }
+
   // Check if product is in cart
   isInCart(productId: string): boolean {
     return this.cartItemsSubject.value.some((item) => item.productId === productId);
