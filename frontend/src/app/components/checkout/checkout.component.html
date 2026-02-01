@@ -30,8 +30,8 @@
           </div>
 
           <mat-form-field >
-            <input matInput formControlName="address" placeholder="Address">
-            <mat-error *ngIf="(formSubmitted || checkoutForm.get('address')?.touched) && checkoutForm.get('address')?.hasError('required')">
+            <input matInput formControlName="street" placeholder="Address">
+            <mat-error *ngIf="(formSubmitted || checkoutForm.get('street')?.touched) && checkoutForm.get('street')?.hasError('required')">
               Address is required.
             </mat-error>
           </mat-form-field>
