@@ -36,6 +36,13 @@
         </a>
       }
 
+      <!-- Orders (for both users and sellers) -->
+      <a routerLink="/order-list" 
+        class="orders-link position-relative me-2" 
+        [title]="authService.isSeller() ? 'Sales Orders' : 'My Orders'">
+        <i class="fas fa-receipt"></i>
+      </a>
+
       <!-- Profile -->
       <a routerLink="/profile">
         <span class="navbar-user">

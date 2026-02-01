@@ -1,5 +1,5 @@
 .order-detail-container {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 40px auto;
   padding: 0 20px;
 }
@@ -17,7 +17,7 @@
   font-size: 48px;
   width: 48px;
   height: 48px;
-  color: red;
+  color: var(--text-secondary);
   margin-bottom: 15px;
 }
 
@@ -28,6 +28,7 @@
 
 .error-state p {
   margin-bottom: 20px;
+  color: var(--text-secondary);
 }
 
 /* ========== Success Header ========== */
@@ -282,7 +283,7 @@ mat-card {
   font-size: 1rem;
   border-radius: 6px;
   font-weight: 500;
-  background-color: var(--primary-dark) !important;
+  background-color: var(--primary) !important;
 }
 
 .btn-primary:hover {

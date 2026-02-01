@@ -8,22 +8,22 @@
 
     <mat-vertical-stepper class="vertical-stepper" [linear]="true" #stepper>
       <!-- ************ Step 1: Address ************* -->
-      <mat-step>
+      <mat-step [stepControl]="checkoutForm">
         <ng-template matStepLabel>Shipping Address</ng-template>
 
-        <form class="checkout-form" [formGroup]="checkoutForm" (ngSubmit)="goToNext(stepper)">
+        <form class="checkout-form" [formGroup]="checkoutForm">
 
           <div class="form-row">
             <mat-form-field class="form-field-half">
               <input matInput formControlName="firstname" placeholder="First Name">
-              <mat-error *ngIf="(formSubmitted || checkoutForm.get('firstname')?.touched) && checkoutForm.get('firstname')?.hasError('required')">
+              <mat-error *ngIf="(checkoutForm.get('firstname')?.touched) && checkoutForm.get('firstname')?.hasError('required')">
                 First Name is required.
               </mat-error>
             </mat-form-field>
 
             <mat-form-field class="form-field-half">
               <input matInput formControlName="lastname" placeholder="Last Name">
-            <mat-error *ngIf="(formSubmitted || checkoutForm.get('lastname')?.touched) && checkoutForm.get('lastname')?.hasError('required')">
+            <mat-error *ngIf="(checkoutForm.get('lastname')?.touched) && checkoutForm.get('lastname')?.hasError('required')">
                 Last Name is required.
               </mat-error>
             </mat-form-field>
@@ -31,14 +31,14 @@
 
           <mat-form-field >
             <input matInput formControlName="street" placeholder="Address">
-            <mat-error *ngIf="(formSubmitted || checkoutForm.get('street')?.touched) && checkoutForm.get('street')?.hasError('required')">
+            <mat-error *ngIf="(checkoutForm.get('street')?.touched) && checkoutForm.get('street')?.hasError('required')">
               Address is required.
             </mat-error>
           </mat-form-field>
 
           <mat-form-field>
             <input matInput formControlName="city" placeholder="City">
-            <mat-error *ngIf="(formSubmitted || checkoutForm.get('city')?.touched)
+            <mat-error *ngIf="(checkoutForm.get('city')?.touched)
                               && checkoutForm.get('city')?.hasError('required')">
               City is required.
             </mat-error>
@@ -47,7 +47,7 @@
           <div class="form-row">
             <mat-form-field class="form-field-half">
               <input matInput formControlName="zip" placeholder="ZIP Code">
-              <mat-error *ngIf="(formSubmitted || checkoutForm.get('zip')?.touched)
+              <mat-error *ngIf="(checkoutForm.get('zip')?.touched)
                                 && checkoutForm.get('zip')?.hasError('required')">
                 ZIP Code is required.
               </mat-error>
@@ -55,7 +55,7 @@
 
             <mat-form-field class="form-field-half">
               <input matInput formControlName="country" placeholder="Country">
-              <mat-error *ngIf="(formSubmitted || checkoutForm.get('country')?.touched)
+              <mat-error *ngIf="(checkoutForm.get('country')?.touched)
                                 && checkoutForm.get('country')?.hasError('required')">
                 Country is required.
               </mat-error>
@@ -63,18 +63,24 @@
           </div>
           <mat-form-field>
             <input matInput formControlName="phone" placeholder="Phone Number">
-            <mat-error *ngIf="(formSubmitted || checkoutForm.get('phone')?.touched)
+            <mat-error *ngIf="(checkoutForm.get('phone')?.touched)
                               && checkoutForm.get('phone')?.hasError('required')">
               Phone Number is required.
             </mat-error>
-            <mat-error *ngIf="(formSubmitted || checkoutForm.get('phone')?.touched)
+            <mat-error *ngIf="(checkoutForm.get('phone')?.touched)
                               && checkoutForm.get('phone')?.hasError('pattern')">
               Phone Number must contain only digits.
             </mat-error>
           </mat-form-field>
 
           <div>
-            <button class="cont-button" mat-button matStepperNext>Continue</button>
+            <button 
+              class="cont-button" 
+              mat-button 
+              matStepperNext
+              type="button">
+              Continue
+            </button>
           </div>
         </form>
       </mat-step>
@@ -123,11 +129,15 @@
           <a routerLink="/cart" class="btn btn-outline-primary">
             <i class="fas fa-edit me-1"></i>Edit Cart
           </a>
-          <button mat-button matStepperNext class="btn cont-button ms-auto">
+          <button 
+            mat-button 
+            (click)="confirmReview(stepper)"
+            class="btn cont-button ms-auto">
             Continue to Payment
           </button>
         </div>
-        <form [formGroup]="reviewForm" style="display:none"></form>
+        <!-- Hidden form for stepper validation -->
+      <form [formGroup]="reviewForm" style="display:none"></form>
       </mat-step>
 
       <!-- ************ Step 3: Confirm ************* -->

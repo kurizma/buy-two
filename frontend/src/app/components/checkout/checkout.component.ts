@@ -10,6 +10,7 @@ import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { AuthService } from '../../services/auth.service';
 import { CartService } from '../../services/cart.service';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
@@ -42,11 +43,14 @@ export class CheckoutComponent implements OnInit {
   total = 0;
   formSubmitted = false;
 
-  public cartService: CartService = inject(CartService);
+  public readonly authService: AuthService = inject(AuthService);
+  public readonly cartService: CartService = inject(CartService);
   private readonly router = inject(Router);
-  private fb: FormBuilder = inject(FormBuilder);
-  reviewForm: FormGroup = this.fb.group({}); // Dummy form for step control
+  private readonly fb: FormBuilder = inject(FormBuilder);
+
+  reviewForm: FormGroup;
   selectedPayment: PaymentMethod = PaymentMethod.PAY_ON_DELIVERY;
+  reviewConfirmed = false;
 
   constructor() {
     this.checkoutForm = this.fb.group({
@@ -58,6 +62,9 @@ export class CheckoutComponent implements OnInit {
       country: ['', Validators.required],
       phone: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
     });
+    this.reviewForm = this.fb.group({
+      confirmed: [false, Validators.requiredTrue],
+    });
   }
 
   ngOnInit() {
@@ -65,20 +72,17 @@ export class CheckoutComponent implements OnInit {
     this.total = this.cartService.getTotal();
   }
 
-  goToNext(stepper: MatStepper) {
-    this.formSubmitted = true;
-    // Mark form as touched  to show errors
-    this.checkoutForm.markAllAsTouched();
-
-    if (this.checkoutForm.valid) {
-      stepper.next();
-    }
+  confirmReview(stepper: MatStepper): void {
+    this.reviewForm.patchValue({ confirmed: true });
+    stepper.next();
   }
+
   placeOrder() {
     const mockOrderId = `ORD-${Date.now()}`;
+
     const orderData: Order = {
       id: mockOrderId,
-      userId: 'user123',
+      userId: this.authService.getUserId() || 'user123',
       orderNumber: mockOrderId,
       items: this.cartService.cartItems as OrderItem[],
       status: OrderStatus.CONFIRMED,

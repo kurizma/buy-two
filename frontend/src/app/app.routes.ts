@@ -16,6 +16,7 @@ import { CheckoutComponent } from './components/checkout/checkout.component';
 import { ClientOnlyGuard } from './guards/client-only.guard';
 import { EmptyCartGuard } from './guards/empty-cart.guard';
 import { OrderDetailComponent } from './components/order-detail/order-detail.component';
+import { OrderListComponent } from './components/order-list/order-list.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
@@ -51,6 +52,11 @@ export const routes: Routes = [
     path: 'order-detail/:id',
     component: OrderDetailComponent,
     canActivate: [ClientOnlyGuard], // Assuming only clients can view order details
+  },
+  {
+    path: 'order-list',
+    component: OrderListComponent,
+    canActivate: [AuthGuard], // Assuming only clients can view order list
   },
   { path: '**', redirectTo: '' },
 ];

@@ -1,12 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
 
 :root {
-  --primary: #8b5cf6;
-  --primary-dark: #7c3aed;
+  --primary: #7c3aed;
   --background: #0f172a;
   --card-bg: #243145;
   --text-primary: #cfd4d8;
   --text-secondary: #f907ed;
+  --text-danger: #a70818;
   --border: #334155;
   --link: #69f0ae;
   --link: #0aeb7e;

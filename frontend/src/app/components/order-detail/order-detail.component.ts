@@ -85,7 +85,7 @@ export class OrderDetailComponent implements OnInit {
   }
 
   goToOrders(): void {
-    this.router.navigate(['/orders']);
+    this.router.navigate(['/order-list']);
   }
 
   continueShopping(): void {

@@ -51,7 +51,7 @@
 }
 
 .table-head  th{ 
-    background: var(--primary-dark) !important; 
+    background: var(--primary) !important; 
     color: var(--text-primary); 
     width: 100%;
 }
