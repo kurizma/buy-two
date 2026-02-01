@@ -84,76 +84,121 @@
   <!-- Orders List -->
   <div class="orders-list">
     <mat-card class="order-card" 
-              *ngFor="let order of filteredOrders"
-              tabindex="0">
+              *ngFor="let order of filteredOrders">
       <div class="order-header">
         <div class="order-info">
           <h3>Order #{{ order.orderNumber }}</h3>
           <p class="order-date">
-            Date: <mat-icon>event</mat-icon>
+            <mat-icon>event</mat-icon>
             {{ order.createdAt | date:'medium' }}
           </p>
+          
+          <!-- ✅ Seller View: Show Customer Info -->
+          @if (isSeller && order.shippingAddress) {
+            <p class="customer-info">
+              <mat-icon>person</mat-icon>
+              Customer: {{ order.shippingAddress.firstname }} {{ order.shippingAddress.lastname }}
+            </p>
+          }
         </div>
-        <mat-chip class="order-status" [ngClass]="getStatusClass(order.status)">
+        <mat-chip [ngClass]="getStatusClass(order.status)">
           {{ order.status }}
         </mat-chip>
       </div>
 
+      <!-- ✅ Different Item Display for Sellers -->
       <div class="order-items">
-        <div class="item-preview" *ngFor="let item of order.items.slice(0, 3)">
-          <img [src]="item.imageUrl || '/assets/placeholder.jpg'" 
-              [alt]="item.productName"
-              class="item-thumb">
-          <div class="item-info">
-            <p class="item-name">{{ item.productName }}</p>
-            <p class="item-details">
-              <span *ngIf="isSeller" class="seller-badge">Qty: {{ item.quantity }}</span>
-              <span *ngIf="!isSeller">Qty: {{ item.quantity }} • {{ item.price | currency:'EUR' }}</span>
-            </p>
+        @if (isSeller) {
+          <!-- Seller View: Show only their products -->
+          <div class="item-preview" *ngFor="let item of getSellerItems(order).slice(0, 3)">
+            <img [src]="item.imageUrl || '/assets/placeholder.jpg'" 
+                [alt]="item.productName"
+                class="item-thumb">
+            <div class="item-info">
+              <p class="item-name">{{ item.productName }}</p>
+              <p class="item-details">
+                <span class="seller-badge">Qty: {{ item.quantity }}</span>
+                x
+                <span class="price-badge">{{ item.price | currency:'EUR' }}</span>
+              </p>
+            </div>
+            <div class="item-revenue">
+              <strong>{{ item.price * item.quantity | currency:'EUR' }}</strong>
+            </div>
           </div>
-        </div>
-        <p *ngIf="order.items.length > 3" class="more-items">
-          +{{ order.items.length - 3 }} more item(s)
-        </p>
+          <p *ngIf="getSellerItems(order).length > 3" class="more-items">
+            +{{ getSellerItems(order).length - 3 }} more of your item(s)
+          </p>
+        } @else {
+          <!-- Client View: Show all items -->
+          <div class="item-preview" *ngFor="let item of order.items.slice(0, 3)">
+            <img [src]="item.imageUrl || '/assets/placeholder.jpg'" 
+                [alt]="item.productName"
+                class="item-thumb">
+            <div class="item-info">
+              <p class="item-name">{{ item.productName }}</p>
+              <p class="item-details">
+                <span>Qty: {{ item.quantity }} x {{ item.price | currency:'EUR' }}</span>
+              </p>
+            </div>
+          </div>
+          <p *ngIf="order.items.length > 3" class="more-items">
+            +{{ order.items.length - 3 }} more item(s)
+          </p>
+        }
       </div>
 
       <div class="order-footer">
+        <!-- ✅ Different Total Display -->
         <div class="order-total">
-          <span>Total:</span>
-          <strong>{{ order.total | currency:'EUR' }}</strong>
+          @if (isSeller) {
+            <div class="seller-revenue">
+              <span>Your Revenue: </span>
+              <strong>{{ getSellerRevenue(order) | currency:'EUR' }}</strong>
+            </div>
+          } @else {
+            <span>Total:</span>
+            <strong>{{ order.total | currency:'EUR' }}</strong>
+          }
         </div>
+        
+        <!-- ✅ Different Actions for Seller -->
         <div class="order-actions">
-          <button mat-button 
-                  *ngIf="canCancel(order)"
-                  (click)="cancelOrder(order, $event)"
-                  class="cancel-btn">
-            <mat-icon>cancel</mat-icon>
-            Cancel
-          </button>
-          
-          <button mat-button 
-                  *ngIf="canRemove(order)"
-                  (click)="removeOrder(order, $event)"
-                  class="remove-btn">
-            <mat-icon>delete</mat-icon>
-            Remove
-          </button>
-          
-          <button mat-button 
-                  *ngIf="canRedo(order)"
-                  (click)="redoOrder(order, $event)"
-                  class="redo-btn">
-            <mat-icon>refresh</mat-icon>
-            Reorder
-          </button>
-          
-          <button mat-raised-button 
-                  class="view-btn"
-                  (click)="viewOrderDetail(order.id)">
-            View Details
-          </button>
+          @if (!isSeller) {
+            <!-- Client actions: Cancel, Remove, Reorder -->
+            <button mat-button 
+                    *ngIf="canCancel(order)"
+                    (click)="cancelOrder(order, $event)"
+                    class="cancel-btn">
+              <mat-icon>cancel</mat-icon>
+              Cancel
+            </button>
+            
+            <button mat-button 
+                    *ngIf="canRemove(order)"
+                    (click)="removeOrder(order, $event)"
+                    class="remove-btn">
+              <mat-icon>delete</mat-icon>
+              Remove
+            </button>
+            
+            <button mat-button 
+                    *ngIf="canRedo(order)"
+                    (click)="redoOrder(order, $event)"
+                    class="redo-btn">
+              <mat-icon>refresh</mat-icon>
+              Reorder
+            </button>
+            
+            <button mat-raised-button 
+                    (click)="viewOrderDetail(order.id)"
+                    class="view-btn">
+              View Details
+            </button>
+          }
         </div>
       </div>
     </mat-card>
   </div>
+
 </div>

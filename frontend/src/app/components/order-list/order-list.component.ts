@@ -234,7 +234,6 @@ export class OrderListComponent implements OnInit {
       return;
     }
 
-    // ✅ Replace this line
     const snackBarRef = this.snackBar.open(
       `Add all items from order ${order.orderNumber} back to your cart?`,
       'Add to Cart',
@@ -246,7 +245,6 @@ export class OrderListComponent implements OnInit {
       },
     );
 
-    // ✅ Wrap your existing code in the action
     snackBarRef.onAction().subscribe(() => {
       let addedCount = 0;
 
@@ -295,5 +293,18 @@ export class OrderListComponent implements OnInit {
 
   canRedo(order: Order): boolean {
     return order.status === OrderStatus.CANCELLED && !this.isSeller;
+  }
+
+  // Get only items that belong to the current seller
+  getSellerItems(order: Order): any[] {
+    if (!this.isSeller) return order.items;
+
+    return order.items.filter((item) => item.sellerId === this.currentUserId);
+  }
+
+  // Calculate revenue for seller from this order
+  getSellerRevenue(order: Order): number {
+    const sellerItems = this.getSellerItems(order);
+    return sellerItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }
 }
