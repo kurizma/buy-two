@@ -11,8 +11,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { Order, OrderStatus } from '../../models/order/order.model';
 import { AuthService } from '../../services/auth.service';
+import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-order-list',
@@ -30,6 +32,7 @@ import { AuthService } from '../../services/auth.service';
     MatChipsModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatSnackBarModule,
   ],
   templateUrl: './order-list.component.html',
   styleUrls: ['./order-list.component.css'],
@@ -48,7 +51,8 @@ export class OrderListComponent implements OnInit {
 
   private router = inject(Router);
   private authService = inject(AuthService);
-
+  private cartService = inject(CartService); // Adjust if you have a separate cart service
+  private snackBar = inject(MatSnackBar);
   // Determine if current user is a seller
   isSeller = false;
   currentUserId = '';
@@ -179,7 +183,12 @@ export class OrderListComponent implements OnInit {
     event.stopPropagation(); // Prevent navigation to detail page
 
     if (order.status === OrderStatus.DELIVERED || order.status === OrderStatus.CANCELLED) {
-      alert('This order cannot be cancelled.');
+      this.snackBar.open('This order cannot be cancelled.', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
       return;
     }
 
@@ -196,7 +205,12 @@ export class OrderListComponent implements OnInit {
 
     // Only allow removal of cancelled orders
     if (order.status !== OrderStatus.CANCELLED) {
-      alert('Only cancelled orders can be removed.');
+      this.snackBar.open('Only cancelled orders can be removed.', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
       return;
     }
 
@@ -211,19 +225,65 @@ export class OrderListComponent implements OnInit {
     event.stopPropagation();
 
     if (order.status !== OrderStatus.CANCELLED) {
-      alert('Only cancelled orders can be redone.');
+      this.snackBar.open('Only cancelled orders can be redone.', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
       return;
     }
 
-    if (confirm(`Reorder items from ${order.orderNumber}?`)) {
-      // Navigate to cart or product pages to reorder
-      // For now, just show a message
-      alert(
-        'Redo order feature: Would add items back to cart. (To be implemented with cart service)',
-      );
-    }
-  }
+    // ✅ Replace this line
+    const snackBarRef = this.snackBar.open(
+      `Add all items from order ${order.orderNumber} back to your cart?`,
+      'Add to Cart',
+      {
+        duration: 5000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      },
+    );
 
+    // ✅ Wrap your existing code in the action
+    snackBarRef.onAction().subscribe(() => {
+      let addedCount = 0;
+
+      // Add each item from the order back to cart
+      order.items.forEach((item) => {
+        // Create a product-like object from order item
+        const product = {
+          _id: item.productId,
+          id: item.productId,
+          name: item.productName,
+          userId: item.sellerId,
+          sellerName: item.sellerName,
+          price: item.price,
+          categoryId: item.categoryId || '',
+          images: item.imageUrl ? [item.imageUrl] : [],
+          description: '',
+          quantity: 999, // Assume available stock (since we don't have real data)
+        };
+
+        // Add to cart with the original quantity
+        for (let i = 0; i < item.quantity; i++) {
+          this.cartService.addProductToCart(product);
+        }
+
+        addedCount++;
+      });
+
+      // Show success message and navigate to cart
+      this.snackBar.open(`${addedCount} product(s) added to your cart!`, 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
+      this.router.navigate(['/cart']);
+    });
+  }
   // Helper to show available actions based on status and role
   canCancel(order: Order): boolean {
     return order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED;
