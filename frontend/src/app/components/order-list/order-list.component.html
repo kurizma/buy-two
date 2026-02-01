@@ -130,7 +130,7 @@
             +{{ getSellerItems(order).length - 3 }} more of your item(s)
           </p>
         } @else {
-          <!-- Client View: Show all items -->
+          <!-- ✅ Client View: Show all items -->
           <div class="item-preview" *ngFor="let item of order.items.slice(0, 3)">
             <img [src]="item.imageUrl || '/assets/placeholder.jpg'" 
                 [alt]="item.productName"
@@ -154,11 +154,15 @@
           @if (isSeller) {
             <div class="seller-revenue">
               <span>Your Revenue: </span>
-              <strong>{{ getSellerRevenue(order) | currency:'EUR' }}</strong>
+              <strong [class.cancelled-strike]="order.status === OrderStatus.CANCELLED">
+                {{ getSellerRevenue(order) | currency:'EUR' }}
+              </strong>
             </div>
           } @else {
             <span>Total:</span>
-            <strong>{{ order.total | currency:'EUR' }}</strong>
+            <strong [class.cancelled-strike]="order.status === OrderStatus.CANCELLED">
+              {{ order.total | currency:'EUR' }}
+            </strong>
           }
         </div>
         
