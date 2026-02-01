@@ -1,0 +1,157 @@
+<div class="orders-container">
+  <div class="page-header">
+    <h1 class="page-title">
+      <mat-icon>receipt_long</mat-icon>
+      {{ isSeller ? 'Sales Orders' : 'My Orders' }}
+    </h1>
+    <p class="subtitle">{{ isSeller ? 'Manage your customer orders' : 'Track and manage your orders' }}</p>
+  </div>
+
+  <!-- Filters Section -->
+  <mat-card class="filters-card">
+    <div class="filters-row">
+      <mat-form-field class="search-field">
+        <mat-label>Search orders</mat-label>
+        <input matInput 
+               [(ngModel)]="searchTerm" 
+               (ngModelChange)="onSearch()"
+               placeholder="Order number or product name">
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field class="status-field">
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="selectedStatus" (ngModelChange)="onStatusChange()">
+          <mat-option *ngFor="let status of statusOptions" [value]="status">
+            {{ status === 'ALL' ? 'All Orders' : status }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field class="date-field">
+        <mat-label>From Date</mat-label>
+        <input matInput 
+               [matDatepicker]="startPicker" 
+               [(ngModel)]="startDate"
+               (ngModelChange)="onDateChange()"
+               placeholder="Start date">
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field class="date-field">
+        <mat-label>To Date</mat-label>
+        <input matInput 
+               [matDatepicker]="endPicker" 
+               [(ngModel)]="endDate"
+               (ngModelChange)="onDateChange()"
+               placeholder="End date">
+        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+
+      <button mat-button 
+              (click)="clearFilters()"
+              class="clear-btn">
+        <mat-icon>clear</mat-icon>
+        Clear
+      </button>
+    </div>
+  </mat-card>
+
+  <!-- Results Summary -->
+  <div class="results-summary" *ngIf="filteredOrders.length > 0">
+    <p>Showing {{ filteredOrders.length }} of {{ orders.length }} orders</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="filteredOrders.length === 0" class="empty-state">
+    <mat-icon>shopping_bag</mat-icon>
+    <h2>No Orders Found</h2>
+    <p *ngIf="searchTerm || selectedStatus !== 'ALL' || startDate || endDate">
+      Try adjusting your filters
+    </p>
+    <p *ngIf="!searchTerm && selectedStatus === 'ALL' && !startDate && !endDate">
+      {{ isSeller ? 'No customer orders yet' : 'You haven\'t placed any orders yet' }}
+    </p>
+    <button mat-raised-button color="primary" routerLink="/" *ngIf="!isSeller">
+      Start Shopping
+    </button>
+  </div>
+
+  <!-- Orders List -->
+  <div class="orders-list">
+    <mat-card class="order-card" 
+              *ngFor="let order of filteredOrders"
+              tabindex="0">
+      <div class="order-header">
+        <div class="order-info">
+          <h3>Order #{{ order.orderNumber }}</h3>
+          <p class="order-date">
+            <mat-icon>event</mat-icon>
+            {{ order.createdAt | date:'medium' }}
+          </p>
+        </div>
+        <mat-chip class="order-status" [ngClass]="getStatusClass(order.status)">
+          {{ order.status }}
+        </mat-chip>
+      </div>
+
+      <div class="order-items">
+        <div class="item-preview" *ngFor="let item of order.items.slice(0, 3)">
+          <img [src]="item.imageUrl || '/assets/placeholder.jpg'" 
+              [alt]="item.productName"
+              class="item-thumb">
+          <div class="item-info">
+            <p class="item-name">{{ item.productName }}</p>
+            <p class="item-details">
+              <span *ngIf="isSeller" class="seller-badge">Qty: {{ item.quantity }}</span>
+              <span *ngIf="!isSeller">Qty: {{ item.quantity }} • {{ item.price | currency:'EUR' }}</span>
+            </p>
+          </div>
+        </div>
+        <p *ngIf="order.items.length > 3" class="more-items">
+          +{{ order.items.length - 3 }} more item(s)
+        </p>
+      </div>
+
+      <div class="order-footer">
+        <div class="order-total">
+          <span>Total:</span>
+          <strong>{{ order.total | currency:'EUR' }}</strong>
+        </div>
+        <div class="order-actions">
+          <button mat-button 
+                  *ngIf="canCancel(order)"
+                  (click)="cancelOrder(order, $event)"
+                  class="cancel-btn">
+            <mat-icon>cancel</mat-icon>
+            Cancel
+          </button>
+          
+          <button mat-button 
+                  *ngIf="canRemove(order)"
+                  (click)="removeOrder(order, $event)"
+                  class="remove-btn">
+            <mat-icon>delete</mat-icon>
+            Remove
+          </button>
+          
+          <button mat-button 
+                  *ngIf="canRedo(order)"
+                  (click)="redoOrder(order, $event)"
+                  class="redo-btn">
+            <mat-icon>refresh</mat-icon>
+            Reorder
+          </button>
+          
+          <button mat-raised-button 
+                  class="view-btn"
+                  (click)="viewOrderDetail(order.id)">
+            View Details
+          </button>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</div>

@@ -40,6 +40,13 @@
         </a>
       }
 
+      <!-- Orders (for both users and sellers) -->
+      <a routerLink="/order-list" 
+        class="orders-link position-relative me-2" 
+        [title]="authService.isSeller() ? 'Sales Orders' : 'My Orders'">
+        <i class="fas fa-receipt"></i>
+      </a>
+
       <!-- Profile -->
 >>>>>>> c00e2af (feat: refactor shopping cart to cart component and update routing)
       <a routerLink="/profile">
