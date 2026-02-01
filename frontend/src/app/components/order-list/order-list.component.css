@@ -241,7 +241,7 @@ mat-chip {
   margin-top: 5px;
 }
 
-/* ========== Order Footer ========== */
+/* ========== Client Order Footer ========== */
 .order-footer {
   display: flex;
   justify-content: space-between;
@@ -342,6 +342,70 @@ mat-chip {
 .cdk-overlay-container {
   z-index: 9999 !important;
 }
+
+/* ========== Seller-Specific Styles ========== */
+.customer-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  margin-top: 5px;
+  font-weight: 500;
+}
+
+.customer-info mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: var(--link);
+}
+
+.item-revenue {
+  text-align: right;
+  min-width: 100px;
+}
+
+.item-revenue strong {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--link);
+  margin-bottom: 2px;
+}
+
+.item-revenue small {
+  font-size: 0.75rem;
+  color: var(--link);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.seller-revenue {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.seller-revenue span {
+  font-size: 0.9rem;
+  color: var(--link);
+}
+
+.seller-revenue strong {
+  font-size: 1.5rem;
+  color: var(--link);
+  font-weight: 700;
+}
+
+.price-badge {
+  margin-left: 8px;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+
 
 
 /* ========== Responsive ========== */
