@@ -11,6 +11,7 @@ import { UserResponse } from '../../models/users/user-response.model';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/categories/category.model';
 import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-product-card',
@@ -20,6 +21,7 @@ import { CartService } from '../../services/cart.service';
 })
 export class ProductCardComponent implements OnInit {
   private readonly route: ActivatedRoute = inject(ActivatedRoute);
+  private readonly authService = inject(AuthService);
   private readonly productService: ProductService = inject(ProductService);
   private readonly userService: UserService = inject(UserService);
   private readonly categoryService: CategoryService = inject(CategoryService);
@@ -47,6 +49,10 @@ export class ProductCardComponent implements OnInit {
       verticalPosition: 'top',
       panelClass: ['custom-snackbar'],
     });
+  }
+
+  isSeller(): boolean {
+    return this.authService.isSeller();
   }
 
   isInCart(productId: string): boolean {

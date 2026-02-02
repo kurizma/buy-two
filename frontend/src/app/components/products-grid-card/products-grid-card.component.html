@@ -54,7 +54,7 @@
         [class.btn-secondary]="isInCart(product.id)"
         (click)="addToCart(product); 
         $event.stopPropagation()"
-        [disabled]="seller"
+        [disabled]="isSeller()"
         >
         <i class="fas me-2"
           [class.fa-shopping-cart] ="!isInCart(product.id)"
