@@ -10,6 +10,8 @@ import { UserService } from '../../services/user.service';
 import { UserResponse } from '../../models/users/user-response.model';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/categories/category.model';
+import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-product-card',
@@ -18,10 +20,14 @@ import { Category } from '../../models/categories/category.model';
   imports: [CommonModule, ProductImageCarouselComponent, RouterLink],
 })
 export class ProductCardComponent implements OnInit {
-  private route: ActivatedRoute = inject(ActivatedRoute);
-  private productService: ProductService = inject(ProductService);
-  private userService: UserService = inject(UserService);
-  private categoryService: CategoryService = inject(CategoryService);
+  private readonly route: ActivatedRoute = inject(ActivatedRoute);
+  private readonly authService = inject(AuthService);
+  private readonly productService: ProductService = inject(ProductService);
+  private readonly userService: UserService = inject(UserService);
+  private readonly categoryService: CategoryService = inject(CategoryService);
+  private readonly cartService: CartService = inject(CartService);
+  private readonly router: Router = inject(Router);
+  private readonly snackBar: MatSnackBar = inject(MatSnackBar);
 
   product!: ProductResponse; // non-null after load
   seller: UserResponse | undefined;
@@ -47,6 +53,14 @@ export class ProductCardComponent implements OnInit {
     // setTimeout(() => {
     //   this.router.navigate(['/shopping-cart']);
     // }, 500);
+  }
+
+  isSeller(): boolean {
+    return this.authService.isSeller();
+  }
+
+  isSeller(): boolean {
+    return this.authService.isSeller();
   }
 
   isInCart(productId: string): boolean {

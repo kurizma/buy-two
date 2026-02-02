@@ -52,7 +52,7 @@
         class="btn btn-outline-secondary w-50 hover-lift"
         (click)="onAddToCart(); 
         $event.stopPropagation()"
-        [disabled]="seller"
+        [disabled]="isSeller()"
         >
         <i class="fas fa-shopping-cart me-2"></i>Add to Cart
       </button>

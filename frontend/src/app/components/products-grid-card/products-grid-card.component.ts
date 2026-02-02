@@ -6,6 +6,7 @@ import { ProductImageCarouselComponent } from '../ui/product-image-carousel/prod
 import { RouterLink, Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-product-grid-card',
@@ -35,7 +36,7 @@ export class ProductGridCardComponent {
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
   private cartService = inject(CartService);
-
+  private authService = inject(AuthService);
   onView(): void {
     this.view.emit(this.product.id);
   }
@@ -55,6 +56,11 @@ export class ProductGridCardComponent {
       verticalPosition: 'top',
       panelClass: ['custom-snackbar'],
     });
+  }
+
+  isSeller(): boolean {
+    // Assuming AuthService is available for injection
+    return this.authService.isSeller();
   }
 
   isInCart(productId: string): boolean {
