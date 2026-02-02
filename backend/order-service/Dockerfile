@@ -20,6 +20,6 @@ COPY docker-start.sh .
 RUN chmod +x docker-start.sh
 
 # Product-service listens on 8080 inside; compose maps to 8567
-EXPOSE 8080
+EXPOSE 8789
 
 ENTRYPOINT ["sh", "./docker-start.sh"]

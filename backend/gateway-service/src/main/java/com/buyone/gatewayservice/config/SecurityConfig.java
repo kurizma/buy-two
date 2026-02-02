@@ -1,18 +1,19 @@
 package com.buyone.gatewayservice.config;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-import org.springframework.security.config.Customizer;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebFluxSecurity
@@ -23,6 +24,7 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers("/auth/**").permitAll()
@@ -31,7 +33,6 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/media/images/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                         
-                        // NEW: Secure Cart, Orders, and Analytics
                         .pathMatchers("/api/cart/**").authenticated()
                         .pathMatchers("/api/orders/**").authenticated()
                         .pathMatchers("/api/analytics/**").authenticated()
