@@ -2,6 +2,7 @@ package com.buyone.orderservice.controller;
 
 import com.buyone.orderservice.dto.request.order.CreateOrderRequest;
 import com.buyone.orderservice.dto.request.order.OrderSearchRequest;
+import com.buyone.orderservice.dto.response.ApiResponse;
 import com.buyone.orderservice.dto.response.order.OrderResponse;
 import com.buyone.orderservice.dto.response.order.OrderItemResponse;
 import com.buyone.orderservice.model.order.Order;
@@ -32,101 +33,135 @@ public class OrderController {
     
     @PostMapping("/checkout")
     @Operation(summary = "Create order from cart", description = "Pay on Delivery")
-    public ResponseEntity<Order> createOrderFromCart(
+    public ResponseEntity<ApiResponse<OrderResponse>> createOrderFromCart(
             @Valid @RequestBody CreateOrderRequest req,
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "CLIENT");
         log.info("Client {} checking out with address", userId);
         Order order = orderService.createOrderFromCart(userId, req.getShippingAddress());
-        return ResponseEntity.status(HttpStatus.CREATED).body(order);
+        OrderResponse orderResp = mapToOrderResponse(order);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.<OrderResponse>builder()
+                        .success(true)
+                        .message("Order created successfully")
+                        .data(orderResp)
+                        .build());
     }
     
     @GetMapping("/buyer")
     @Operation(summary = "Get buyer orders")
-    public ResponseEntity<List<OrderResponse>> getBuyerOrders(
+    public ResponseEntity<ApiResponse<List<OrderResponse>>> getBuyerOrders(
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "CLIENT");
         List<OrderResponse> orders = orderService.getBuyerOrders(userId)
                 .stream()
                 .map(this::mapToOrderResponse)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(ApiResponse.<List<OrderResponse>>builder()
+                .success(true)
+                .message("Buyer orders fetched successfully")
+                .data(orders)
+                .build());
     }
     
     @GetMapping("/{orderNumber}")
     @Operation(summary = "Get order details")
-    public ResponseEntity<OrderResponse> getOrder(@PathVariable String orderNumber) {
+    public ResponseEntity<ApiResponse<OrderResponse>> getOrder(@PathVariable String orderNumber) {
         OrderResponse order = orderService.getOrder(orderNumber)
                 .map(this::mapToOrderResponse)
                 .orElseThrow(() -> new BadRequestException("Order not found: " + orderNumber));
-        return ResponseEntity.ok(order);
+        return ResponseEntity.ok(ApiResponse.<OrderResponse>builder()
+                .success(true)
+                .message("Order details fetched successfully")
+                .data(order)
+                .build());
     }
     
     @PutMapping("/{orderNumber}/status")
     @Operation(summary = "Update order status", description = "Seller: PENDING→CONFIRMED→SHIPPED→DELIVERED")
-    public ResponseEntity<OrderResponse> updateStatus(
+    public ResponseEntity<ApiResponse<OrderResponse>> updateStatus(
             @PathVariable String orderNumber,
             @RequestParam OrderStatus status,
             @RequestHeader("X-USER-ID") String sellerId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "SELLER") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "SELLER");
         log.info("Seller {} updating order {} to {}", sellerId, orderNumber, status);
         OrderResponse updated = orderService.updateStatus(orderNumber, sellerId, status)
                 .map(this::mapToOrderResponse)
                 .orElseThrow(() -> new BadRequestException("Order not found or update failed: " + orderNumber));
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(ApiResponse.<OrderResponse>builder()
+                .success(true)
+                .message("Order status updated successfully")
+                .data(updated)
+                .build());
     }
     
     @PostMapping("/{orderNumber}/cancel")
     @Operation(summary = "Cancel PENDING order")
-    public ResponseEntity<Void> cancelOrder(
+    public ResponseEntity<ApiResponse<Void>> cancelOrder(
             @PathVariable String orderNumber,
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "CLIENT");
         orderService.cancelOrder(orderNumber, userId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .success(true)
+                .message("Order cancelled successfully")
+                .build());
     }
     
     @PostMapping("/{orderNumber}/redo")
     @Operation(summary = "Redo CANCELLED order")
-    public ResponseEntity<OrderResponse> redoOrder(
+    public ResponseEntity<ApiResponse<OrderResponse>> redoOrder(
             @PathVariable String orderNumber,
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "CLIENT");
         OrderResponse newOrder = orderService.redoOrder(orderNumber, userId)
                 .map(this::mapToOrderResponse)
                 .orElseThrow(() -> new BadRequestException("Order not found: " + orderNumber));
-        return ResponseEntity.status(HttpStatus.CREATED).body(newOrder);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.<OrderResponse>builder()
+                        .success(true)
+                        .message("Order recreated successfully")
+                        .data(newOrder)
+                        .build());
     }
     
     @GetMapping("/buyer/search")
     @Operation(summary = "Search buyer orders")
-    public ResponseEntity<Page<OrderResponse>> searchMyOrders(
+    public ResponseEntity<ApiResponse<Page<OrderResponse>>> searchMyOrders(
             @Valid @ModelAttribute OrderSearchRequest req,
             @RequestHeader("X-USER-ID") String userId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "CLIENT") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "CLIENT");
         Page<OrderResponse> orders = orderService.searchBuyerOrders(userId, req)
                 .map(this::mapToOrderResponse);
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(ApiResponse.<Page<OrderResponse>>builder()
+                .success(true)
+                .message("Buyer orders search completed")
+                .data(orders)
+                .build());
     }
     
     @GetMapping("/seller")
     @Operation(summary = "Get seller orders", description = "Paginated dashboard")
-    public ResponseEntity<Page<OrderResponse>> getSellerOrders(
+    public ResponseEntity<ApiResponse<Page<OrderResponse>>> getSellerOrders(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestHeader("X-USER-ID") String sellerId,
-            @RequestHeader(value = "X-USER-ROLE", defaultValue = "SELLER") String role) {
+            @RequestHeader("X-USER-ROLE") String role) {
         validateRole(role, "SELLER");
         Pageable pageable = PageRequest.of(page, size);
         Page<OrderResponse> orders = orderService.getSellerOrders(sellerId, pageable)
                 .map(this::mapToOrderResponse);
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(ApiResponse.<Page<OrderResponse>>builder()
+                .success(true)
+                .message("Seller orders fetched successfully")
+                .data(orders)
+                .build());
     }
     
     private void validateRole(String role, String requiredRole) {
@@ -135,7 +170,7 @@ public class OrderController {
         }
     }
     
-    private OrderResponse mapToOrderResponse(com.buyone.orderservice.model.order.Order order) {
+    private OrderResponse mapToOrderResponse(Order order) {
         List<OrderItemResponse> items = order.getItems().stream()
                 .map(item -> OrderItemResponse.builder()
                         .productName(item.getProductName())
@@ -156,5 +191,4 @@ public class OrderController {
                 .items(items)
                 .build();
     }
-    
 }
