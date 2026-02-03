@@ -36,8 +36,8 @@ pipeline {
 		// Optional: shared npm cache
 		NPM_CONFIG_CACHE = "${env.JENKINS_HOME}/.npm"
 		
-		// Maven memory limits for 4GB VM - prevent OOM during Spring Boot repackage
-		MAVEN_OPTS = "-Xmx512m -Xms256m"
+		// Maven memory limits for 4GB VM
+		MAVEN_OPTS = "-Xmx768m -Xms384m -XX:+UseG1GC -XX:MaxGCPauseMillis=100"
 	}
 
 	// Tools section commented out - using system Maven/Node instead
