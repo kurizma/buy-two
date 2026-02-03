@@ -35,6 +35,9 @@ pipeline {
 		MAVEN_REPO_LOCAL = "${env.JENKINS_HOME}/.m2/repository"
 		// Optional: shared npm cache
 		NPM_CONFIG_CACHE = "${env.JENKINS_HOME}/.npm"
+		
+		// Maven memory limits for 4GB VM - prevent OOM during Spring Boot repackage
+		MAVEN_OPTS = "-Xmx512m -Xms256m"
 	}
 
 	// Tools section commented out - using system Maven/Node instead
