@@ -1,3 +1,11 @@
+properties([
+	throttleJobProperty(
+		categories: ['buy-two-serial'],
+		throttleEnabled: true,
+		throttleOption: 'category'
+	)
+])
+
 pipeline {
 	agent any
 
@@ -5,7 +13,6 @@ pipeline {
 	 * Prevent concurrent builds
 	 **********************/
 	options {
-		disableConcurrentBuilds()
 		timestamps()
 		timeout(time: 20, unit: 'MINUTES')
 	}
@@ -56,12 +63,14 @@ pipeline {
 		 ******************************/
 		stage('Clean Maven Cache') {
 			steps {
-				script {
-					// Remove any stale Maven lock files that might cause hangs
-					sh """
-						find ${MAVEN_REPO_LOCAL} -name '*.lock' -type f -delete 2>/dev/null || true
-						find ${MAVEN_REPO_LOCAL} -name '_remote.repositories' -mtime +7 -type f -delete 2>/dev/null || true
-					"""
+				lock(resource: 'buy-two-pipeline', skipIfLocked: false) {
+					script {
+						// Remove any stale Maven lock files that might cause hangs
+						sh """
+							find ${MAVEN_REPO_LOCAL} -name '*.lock' -type f -delete 2>/dev/null || true
+							find ${MAVEN_REPO_LOCAL} -name '_remote.repositories' -mtime +7 -type f -delete 2>/dev/null || true
+						"""
+					}
 				}
 			}
 		}
