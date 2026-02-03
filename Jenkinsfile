@@ -7,7 +7,7 @@ pipeline {
 	options {
 		disableConcurrentBuilds()
 		timestamps()
-		timeout(time: 1, unit: 'HOURS')
+		timeout(time: 20, unit: 'MINUTES')
 	}
 
 	/**********************
@@ -159,10 +159,10 @@ pipeline {
 			steps {
 				dir('frontend') {
 					// nodejs(nodeJSInstallationName: 'node-20.19.6')
-					sh 'npm ci'
-					sh 'npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox --no-progress'
+					sh 'JAVA_TOOL_OPTIONS=\'-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400\' npm ci'
+					sh 'JAVA_TOOL_OPTIONS=\'-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400\' npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox --no-progress'
 					sh 'ls -la test-results/junit/ || echo "No test-results dir"'
-					sh 'npx ng build --configuration production'
+					sh 'JAVA_TOOL_OPTIONS=\'-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400\' npx ng build --configuration production'
 				}
 			}
 		}
