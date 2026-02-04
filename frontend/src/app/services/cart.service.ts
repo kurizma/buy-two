@@ -1,42 +1,124 @@
 import { inject, Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, catchError, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment.docker';
+
+import { UserService } from './user.service';
 import { CartItem } from '../models/cart/cart-item.model';
-import { AuthService } from './auth.service';
+import { CartResponse } from '../models/cart/cart-response.model';
+import { ApiResponse } from '../models/api-response/api-response.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CartService {
   private readonly CART_STORAGE_KEY = 'shopping_cart';
-  private readonly cartItemsSubject = new BehaviorSubject<CartItem[]>(this.loadCartFromStorage());
-  private snackBar = inject(MatSnackBar);
-  private authService = inject(AuthService);
+  private readonly baseUrl = `${environment.apiBaseUrl}/api/cart`;
+
+  private readonly http = inject(HttpClient);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly userService = inject(UserService);
+  private sellerCache: { [sellerId: string]: { name: string; avatar: string } } = {};
+
+  private cartItemsSubject = new BehaviorSubject<CartItem[]>(this.loadCartFromStorage());
   cartItems$ = this.cartItemsSubject.asObservable();
 
   constructor() {
-    // Save cart to localStorage whenever it changes
+    // Save cart to localStorage on changes (backup)
     this.cartItems$.subscribe((items) => {
       this.saveCartToStorage(items);
     });
   }
 
-  // Add full product to cart (more convenient method)
+  // Public methods (what component calls)
+
+  /** Load cart from API */
+  loadCart(): void {
+    this.http
+      .get<ApiResponse<CartResponse>>(this.baseUrl)
+      .pipe(catchError(this.handleApiError.bind(this)))
+      .subscribe({
+        next: (response) => {
+          if (response.success && response.data?.items?.length) {
+            this.loadSellersForCart(response.data.items);
+          } else {
+            this.cartItemsSubject.next([]);
+          }
+        },
+      });
+  }
+
+  private loadSellersForCart(items: any[]) {
+    const sellerIds = [...new Set(items.map((item) => item.sellerId).filter(Boolean))];
+
+    // Load missing sellers only
+    const missingSellers = sellerIds.filter((id) => !this.sellerCache[id]);
+
+    if (missingSellers.length === 0) {
+      this.mapCartWithSellers(items);
+      return;
+    }
+
+    // Load sellers in parallel
+    missingSellers.forEach((sellerId) => {
+      this.userService.getUserById(sellerId).subscribe({
+        next: (user) => {
+          console.log('Full seller object:', user);
+          if (user) {
+            this.sellerCache[user.id] = {
+              name: user.name || 'Seller',
+              avatar: user.avatar || '/assets/user-default.png',
+            };
+          }
+          // Map when all loaded (or first time)
+          if (Object.keys(this.sellerCache).length === sellerIds.length) {
+            this.mapCartWithSellers(items);
+          }
+        },
+        error: () => {
+          console.warn(`Seller ${sellerId} not found`);
+          this.mapCartWithSellers(items); // Continue anyway
+        },
+      });
+    });
+  }
+
+  private mapCartWithSellers(items: any[]) {
+    const frontendItems: CartItem[] = items.map((item) => ({
+      id: this.generateCartItemId(),
+      productId: item.productId,
+      productName: item.productName,
+      sellerId: item.sellerId,
+      sellerName: this.sellerCache[item.sellerId]?.name || 'Seller',
+      sellerAvatarUrl:
+        this.sellerCache[item.sellerId]?.avatar || '/assets/avatars/user-default.png',
+      price: item.price,
+      quantity: item.quantity,
+      categoryId: item.categoryId || '',
+      imageUrl: item.imageUrl,
+      productDescription: '',
+    }));
+    this.cartItemsSubject.next(frontendItems);
+  }
+
+  /** Add product to cart */
   addProductToCart(product: any): void {
     this.addToCart({
       productId: product._id || product.id,
       productName: product.name,
       sellerId: product.sellerId || product.userId || product.ownerId || 'Unknown Seller',
       sellerName: product.sellerName || 'Unknown Seller',
-      sellerAvatarUrl: product.sellerAvatarUrl || '',
+      sellerAvatarUrl: product.sellerAvatarUrl || '/assets/avatars/user-default.png',
       price: product.price,
       categoryId: product.categoryId,
-      imageUrl: product.images?.[0] || '', // Use first image
+      imageUrl: product.images?.[0] || '',
       productDescription: product.description,
-      availableStock: product.quantity, // Available stock
+      availableStock: product.quantity,
     });
   }
 
+  /** Add/update item */
   addToCart(params: {
     productId: string;
     productName: string;
@@ -49,73 +131,89 @@ export class CartService {
     sellerName: string;
     sellerAvatarUrl?: string;
   }): void {
-    const {
-      productId,
-      productName,
-      sellerId,
-      price,
-      categoryId,
-      imageUrl,
-      productDescription,
-      availableStock,
-      sellerName,
-      sellerAvatarUrl,
-    } = params;
+    const cartItem = {
+      productId: params.productId,
+      sellerId: params.sellerId,
+      quantity: 1,
+      price: params.price,
+      productName: params.productName,
+      categoryId: params.categoryId,
+      imageUrl: params.imageUrl || '/assets/product-default.png',
+    };
 
-    const currentCart = this.cartItemsSubject.value;
-    const existingItem = currentCart.find((item) => item.productId === productId);
-
-    if (existingItem) {
-      // Check stock limit
-      if (availableStock && existingItem.quantity >= availableStock) {
-        console.warn('Cannot add more items. Stock limit reached.');
-        return;
-      }
-      // Update quantity
-      existingItem.quantity++;
-      this.cartItemsSubject.next([...currentCart]);
-    } else {
-      // Add new item
-      const newItem: CartItem = {
-        id: this.generateCartItemId(),
-        productId,
-        productName,
-        productDescription,
-        sellerId,
-        sellerName,
-        price,
-        quantity: 1,
-        categoryId,
-        imageUrl: imageUrl || '/assets/placeholder.jpg',
-        sellerAvatarUrl,
-      };
-      this.cartItemsSubject.next([...currentCart, newItem]);
-    }
+    this.http
+      .post<ApiResponse<CartResponse>>(`${this.baseUrl}/items`, cartItem)
+      .pipe(catchError(this.handleApiError.bind(this)))
+      .subscribe((response) => {
+        if (response.success && response.data?.items) {
+          this.cartItemsSubject.next(response.data.items);
+          this.snackBar.open('✅ Item added to cart', 'Close', { duration: 2000 });
+        }
+      });
   }
 
-  removeItem(productId: string): void {
-    const currentCart = this.cartItemsSubject.value;
-    const updatedCart = currentCart.filter((item) => item.productId !== productId);
-    this.cartItemsSubject.next(updatedCart);
-  }
-
+  /** Update quantity */
   updateQuantity(productId: string, quantity: number): void {
     if (quantity < 1) {
       this.removeItem(productId);
       return;
     }
 
-    const currentCart = this.cartItemsSubject.value;
-    const item = currentCart.find((item) => item.productId === productId);
-
-    if (item) {
-      item.quantity = quantity;
-      this.cartItemsSubject.next([...currentCart]);
-    }
+    this.http
+      .put<ApiResponse<CartResponse>>(
+        `${this.baseUrl}/items/${productId}/quantity/${quantity}`,
+        null,
+      )
+      .pipe(catchError(this.handleApiError.bind(this)))
+      .subscribe((response) => {
+        if (response.success && response.data?.items) {
+          this.cartItemsSubject.next(response.data.items);
+        }
+      });
   }
 
+  /** Remove item */
+  removeItem(productId: string): void {
+    this.http
+      .delete<ApiResponse<CartResponse>>(`${this.baseUrl}/items/${productId}`)
+      .pipe(catchError(this.handleApiError.bind(this)))
+      .subscribe((response) => {
+        if (response.success && response.data?.items) {
+          this.cartItemsSubject.next(response.data.items);
+        }
+      });
+  }
+
+  /** Update full item */
   updateItemQuantity(updatedItem: CartItem): void {
     this.updateQuantity(updatedItem.productId, updatedItem.quantity);
+  }
+
+  /** Clear cart with confirmation */
+  clearCart(): void {
+    const snackBarRef = this.snackBar.open('Clear entire cart?', 'Confirm', {
+      duration: 5000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ['custom-snackbar'],
+    });
+
+    snackBarRef.onAction().subscribe(() => {
+      this.http
+        .delete<ApiResponse<any>>(this.baseUrl)
+        .pipe(catchError(this.handleApiError.bind(this)))
+        .subscribe((response) => {
+          if (response.success) {
+            this.cartItemsSubject.next([]);
+            this.snackBar.open('🛒 Cart cleared!', 'Close', {
+              duration: 3000,
+              horizontalPosition: 'center',
+              verticalPosition: 'top',
+              panelClass: ['custom-snackbar'],
+            });
+          }
+        });
+    });
   }
 
   getTotalInclVat(): number {
@@ -142,26 +240,6 @@ export class CartService {
     return this.cartItemsSubject.value.reduce((sum, item) => sum + item.quantity, 0);
   }
 
-  clearCart(): void {
-    const snackBarRef = this.snackBar.open('Are you sure you want to clear your cart?', 'Confirm', {
-      duration: 5000,
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
-      panelClass: ['custom-snackbar'],
-    });
-
-    snackBarRef.onAction().subscribe(() => {
-      this.cartItemsSubject.next([]);
-      // ✅ Success feedback
-      this.snackBar.open('🛒 Cart cleared!', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'center',
-        verticalPosition: 'top',
-        panelClass: ['custom-snackbar'],
-      });
-    });
-  }
-
   clearCartAfterOrder(): void {
     this.cartItemsSubject.next([]);
     console.log('🛒 Cart cleared after order!');
@@ -186,7 +264,7 @@ export class CartService {
     return this.cartItemsSubject.value;
   }
 
-  // LocalStorage methods
+  // LocalStorage methods (backup)
   private loadCartFromStorage(): CartItem[] {
     try {
       const cartData = localStorage.getItem(this.CART_STORAGE_KEY);
@@ -208,5 +286,13 @@ export class CartService {
   // Generate unique cart item ID
   private generateCartItemId(): string {
     return `cart-item-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+  }
+
+  /** API Error handler */
+  private handleApiError(error: any) {
+    console.error('Cart API error:', error);
+    const message = error.error?.message || 'Cart operation failed. Try again.';
+    this.snackBar.open(message, 'Close', { duration: 4000 });
+    return of({ success: false, message: message, data: null } as ApiResponse<null>);
   }
 }

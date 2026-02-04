@@ -7,4 +7,5 @@ export interface CartResponse {
   subtotal: number;
   tax: number;
   total: number;
+  updatedAt: string;
 }
