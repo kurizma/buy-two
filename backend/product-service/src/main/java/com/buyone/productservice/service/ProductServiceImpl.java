@@ -199,6 +199,38 @@ public class ProductServiceImpl implements ProductService {
         return products.stream().map(this::toProductResponse).collect(Collectors.toList());
     }
     
+    @Override
+    @Transactional  // MongoDB single-doc ACID
+    public void reserveStock(String productId, int quantity, String orderNumber) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new BadRequestException("Product not found: " + productId));  // Use BadRequest for client errors
+        
+        if (product.getQuantity() < quantity) {
+            throw new BadRequestException(
+                    String.format("Insufficient stock. Available: %d, Requested: %d",
+                            product.getQuantity(), quantity));
+        }
+        
+        product.setQuantity(product.getQuantity() - quantity);
+        productRepository.save(product);
+        
+        log.info("Reserved {} units of {} (order={})", quantity, productId, orderNumber);
+    }
+    
+    @Override
+    @Transactional
+    public void releaseStock(String productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new BadRequestException("Product not found: " + productId));
+        
+        // Allow oversell recovery (quantity may be negative from partial txns)
+        product.setQuantity(product.getQuantity() + quantity);
+        productRepository.save(product);
+        
+        log.info("Released {} units of {}", quantity, productId);
+    }
+    
+    
     // Helper: Map Product entity to ProductResponse DTO
     private ProductResponse toProductResponse(Product product) {
         return ProductResponse.builder()
