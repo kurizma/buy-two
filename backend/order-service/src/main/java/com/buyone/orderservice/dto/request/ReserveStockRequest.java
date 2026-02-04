@@ -1,4 +1,4 @@
-package com.buyone.productservice.request;
+package com.buyone.orderservice.dto.request;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -9,10 +9,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReleaseStockRequest {
+public class ReserveStockRequest {
     @NotBlank(message = "Product ID is required")
     private String productId;
     
     @Min(value = 1, message = "Quantity must be at least 1")
     private int quantity;
+    
+    @NotBlank(message = "Order number is required")
+    private String orderNumber;
 }

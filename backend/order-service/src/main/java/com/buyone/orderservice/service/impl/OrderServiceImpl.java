@@ -2,6 +2,8 @@ package com.buyone.orderservice.service.impl;
 
 import com.buyone.orderservice.client.ProductClient;
 import com.buyone.orderservice.dto.request.order.OrderSearchRequest;
+import com.buyone.orderservice.dto.request.ReserveStockRequest;
+import com.buyone.orderservice.dto.request.ReleaseStockRequest;
 import com.buyone.orderservice.exception.BadRequestException;
 import com.buyone.orderservice.exception.ResourceNotFoundException;
 import com.buyone.orderservice.model.*;
@@ -82,8 +84,8 @@ public class OrderServiceImpl implements OrderService {
         Order saved = orderRepository.save(order);
         
         // Post-checkout actions
+        reserveInventory(saved.getItems(), saved.getOrderNumber());
         cartService.clearCart(userId);
-        reserveInventoryAsync(orderItems, orderNumber);
         
         log.info("Order {} created for {} (subtotal: {})", orderNumber, userId, subtotal);
         return saved;
@@ -158,9 +160,23 @@ public class OrderServiceImpl implements OrderService {
     /**
      * Queues inventory reservation (TODO: @Async + RabbitMQ).
      */
-    private void reserveInventoryAsync(List<OrderItem> items, String orderNumber) {
-        log.debug("Inventory reservation queued for order: {}", orderNumber);
-        // TODO: productClient.reserveStock(items, orderNumber);
+    private void reserveInventory(List<OrderItem> items, String orderNumber) {
+        for (OrderItem item : items) {
+            ReserveStockRequest req = new ReserveStockRequest(
+                    item.getProductId(),
+                    item.getQuantity(),
+                    orderNumber
+            );
+            
+            ApiResponse<Void> response = productClient.reserveStock(req);
+            if (!response.isSuccess()) {
+                throw new BadRequestException(
+                        "Failed to reserve stock for product: " + item.getProductId() +
+                                ". Error: " + response.getMessage());
+            }
+            log.info("Reserved {} units of {} for order {}",
+                    item.getQuantity(), item.getProductId(), orderNumber);
+        }
     }
     
     // ========== EXISTING METHODS (PERFECT - MINOR ENUM FIXES) ==========
@@ -211,9 +227,19 @@ public class OrderServiceImpl implements OrderService {
         if (order.getStatus() != OrderStatus.PENDING) {
             throw new IllegalStateException("Only PENDING orders can be cancelled");
         }
+        
         order.setStatus(OrderStatus.CANCELLED);
         order.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(order);
+        order.getItems().forEach(item -> {
+            ReleaseStockRequest req = new ReleaseStockRequest(
+                    item.getProductId(),
+                    item.getQuantity()
+            );
+            productClient.releaseStock(req);
+            log.info("Released {} units of {} for cancelled order {}",
+                    item.getQuantity(), item.getProductId(), orderNumber);
+        });
     }
     
     /**

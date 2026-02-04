@@ -1,4 +1,4 @@
-package com.buyone.productservice.dto.request;
+package com.buyone.productservice.request;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

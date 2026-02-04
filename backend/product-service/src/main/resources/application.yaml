@@ -9,6 +9,8 @@ spring:
   data:
     mongodb:
       uri: ${ATLAS_URI}
+  transaction:
+    manager: mongodb
   security:
     user:
       name: ${SPRING_SECURITY_USER_NAME:user}
