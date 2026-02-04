@@ -359,7 +359,8 @@ pipeline {
 								string(credentialsId: 'keystore-password', variable: 'KEYSTORE_PASSWORD'),
 								string(credentialsId: 'r2-endpoint', variable: 'R2_ENDPOINT'),
 								string(credentialsId: 'r2-access-key', variable: 'R2_ACCESS_KEY'),
-								string(credentialsId: 'r2-secret-key', variable: 'R2_SECRET_KEY')
+								string(credentialsId: 'r2-secret-key', variable: 'R2_SECRET_KEY'),
+								string(credentialsId: 'gateway-keystore-base64', variable: 'KEYSTORE_BASE64')
 							]) {
 								sh '''
 									cat > .env << EOF
@@ -376,6 +377,8 @@ ORDER_DB=buy-two
 SPRING_SECURITY_USER_NAME=user
 SPRING_SECURITY_USER_PASSWORD=password
 EOF
+									# Decode base64 keystore into gateway resources
+									echo "${KEYSTORE_BASE64}" | base64 -d > backend/gateway-service/src/main/resources/gateway-keystore.p12
 								'''
 							}
 
