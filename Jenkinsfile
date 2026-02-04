@@ -1,3 +1,11 @@
+properties([
+	throttleJobProperty(
+		categories: ['buy-two-serial'],
+		throttleEnabled: true,
+		throttleOption: 'category'
+	)
+])
+
 pipeline {
 	agent any
 
@@ -5,9 +13,8 @@ pipeline {
 	 * Prevent concurrent builds
 	 **********************/
 	options {
-		disableConcurrentBuilds()
 		timestamps()
-		timeout(time: 1, unit: 'HOURS')
+		timeout(time: 20, unit: 'MINUTES')
 	}
 
 	/**********************
@@ -28,6 +35,9 @@ pipeline {
 		MAVEN_REPO_LOCAL = "${env.JENKINS_HOME}/.m2/repository"
 		// Optional: shared npm cache
 		NPM_CONFIG_CACHE = "${env.JENKINS_HOME}/.npm"
+		
+		// Maven memory limits for 4GB VM
+		MAVEN_OPTS = "-Xmx768m -Xms384m -XX:+UseG1GC -XX:MaxGCPauseMillis=100"
 	}
 
 	// Tools section commented out - using system Maven/Node instead
@@ -159,10 +169,10 @@ pipeline {
 			steps {
 				dir('frontend') {
 					// nodejs(nodeJSInstallationName: 'node-20.19.6')
-					sh 'npm ci'
-					sh 'npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox --no-progress'
+					sh 'JAVA_TOOL_OPTIONS=\'-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400\' npm ci'
+					sh 'JAVA_TOOL_OPTIONS=\'-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400\' npm test -- --watch=false --browsers=ChromeHeadlessNoSandbox --no-progress'
 					sh 'ls -la test-results/junit/ || echo "No test-results dir"'
-					sh 'npx ng build --configuration production'
+					sh 'JAVA_TOOL_OPTIONS=\'-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400\' npx ng build --configuration production'
 				}
 			}
 		}
