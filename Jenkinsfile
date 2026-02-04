@@ -8,10 +8,6 @@ properties([
 
 pipeline {
 	agent any
-
-	/**********************
-	 * Prevent concurrent builds
-	 **********************/
 	options {
 		timestamps()
 		timeout(time: 20, unit: 'MINUTES')
