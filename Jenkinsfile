@@ -378,7 +378,7 @@ SPRING_SECURITY_USER_NAME=user
 SPRING_SECURITY_USER_PASSWORD=password
 EOF
 									# Decode base64 keystore into gateway resources
-									echo "${KEYSTORE_BASE64}" | base64 -d > backend/gateway-service/src/main/resources/gateway-keystore.p12
+									echo "${KEYSTORE_BASE64}" | tr -d '[:space:]' | base64 -d > backend/gateway-service/src/main/resources/gateway-keystore.p12
 								'''
 							}
 
