@@ -21,12 +21,7 @@ export class CartComponent implements OnInit, OnDestroy {
   private readonly categoryService = inject(CategoryService);
 
   ngOnInit() {
-    // For styling purposes, load mock data
-    // Later replace this with actual service call
-    // this.cartItems = mockCartItems;
-    // console.log('Loaded mock cart items:', this.cartItems);
-
-    // Uncomment when service is ready
+    this.cartService.loadCart();
 
     this.subscription = this.cartService.cartItems$.subscribe((items) => {
       this.cartItems = items || [];

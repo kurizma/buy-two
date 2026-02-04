@@ -33,7 +33,7 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductClient productClient;  //  Fixed: no @Autowired
     
-    @Value("${app.cart.tax-rate:0.1}")  //  Configurable
+    @Value("${app.cart.tax-rate:0.24}")  //  Configurable
     private double taxRate;
     
     @Override
@@ -147,21 +147,26 @@ public class CartServiceImpl implements CartService {
     }
     
     private Cart recalculateTotals(Cart cart) {
-        BigDecimal subtotal = cart.getItems().stream()
-                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Total price (already incl VAT from product)
+        BigDecimal totalInclVat = cart.getItems().stream()
+            .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
         
-        BigDecimal tax = subtotal.multiply(BigDecimal.valueOf(taxRate))
-                .setScale(2, RoundingMode.HALF_UP);
-        BigDecimal total = subtotal.add(tax);
+        // VAT = 24% of excl VAT price → reverse calculate
+        // totalInclVat = subtotal * 1.24 → subtotal = totalInclVat / 1.24
+        BigDecimal subtotalExclVat = totalInclVat.divide(BigDecimal.valueOf(1.24), 2, RoundingMode.HALF_UP);
         
-        cart.setSubtotal(subtotal);
-        cart.setTax(tax);
-        cart.setTotal(total);
+        // VAT amount = totalInclVat - subtotalExclVat
+        BigDecimal vatAmount = totalInclVat.subtract(subtotalExclVat);
+        
+        cart.setSubtotal(subtotalExclVat);    // €17.74
+        cart.setTax(vatAmount);               // €4.26  
+        cart.setTotal(totalInclVat);          // €22.00
         cart.setUpdatedAt(LocalDateTime.now());
         
         return cartRepository.save(cart);
     }
+
     
     private void validateCartItem(CartItem item) {
         if (item.getQuantity() <= 0) {

@@ -29,7 +29,7 @@ eureka:
 
 app:
   cart:
-    tax-rate: 0.1
+    tax-rate: 0.24
   kafka:
     topic:
       order-created: order.created
