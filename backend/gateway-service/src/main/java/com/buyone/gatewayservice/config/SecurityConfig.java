@@ -53,7 +53,7 @@ public class SecurityConfig {
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:4200",
                 "https://localhost:4200",
-                    "https://79.133.14.85:4200",
+                "http://157.180.64.182:4200",
                 "http://localhost:*"  // Allow any local port during development
         ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
