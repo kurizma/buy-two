@@ -359,6 +359,10 @@ pipeline {
 								string(credentialsId: 'gateway-keystore-base64', variable: 'KEYSTORE_BASE64')
 							]) {
 								sh '''
+									mkdir -p secrets
+									echo "${KEYSTORE_BASE64}" | base64 -d > secrets/gateway-keystore.p12
+									ls -la secrets/gateway-keystore.p12
+
 									cat > .env << EOF
 ATLAS_URI=${ATLAS_URI}
 SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_SECRET=${JWT_SECRET}
@@ -402,7 +406,12 @@ EOF
 									// Strong health check
 									sh '''
                                         timeout 30 bash -c "until docker compose ps | grep -q Up && curl -f http://localhost:4200 || curl -f http://localhost:8080/health; do sleep 2; done" || exit 1
-                                        if docker compose ps | grep -q "Exit"; then exit 1; fi
+                                        if docker compose ps | grep -q "Exit"; then 
+                                            echo "❌ Container startup failed:"
+                                            docker compose ps -a
+                                            docker compose logs
+                                            exit 1
+                                        fi
                                     '''
 								}
 								echo "✅ New deploy verified - promoted build-${BUILD_NUMBER} to stable"
