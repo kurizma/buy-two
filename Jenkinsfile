@@ -347,16 +347,6 @@ pipeline {
 					script {
 						dir("${env.WORKSPACE}") {
 							def cleanBranch = "${BRANCH ?: GIT_BRANCH ?: 'main'}".replaceAll(/^origin\//, '')
-							
-							// Checkout code
-							checkout([
-								$class: 'GitSCM',
-								branches: [[name: "*/${cleanBranch}"]],
-								userRemoteConfigs: [[
-									url: 'https://github.com/kurizma/buy-two.git',
-									credentialsId: 'buy-two-pat'
-								]]
-							])
 
 							// Create .env from Jenkins credentials
 							withCredentials([
@@ -383,11 +373,6 @@ ORDER_DB=buy-two
 SPRING_SECURITY_USER_NAME=user
 SPRING_SECURITY_USER_PASSWORD=password
 EOF
-									# Decode base64 keystore
-									echo "${KEYSTORE_BASE64}" | base64 -d > backend/gateway-service/src/main/resources/gateway-keystore.p12
-									
-									# Verify
-									ls -lh backend/gateway-service/src/main/resources/gateway-keystore.p12
 								'''
 							}
 
