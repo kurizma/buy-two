@@ -400,7 +400,14 @@ EOF
                                     '''
 
 									// Deploy new version for verification
-									sh 'docker compose up -d'
+									try {
+										sh 'docker compose up -d'
+									} catch (Exception e) {
+										echo "❌ 'docker compose up' failed to start containers:"
+										sh 'docker compose ps -a'
+										sh 'docker compose logs --tail=50'
+										throw e
+									}
 									sleep 20
 
 									// Strong health check
