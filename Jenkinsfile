@@ -341,14 +341,18 @@ pipeline {
 		/******************************
 		 * Deploy, verify, and rollback
 		 ******************************/
-		stage('Deploy & Verify') {
+		stage('Deploy & Verify - Debug Mode') {
 			steps {
 				timeout(time: 30, unit: 'MINUTES') {
 					script {
 						dir("${env.WORKSPACE}") {
-							def cleanBranch = "${BRANCH ?: GIT_BRANCH ?: 'main'}".replaceAll(/^origin\//, '')
+							
+							echo "=================================================="
+							echo "   STARTING DEBUG DEPLOYMENT PROCEDURE"
+							echo "=================================================="
 
-							// Create .env from Jenkins credentials
+							// 1. Secrets Setup
+                            echo "--- STEP 1: Setting up Secrets ---"
 							withCredentials([
 								string(credentialsId: 'atlas-uri', variable: 'ATLAS_URI'),
 								string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET'),
@@ -358,12 +362,23 @@ pipeline {
 								string(credentialsId: 'r2-secret-key', variable: 'R2_SECRET_KEY'),
 								string(credentialsId: 'gateway-keystore-base64', variable: 'KEYSTORE_BASE64')
 							]) {
-								sh '''
-									mkdir -p secrets
-									echo "${KEYSTORE_BASE64}" | base64 -d > secrets/gateway-keystore.p12
-									ls -la secrets/gateway-keystore.p12
+                                sh '''
+                                    echo "Creating secrets directory..."
+                                    mkdir -p secrets
+                                    
+                                    echo "Decoding keystore..."
+                                    echo "${KEYSTORE_BASE64}" | base64 -d > secrets/gateway-keystore.p12
+                                    
+                                    if [ -s secrets/gateway-keystore.p12 ]; then
+                                        echo "✅ Keystore created successfully. Size:"
+                                        ls -lh secrets/gateway-keystore.p12
+                                    else
+                                        echo "❌ Keystore file is empty or missing!"
+                                        exit 1
+                                    fi
 
-									cat > .env << EOF
+                                    echo "Creating .env file..."
+                                    cat > .env << EOF
 ATLAS_URI=${ATLAS_URI}
 SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_SECRET=${JWT_SECRET}
 KEY_STORE_PASSWORD=${KEYSTORE_PASSWORD}
@@ -377,31 +392,39 @@ ORDER_DB=buy-two
 SPRING_SECURITY_USER_NAME=user
 SPRING_SECURITY_USER_PASSWORD=password
 EOF
-								'''
-							}
+                                    echo "✅ .env file created"
+                                '''
+                            }
 
-							// Cleanup old containers aggressively
+                            // 2. Cleanup
+                            echo "--- STEP 2: Cleaning up Old Containers ---"
 							sh '''
-								docker compose down || true
+                                echo "Running docker compose down..."
+								docker compose down --remove-orphans || true
 								
-								# Force remove any containers that might be hogging ports (v6, v7, etc)
-								docker ps -q --filter "name=discovery-service" | xargs -r docker rm -f
-								docker ps -q --filter "name=gateway-service" | xargs -r docker rm -f
-								docker ps -q --filter "name=frontend" | xargs -r docker rm -f
-								docker ps -q --filter "name=user-service" | xargs -r docker rm -f
-								docker ps -q --filter "name=product-service" | xargs -r docker rm -f
-								docker ps -q --filter "name=media-service" | xargs -r docker rm -f
-								docker ps -q --filter "name=order-service" | xargs -r docker rm -f
-								docker ps -q --filter "name=kafka" | xargs -r docker rm -f
+                                echo "Force killing specific service containers..."
+								services="discovery-service gateway-service frontend user-service product-service media-service order-service kafka"
+								for service in $services; do
+									ids=$(docker ps -aq --filter "name=$service")
+									if [ -n "$ids" ]; then
+										echo "Targeting $service containers: $ids"
+										docker rm -f $ids || true
+									fi
+								done
+                                
+                                echo "Verifying cleanup (should be empty of project containers):"
+                                docker ps -a
 							'''
-							sleep 3
+							sleep 2
 
-							try {
-								echo "Building and tagging ${VERSION} as potential stable"
-
+                            // 3. Build
+                            try {
+                                echo "--- STEP 3: Building Images ---"
 								withEnv(["IMAGE_TAG=${VERSION}"]) {
-									sh 'docker compose build frontend || exit 1'
+                                    sh 'docker compose build frontend || exit 1'
 									sh 'docker compose build --pull --parallel --progress=plain'
+                                    
+                                    echo "Tagging images..."
 									sh '''
                                         docker tag frontend:${VERSION} frontend:${STABLE_TAG} frontend:build-${BUILD_NUMBER} || true
                                         docker tag discovery-service:${VERSION} discovery-service:${STABLE_TAG} discovery-service:build-${BUILD_NUMBER} || true
@@ -410,56 +433,75 @@ EOF
                                         docker tag product-service:${VERSION} product-service:${STABLE_TAG} product-service:build-${BUILD_NUMBER} || true
                                         docker tag media-service:${VERSION} media-service:${STABLE_TAG} media-service:build-${BUILD_NUMBER} || true
                                     '''
+                                }
+                            } catch (Exception e) {
+                                echo "❌ Build Failed"
+                                throw e
+                            }
 
-									// Deploy new version for verification
-									def upStatus = sh(script: 'docker compose up -d', returnStatus: true)
-									if (upStatus != 0) {
-										echo "❌ 'docker compose up' failed. Dumping logs:"
-										sh 'docker compose ps -a'
-										sh 'docker compose logs'
-										error "Deployment failed: docker compose up returned ${upStatus}"
-									}
-									sleep 20
+                            // 4. Debug Deployment
+                            echo "--- STEP 4: Debug Deployment (Step-by-Step) ---"
+                            try {
+                                withEnv(["IMAGE_TAG=${VERSION}"]) {
+                                    
+                                    // Start Infra
+                                    echo "▶️ Starting Kafka..."
+                                    sh 'docker compose up -d kafka'
+                                    sleep 5
+                                    sh 'docker ps | grep kafka || echo "⚠️ Kafka not running"'
+                                    
+                                    // Start Discovery
+                                    echo "▶️ Starting Discovery Service..."
+                                    sh 'docker compose up -d discovery-service'
+                                    sleep 10
+                                    sh 'docker ps | grep discovery || echo "⚠️ Discovery not running"'
+                                    sh 'docker logs discovery-service || true'
 
-									// Strong health check
-									sh '''
-                                        timeout 30 bash -c "until docker compose ps | grep -q Up && curl -f http://localhost:4200 || curl -f http://localhost:8080/health; do sleep 2; done" || exit 1
-                                        if docker compose ps | grep -q "Exit"; then 
-                                            echo "❌ Container startup failed:"
-                                            docker compose ps -a
+                                    // Start Gateway (Dependent on Discovery)
+                                    echo "▶️ Starting Gateway Service..."
+                                    sh 'docker compose up -d gateway-service'
+                                    sleep 10
+                                    sh 'docker ps | grep gateway || echo "⚠️ Gateway not running"' 
+                                    echo "--- GATEWAY LOGS (Initial 10s) ---"
+                                    sh 'docker logs gateway-service || true'
+                                    echo "--------------------"
+
+                                    // Start Rest
+                                    echo "▶️ Starting Remaining Services..."
+                                    sh 'docker compose up -d'
+                                    sleep 20
+                                    
+                                    echo "--- STEP 5: Verification ---"
+                                    sh 'docker ps -a'
+
+                                    // Check if Gateway matches requirements
+                                    echo "🔍 Checking Gateway Health:"
+                                    // We use || true so script doesn't abort immediately, we handle checking manually
+                                    sh 'curl -v http://localhost:8080/actuator/health || echo "Curl failed"'
+                                    
+                                    // Final check
+                                    sh '''
+                                        if docker compose ps | grep -q "Exited"; then 
+                                            echo "❌ FOUND EXITED CONTAINERS:"
+                                            docker compose ps --filter "status=exited"
+                                            echo "Dumping logs for exited containers..."
                                             docker compose logs
                                             exit 1
+                                        else
+                                            echo "✅ All containers seem to be running."
                                         fi
                                     '''
-								}
-								echo "✅ New deploy verified - promoted build-${BUILD_NUMBER} to stable"
-								echo "✅ New deploy verified - promoted build-${BUILD_NUMBER} to stable"
-								currentBuild.result = 'SUCCESS'
+                                }
+                                
+                                echo "✅ Deployment Success"
+                                currentBuild.result = 'SUCCESS'
 
-							} catch (Exception e) {
-								def stableTag = env.STABLE_TAG ?: 'latest'
-
-								echo "❌ Deploy failed: ${e.message}"
-
-								withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
-									sh """
-                                    curl -sS -X POST -H 'Content-type: application/json' \\
-                                        --data '{\"text\":\"🚨 Rollback #${BUILD_NUMBER} → ${stableTag}\"}' \$SLACK_WEBHOOK
-                                """
-								}
-
-								// Rollback: Always deploy known stable
-								sh """
-                                STABLE_TAG=\${STABLE_TAG:-latest}
-                                docker compose down || true
-                                IMAGE_TAG=\$STABLE_TAG docker compose up -d --pull never
-                                sleep 10
-                                docker compose ps  # Verify
-                                echo "✅ Rolled back to ${stableTag}"
-                            """
-								currentBuild.result = 'UNSTABLE'
-								throw e
-							}
+                            } catch (Exception e) {
+                                echo "❌ DEPLOYMENT FAILED: ${e.message}"
+                                echo "--- FINAL SYSTEM STATE ---"
+                                sh 'docker ps -a'
+                                throw e
+                            }
 						}
 					}
 				}
