@@ -62,7 +62,7 @@ services:
       SERVER_PORT: 8080
     volumes:
       - maven-repo:/root/.m2
-      - ./secrets/gateway-keystore.p12:/opt/buy-two/secrets/gateway-keystore.p12:ro
+      - /opt/buy-two/secrets/gateway-keystore.p12:/opt/buy-two/secrets/gateway-keystore.p12:ro
 
   # === BUSINESS SERVICES ===
   user-service:

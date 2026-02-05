@@ -382,15 +382,16 @@ pipeline {
                                     set -e
                                     set -x
                                     
-                                    echo "Creating secrets directory..."
-                                    mkdir -p secrets
+                                    echo "Creating secrets directory on host..."
+                                    mkdir -p /opt/buy-two/secrets
                                     
-                                    echo "Decoding keystore..."
-                                    echo "$KEYSTORE_BASE64" | base64 -d > secrets/gateway-keystore.p12
+                                    echo "Decoding keystore to host path..."
+                                    echo "$KEYSTORE_BASE64" | base64 -d > /opt/buy-two/secrets/gateway-keystore.p12
+                                    chmod 600 /opt/buy-two/secrets/gateway-keystore.p12
                                     
-                                    if [ -s secrets/gateway-keystore.p12 ]; then
-                                        echo "✅ Keystore created successfully. Size:"
-                                        ls -lh secrets/gateway-keystore.p12
+                                    if [ -f "/opt/buy-two/secrets/gateway-keystore.p12" ]; then
+                                        echo "✅ Keystore generated at /opt/buy-two/secrets/gateway-keystore.p12"
+                                        ls -l /opt/buy-two/secrets/gateway-keystore.p12
                                     else
                                         echo "❌ Keystore file is empty or missing!"
                                         exit 1
