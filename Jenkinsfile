@@ -412,13 +412,12 @@ EOF
                                     '''
 
 									// Deploy new version for verification
-									try {
-										sh 'docker compose up -d'
-									} catch (Exception e) {
-										echo "❌ 'docker compose up' failed to start containers:"
+									def upStatus = sh(script: 'docker compose up -d', returnStatus: true)
+									if (upStatus != 0) {
+										echo "❌ 'docker compose up' failed. Dumping logs:"
 										sh 'docker compose ps -a'
-										sh 'docker compose logs --tail=50'
-										throw e
+										sh 'docker compose logs'
+										error "Deployment failed: docker compose up returned ${upStatus}"
 									}
 									sleep 20
 
