@@ -362,12 +362,20 @@ pipeline {
 								string(credentialsId: 'r2-secret-key', variable: 'R2_SECRET_KEY'),
 								string(credentialsId: 'gateway-keystore-base64', variable: 'KEYSTORE_BASE64')
 							]) {
+                                // Diagnostic checks
+                                sh 'echo "DEBUG: Entering Shell Block"'
+                                sh 'which base64 || echo "WARNING: base64 not found"'
+                                sh 'if [ -z "$KEYSTORE_BASE64" ]; then echo "❌ KEYSTORE_BASE64 var is empty"; exit 1; else echo "✅ KEYSTORE_BASE64 var is present"; fi'
+
                                 sh '''
+                                    set -e
+                                    set -x
+                                    
                                     echo "Creating secrets directory..."
                                     mkdir -p secrets
                                     
                                     echo "Decoding keystore..."
-                                    echo "${KEYSTORE_BASE64}" | base64 -d > secrets/gateway-keystore.p12
+                                    echo "$KEYSTORE_BASE64" | base64 -d > secrets/gateway-keystore.p12
                                     
                                     if [ -s secrets/gateway-keystore.p12 ]; then
                                         echo "✅ Keystore created successfully. Size:"
@@ -376,7 +384,11 @@ pipeline {
                                         echo "❌ Keystore file is empty or missing!"
                                         exit 1
                                     fi
+                                '''
 
+                                sh '''
+                                    set -e
+                                    set -x
                                     echo "Creating .env file..."
                                     cat > .env << EOF
 ATLAS_URI=${ATLAS_URI}
