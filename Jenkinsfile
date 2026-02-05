@@ -382,14 +382,30 @@ pipeline {
                                     set -e
                                     set -x
                                     
-                                    echo "Creating secrets directory on host..."
-                                    mkdir -p /opt/buy-two/secrets
+                                    TARGET="/opt/buy-two/secrets/gateway-keystore.p12"
+                                    DIR="/opt/buy-two/secrets"
                                     
-                                    echo "Decoding keystore to host path..."
-                                    echo "$KEYSTORE_BASE64" | base64 -d > /opt/buy-two/secrets/gateway-keystore.p12
-                                    chmod 600 /opt/buy-two/secrets/gateway-keystore.p12
+                                    echo "Ensuring directory exists..."
+                                    # Create dir if not exists (will fail if no permissions, but we try)
+                                    [ ! -d "$DIR" ] && mkdir -p "$DIR" || true
+
+                                    echo "Handling Keystore at $TARGET..."
+                                    if [ -f "$TARGET" ]; then
+                                        echo "ℹ️ File already exists on host."
+                                        if [ -w "$TARGET" ]; then
+                                             echo "🔄 Overwriting with Jenkins credential version..."
+                                             echo "$KEYSTORE_BASE64" | base64 -d > "$TARGET"
+                                             chmod 600 "$TARGET"
+                                        else
+                                             echo "⚠️ File exists but is NOT writable by Jenkins. Using existing file as-is."
+                                        fi
+                                    else
+                                        echo "🆕 Generating new keystore file..."
+                                        echo "$KEYSTORE_BASE64" | base64 -d > "$TARGET"
+                                        chmod 600 "$TARGET"
+                                    fi
                                     
-                                    if [ -f "/opt/buy-two/secrets/gateway-keystore.p12" ]; then
+                                    if [ -f "$TARGET" ]; then
                                         echo "✅ Keystore generated at /opt/buy-two/secrets/gateway-keystore.p12"
                                         ls -l /opt/buy-two/secrets/gateway-keystore.p12
                                     else
