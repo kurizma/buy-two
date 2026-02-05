@@ -380,8 +380,20 @@ EOF
 								'''
 							}
 
-							// Cleanup old containers
-							sh 'docker compose down || true'
+							// Cleanup old containers aggressively
+							sh '''
+								docker compose down || true
+								
+								# Force remove any containers that might be hogging ports (v6, v7, etc)
+								docker ps -q --filter "name=discovery-service" | xargs -r docker rm -f
+								docker ps -q --filter "name=gateway-service" | xargs -r docker rm -f
+								docker ps -q --filter "name=frontend" | xargs -r docker rm -f
+								docker ps -q --filter "name=user-service" | xargs -r docker rm -f
+								docker ps -q --filter "name=product-service" | xargs -r docker rm -f
+								docker ps -q --filter "name=media-service" | xargs -r docker rm -f
+								docker ps -q --filter "name=order-service" | xargs -r docker rm -f
+								docker ps -q --filter "name=kafka" | xargs -r docker rm -f
+							'''
 							sleep 3
 
 							try {
