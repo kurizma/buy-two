@@ -409,12 +409,13 @@ EOF
                             }
 
                             // 2. Cleanup
-                            echo "--- STEP 2: Cleaning up Old Containers ---"
+                            echo "--- STEP 2: Cleaning up Old Containers & Ports ---"
 							sh '''
+                                set +e # Continue even if commands fail
                                 echo "Running docker compose down..."
 								docker compose down --remove-orphans || true
 								
-                                echo "Force killing specific service containers..."
+                                echo "1. Force killing by container name..."
 								services="discovery-service gateway-service frontend user-service product-service media-service order-service kafka"
 								for service in $services; do
 									ids=$(docker ps -aq --filter "name=$service")
@@ -423,6 +424,20 @@ EOF
 										docker rm -f $ids || true
 									fi
 								done
+                                
+                                echo "2. Force killing processes holding specific ports..."
+                                # Ports: 8761(discovery), 8080(gateway/others), 4200(frontend), 9092(kafka), 8789(order), 8456(user), 8567(product), 8678(media)
+                                ports="8761 8080 4200 9092 8789 8456 8567 8678"
+                                for port in $ports; do
+                                    echo "Checking port $port..."
+                                    # Find PID using lsof or netstat if available, or docker ps
+                                    # Fallback: finding docker container mapping this port if lsof/fuser not available
+                                    cid=$(docker ps -q --filter "publish=$port")
+                                    if [ -n "$cid" ]; then
+                                         echo "Killing container $cid holding port $port"
+                                         docker rm -f $cid
+                                    fi
+                                done
                                 
                                 echo "Verifying cleanup (should be empty of project containers):"
                                 docker ps -a
