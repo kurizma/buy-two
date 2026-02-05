@@ -351,8 +351,19 @@ pipeline {
 							echo "   STARTING DEBUG DEPLOYMENT PROCEDURE"
 							echo "=================================================="
 
+                            // 0. Diagnostic: Credential Check
+                            echo "--- STEP 0: Verifying Existence of Credentials ---"
+                            // We check them one-by-one to identify which one causes the silent crash
+                            try { withCredentials([string(credentialsId: 'atlas-uri', variable: 'X')]) { echo "✅ Found: atlas-uri" } } catch(e) { error "❌ MISSING: atlas-uri" }
+                            try { withCredentials([string(credentialsId: 'jwt-secret', variable: 'X')]) { echo "✅ Found: jwt-secret" } } catch(e) { error "❌ MISSING: jwt-secret" }
+                            try { withCredentials([string(credentialsId: 'keystore-password', variable: 'X')]) { echo "✅ Found: keystore-password" } } catch(e) { error "❌ MISSING: keystore-password" }
+                            try { withCredentials([string(credentialsId: 'r2-endpoint', variable: 'X')]) { echo "✅ Found: r2-endpoint" } } catch(e) { error "❌ MISSING: r2-endpoint" }
+                            try { withCredentials([string(credentialsId: 'r2-access-key', variable: 'X')]) { echo "✅ Found: r2-access-key" } } catch(e) { error "❌ MISSING: r2-access-key" }
+                            try { withCredentials([string(credentialsId: 'r2-secret-key', variable: 'X')]) { echo "✅ Found: r2-secret-key" } } catch(e) { error "❌ MISSING: r2-secret-key" }
+                            try { withCredentials([string(credentialsId: 'gateway-keystore-base64', variable: 'X')]) { echo "✅ Found: gateway-keystore-base64" } } catch(e) { error "❌ MISSING: gateway-keystore-base64" }
+
 							// 1. Secrets Setup
-                            echo "--- STEP 1: Setting up Secrets ---"
+                            echo "--- STEP 1: Setting up Secrets (Batch) ---"
 							withCredentials([
 								string(credentialsId: 'atlas-uri', variable: 'ATLAS_URI'),
 								string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET'),
