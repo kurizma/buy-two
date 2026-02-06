@@ -72,7 +72,11 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, credentials).pipe(
       tap((response) => {
-        this.saveAuthData(response.token, response.user);
+        localStorage.setItem('token', response.token);
+        if (response.user) {
+          localStorage.setItem('currentUser', JSON.stringify(response.user));
+          this.currentUserSubject.next(response.user);
+        }
       }),
     );
   }
