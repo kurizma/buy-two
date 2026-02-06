@@ -35,11 +35,16 @@ export class CartService {
 
   /** Load cart from API */
   loadCart(): void {
+    console.log('🔄 Loading cart from:', this.baseUrl); // Debug
+
     this.http
-      .get<ApiResponse<CartResponse>>(this.baseUrl)
+      // .get<ApiResponse<CartResponse>>(this.baseUrl)
+      .get<ApiResponse<any>>(this.baseUrl)
       .pipe(catchError(this.handleApiError.bind(this)))
       .subscribe({
         next: (response) => {
+          console.log('📦 Raw backend response:', response); // Debug
+
           if (response.success && response.data?.items?.length) {
             this.loadSellersForCart(response.data.items);
           } else {
@@ -85,7 +90,7 @@ export class CartService {
   }
 
   private mapCartWithSellers(items: any[]) {
-    const frontendItems: CartItem[] = items.map((item) => ({
+    const frontendItems: CartItem[] = items.map((item: any) => ({
       id: this.generateCartItemId(),
       productId: item.productId,
       productName: item.productName,
@@ -93,12 +98,13 @@ export class CartService {
       sellerName: this.sellerCache[item.sellerId]?.name || 'Seller',
       sellerAvatarUrl:
         this.sellerCache[item.sellerId]?.avatar || '/assets/avatars/user-default.png',
-      price: item.price,
-      quantity: item.quantity,
+      price: Number.parseFloat(item.price) || 0,
+      quantity: Number.parseInt(item.quantity, 10) || 1,
       categoryId: item.categoryId || '',
-      imageUrl: item.imageUrl,
+      imageUrl: item.imageUrl || '/assets/product-default.png',
       productDescription: '',
     }));
+    console.log('✅ Cart mapped:', frontendItems); // Debug
     this.cartItemsSubject.next(frontendItems);
   }
 
@@ -110,9 +116,9 @@ export class CartService {
       sellerId: product.sellerId || product.userId || product.ownerId || 'Unknown Seller',
       sellerName: product.sellerName || 'Unknown Seller',
       sellerAvatarUrl: product.sellerAvatarUrl || '/assets/avatars/user-default.png',
-      price: product.price,
+      price: Number.parseFloat(product.price) || 0,
       categoryId: product.categoryId,
-      imageUrl: product.images?.[0] || '',
+      imageUrl: product.images?.[0] || '/assets/product-default.png',
       productDescription: product.description,
       availableStock: product.quantity,
     });
@@ -146,10 +152,15 @@ export class CartService {
       .pipe(catchError(this.handleApiError.bind(this)))
       .subscribe((response) => {
         if (response.success && response.data?.items) {
-          this.cartItemsSubject.next(response.data.items);
+          this.loadSellersForCart(response.data.items);
           this.snackBar.open('✅ Item added to cart', 'Close', { duration: 2000 });
         }
-      });
+      }); // .subscribe((response) => {
+    //   if (response.success && response.data?.items) {
+    //     this.cartItemsSubject.next(response.data.items);
+    //     this.snackBar.open('✅ Item added to cart', 'Close', { duration: 2000 });
+    //   }
+    // });
   }
 
   /** Update quantity */
@@ -167,7 +178,7 @@ export class CartService {
       .pipe(catchError(this.handleApiError.bind(this)))
       .subscribe((response) => {
         if (response.success && response.data?.items) {
-          this.cartItemsSubject.next(response.data.items);
+          this.loadSellersForCart(response.data.items);
         }
       });
   }
@@ -179,7 +190,7 @@ export class CartService {
       .pipe(catchError(this.handleApiError.bind(this)))
       .subscribe((response) => {
         if (response.success && response.data?.items) {
-          this.cartItemsSubject.next(response.data.items);
+          this.loadSellersForCart(response.data.items);
         }
       });
   }
@@ -204,7 +215,7 @@ export class CartService {
         .pipe(catchError(this.handleApiError.bind(this)))
         .subscribe((response) => {
           if (response.success) {
-            this.cartItemsSubject.next([]);
+            this.loadSellersForCart([]);
             this.snackBar.open('🛒 Cart cleared!', 'Close', {
               duration: 3000,
               horizontalPosition: 'center',
