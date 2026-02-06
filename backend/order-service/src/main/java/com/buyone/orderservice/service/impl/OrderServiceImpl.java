@@ -2,6 +2,8 @@ package com.buyone.orderservice.service.impl;
 
 import com.buyone.orderservice.client.ProductClient;
 import com.buyone.orderservice.dto.request.order.OrderSearchRequest;
+import com.buyone.orderservice.dto.request.ReserveStockRequest;
+import com.buyone.orderservice.dto.request.ReleaseStockRequest;
 import com.buyone.orderservice.exception.BadRequestException;
 import com.buyone.orderservice.exception.ResourceNotFoundException;
 import com.buyone.orderservice.model.*;
@@ -82,12 +84,45 @@ public class OrderServiceImpl implements OrderService {
         Order saved = orderRepository.save(order);
         
         // Post-checkout actions
+        reserveInventory(saved.getItems(), saved.getOrderNumber());
+        
+//        // 2. NEW: auto-confirm Pay on Delivery
+//        if (saved.getPaymentMethod() == PaymentMethod.PAY_ON_DELIVERY) {
+//            saved.setStatus(OrderStatus.CONFIRMED);
+//            saved.setUpdatedAt(LocalDateTime.now());
+//            saved = orderRepository.save(saved);  // Save CONFIRMED
+            
+            // Commit: delete reservations, qty stays deducted ✅
+//            productClient.commitStock(saved.getOrderNumber());
+//            log.info("Auto-confirmed Pay on Delivery order {}", saved.getOrderNumber());
+//        }
+        
         cartService.clearCart(userId);
-        reserveInventoryAsync(orderItems, orderNumber);
         
         log.info("Order {} created for {} (subtotal: {})", orderNumber, userId, subtotal);
         return saved;
     }
+    
+    @Override
+    public Optional<Order> confirmOrder(String orderNumber, String userId) {
+        return getOrder(orderNumber)
+                .filter(order -> userId.equals(order.getUserId()))      // Buyer owns order
+                .filter(order -> order.getStatus() == OrderStatus.PENDING)  // Only PENDING
+                .map(order -> {
+                    OrderStatus oldStatus = order.getStatus();
+                    order.setStatus(OrderStatus.CONFIRMED);
+                    order.setUpdatedAt(LocalDateTime.now());
+                    Order saved = orderRepository.save(order);
+                    
+                    // Commit stock (same as seller updateStatus)
+                    productClient.commitStock(orderNumber);
+                    log.info("Buyer {} confirmed order {}", userId, orderNumber);
+                    
+                    return saved;
+                });
+    }
+
+    
     
     /**
      * Gets cart items with validation - quantities only (don't trust stale cart data).
@@ -158,9 +193,23 @@ public class OrderServiceImpl implements OrderService {
     /**
      * Queues inventory reservation (TODO: @Async + RabbitMQ).
      */
-    private void reserveInventoryAsync(List<OrderItem> items, String orderNumber) {
-        log.debug("Inventory reservation queued for order: {}", orderNumber);
-        // TODO: productClient.reserveStock(items, orderNumber);
+    private void reserveInventory(List<OrderItem> items, String orderNumber) {
+        for (OrderItem item : items) {
+            ReserveStockRequest req = new ReserveStockRequest(
+                    item.getProductId(),
+                    item.getQuantity(),
+                    orderNumber
+            );
+            
+            ApiResponse<Void> response = productClient.reserveStock(req);
+            if (!response.isSuccess()) {
+                throw new BadRequestException(
+                        "Failed to reserve stock for product: " + item.getProductId() +
+                                ". Error: " + response.getMessage());
+            }
+            log.info("Reserved {} units of {} for order {}",
+                    item.getQuantity(), item.getProductId(), orderNumber);
+        }
     }
     
     // ========== EXISTING METHODS (PERFECT - MINOR ENUM FIXES) ==========
@@ -191,9 +240,20 @@ public class OrderServiceImpl implements OrderService {
             throw new BadRequestException("Seller not authorized for this order");
         }
         
+        OrderStatus oldStatus = order.getStatus();
+        
         order.setStatus(status);
         order.setUpdatedAt(LocalDateTime.now());
-        return Optional.of(orderRepository.save(order));
+        Order saved = orderRepository.save(order);
+        
+        // NEW: commit stock once when leaving PENDING
+        if (oldStatus == OrderStatus.PENDING && status == OrderStatus.CONFIRMED) {
+            // We only need orderNumber to commit all reservations
+            productClient.commitStock(orderNumber);
+            log.info("Committed stock reservations for order {}", orderNumber);
+        }
+        
+        return Optional.of(saved);
     }
     
     /**
@@ -211,9 +271,19 @@ public class OrderServiceImpl implements OrderService {
         if (order.getStatus() != OrderStatus.PENDING) {
             throw new IllegalStateException("Only PENDING orders can be cancelled");
         }
+        
         order.setStatus(OrderStatus.CANCELLED);
         order.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(order);
+        order.getItems().forEach(item -> {
+            ReleaseStockRequest req = new ReleaseStockRequest(
+                    item.getProductId(),
+                    item.getQuantity()
+            );
+            productClient.releaseStock(req);
+            log.info("Released {} units of {} for cancelled order {}",
+                    item.getQuantity(), item.getProductId(), orderNumber);
+        });
     }
     
     /**
