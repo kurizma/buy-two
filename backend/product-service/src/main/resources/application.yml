@@ -1,0 +1,39 @@
+server:
+  port: 8567
+
+spring:
+  application:
+    name: product-service
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  data:
+    mongodb:
+      uri: ${ATLAS_URI}
+      reactive:
+        repositories:
+          enabled: true
+  transaction:
+    manager: mongodb
+  security:
+    user:
+      name: ${SPRING_SECURITY_USER_NAME:user}
+      password: ${SPRING_SECURITY_USER_PASSWORD}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+
+
+app:
+  kafka:
+    topic:
+      product-created: product.created
+      product-updated: product.updated
+      product-deleted: product.deleted
+
+logging:
+  level:
+    org.springframework.security: DEBUG

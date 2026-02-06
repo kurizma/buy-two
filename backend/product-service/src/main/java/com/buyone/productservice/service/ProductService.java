@@ -13,6 +13,12 @@ public interface ProductService {
     ProductResponse updateProduct(String id, UpdateProductRequest request, String sellerId);
     void deleteProduct(String id, String sellerId);
     List<ProductResponse> getProductsBySeller(String sellerId); // for seller dashboard
+    
+    
+    void reserveStock(String productId, int quantity, String orderNumber);
+    void releaseStock(String productId, int quantity);
+    void commitReservations(String orderNumber);
+    
 }
 
 

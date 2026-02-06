@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.GET, "/media/images/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                         
+                        .pathMatchers("/products/stock/**").authenticated()
                         .pathMatchers("/api/cart/**").authenticated()
                         .pathMatchers("/api/orders/**").authenticated()
                         .pathMatchers("/api/analytics/**").authenticated()

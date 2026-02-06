@@ -2,6 +2,8 @@ package com.buyone.productservice.controller;
 
 import com.buyone.productservice.request.CreateProductRequest;
 import com.buyone.productservice.request.UpdateProductRequest;
+import com.buyone.productservice.request.ReserveStockRequest;
+import com.buyone.productservice.request.ReleaseStockRequest;
 import com.buyone.productservice.response.ProductResponse;
 import com.buyone.productservice.response.ApiResponse;
 import com.buyone.productservice.exception.ForbiddenException;
@@ -11,6 +13,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+
+
 
 import jakarta.validation.Valid;
 import java.util.List;
@@ -94,6 +98,45 @@ public class ProductController {
         productService.deleteProduct(id, sellerId);
         return ResponseEntity.ok(okResponse("Product deleted successfully", null));
     }
+    
+    @PostMapping("/stock/reserve")
+    public ResponseEntity<ApiResponse<Void>> reserveStock(
+            @Valid @RequestBody ReserveStockRequest request) {
+        
+        productService.reserveStock(
+                request.getProductId(),
+                request.getQuantity(),
+                request.getOrderNumber()
+        );
+        
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .success(true)
+                .message("Stock reserved successfully")
+                .build());
+    }
+    
+    @PostMapping("/stock/release")
+    public ResponseEntity<ApiResponse<Void>> releaseStock(
+            @Valid @RequestBody ReleaseStockRequest request) {
+        
+        productService.releaseStock(
+                request.getProductId(),
+                request.getQuantity()
+        );
+        
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .success(true)
+                .message("Stock released successfully")
+                .build());
+    }
+    
+    @PostMapping("/stock/commit/{orderNumber}")
+    public ResponseEntity<Void> commitStock(@PathVariable String orderNumber) {
+        productService.commitReservations(orderNumber);  // We'll add this method next
+        return ResponseEntity.ok().build();
+    }
+    
+    
     
     // Helper to build ApiResponse consistently
     private <T> ApiResponse<T> okResponse(String message, T data) {
