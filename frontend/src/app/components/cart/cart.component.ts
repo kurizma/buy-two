@@ -21,9 +21,12 @@ export class CartComponent implements OnInit, OnDestroy {
   private readonly categoryService = inject(CategoryService);
 
   ngOnInit() {
+    console.log('🛒 CartComponent init - loading from API'); // Debug
+
     this.cartService.loadCart();
 
     this.subscription = this.cartService.cartItems$.subscribe((items) => {
+      console.log('🛒 Cart items updated:', items); // Debug
       this.cartItems = items || [];
     });
 
