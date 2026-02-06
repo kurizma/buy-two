@@ -41,12 +41,12 @@ export const routes: Routes = [
   {
     path: 'cart',
     component: CartComponent,
-    canActivate: [ClientOnlyGuard, EmptyCartGuard], //Client + has items in cart
+    canActivate: [ClientOnlyGuard], //Client + has items in cart
   },
   {
     path: 'checkout',
     component: CheckoutComponent,
-    canActivate: [ClientOnlyGuard, EmptyCartGuard], //Client + has items in cart
+    canActivate: [ClientOnlyGuard], //Client + has items in cart
   },
   {
     path: 'order-detail/:id',

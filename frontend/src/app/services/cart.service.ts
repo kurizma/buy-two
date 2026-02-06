@@ -1,10 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BehaviorSubject, catchError, of } from 'rxjs';
+import { BehaviorSubject, catchError, firstValueFrom, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment.docker';
 
 import { UserService } from './user.service';
+import { ProductService } from './product.service';
+import { CategoryService } from './category.service';
 import { CartItem } from '../models/cart/cart-item.model';
 import { CartResponse } from '../models/cart/cart-response.model';
 import { ApiResponse } from '../models/api-response/api-response.model';
@@ -19,6 +21,8 @@ export class CartService {
   private readonly http = inject(HttpClient);
   private readonly snackBar = inject(MatSnackBar);
   private readonly userService = inject(UserService);
+  private readonly categoryService = inject(CategoryService);
+  private readonly productService = inject(ProductService);
   private sellerCache: { [sellerId: string]: { name: string; avatar: string } } = {};
 
   private cartItemsSubject = new BehaviorSubject<CartItem[]>(this.loadCartFromStorage());
@@ -89,22 +93,35 @@ export class CartService {
     });
   }
 
-  private mapCartWithSellers(items: any[]) {
-    const frontendItems: CartItem[] = items.map((item: any) => ({
-      id: this.generateCartItemId(),
-      productId: item.productId,
-      productName: item.productName,
-      sellerId: item.sellerId,
-      sellerName: this.sellerCache[item.sellerId]?.name || 'Seller',
-      sellerAvatarUrl:
-        this.sellerCache[item.sellerId]?.avatar || '/assets/avatars/user-default.png',
-      price: Number.parseFloat(item.price) || 0,
-      quantity: Number.parseInt(item.quantity, 10) || 1,
-      categoryId: item.categoryId || '',
-      imageUrl: item.imageUrl || '/assets/product-default.png',
-      productDescription: '',
-    }));
-    console.log('✅ Cart mapped:', frontendItems); // Debug
+  private async mapCartWithSellers(items: any[]) {
+    // Process all items in parallel
+    const frontendItemsPromises = items.map(async (item: any) => {
+      // Existing seller mapping
+      const sellerName = this.sellerCache[item.sellerId]?.name || 'Seller';
+      const sellerAvatarUrl =
+        this.sellerCache[item.sellerId]?.avatar || '/assets/avatars/user-default.png';
+
+      // NEW: Get real categoryId from product
+      const product = await firstValueFrom(this.productService.getProductById(item.productId));
+      const categoryId = product.categoryId || '';
+
+      return {
+        id: this.generateCartItemId(),
+        productId: item.productId,
+        productName: item.productName,
+        sellerId: item.sellerId,
+        sellerName,
+        sellerAvatarUrl,
+        price: Number.parseFloat(item.price) || 0,
+        quantity: Number.parseInt(item.quantity, 10) || 1,
+        categoryId, // Now real ID!
+        categorySlug: this.categoryService.getCategorySlug(categoryId), // ✅ "tees"!
+        imageUrl: item.imageUrl || '/assets/product-default.png',
+      };
+    });
+
+    const frontendItems = await Promise.all(frontendItemsPromises);
+    console.log('✅ Cart mapped with slugs:', frontendItems);
     this.cartItemsSubject.next(frontendItems);
   }
 
@@ -144,6 +161,7 @@ export class CartService {
       price: params.price,
       productName: params.productName,
       categoryId: params.categoryId,
+      categorySlug: this.categoryService.getCategorySlug(params.categoryId) || '',
       imageUrl: params.imageUrl || '/assets/product-default.png',
     };
 
@@ -155,12 +173,7 @@ export class CartService {
           this.loadSellersForCart(response.data.items);
           this.snackBar.open('✅ Item added to cart', 'Close', { duration: 2000 });
         }
-      }); // .subscribe((response) => {
-    //   if (response.success && response.data?.items) {
-    //     this.cartItemsSubject.next(response.data.items);
-    //     this.snackBar.open('✅ Item added to cart', 'Close', { duration: 2000 });
-    //   }
-    // });
+      });
   }
 
   /** Update quantity */

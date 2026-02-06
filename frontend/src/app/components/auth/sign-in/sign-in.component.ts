@@ -1,7 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { RouterModule } from '@angular/router';
 
 import { AuthService } from '../../../services/auth.service';
 
@@ -13,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { NgIf } from '@angular/common';
+import { CartService } from '../../../services/cart.service';
 
 @Component({
   selector: 'app-sign-in',
@@ -20,7 +20,6 @@ import { NgIf } from '@angular/common';
   styleUrls: ['./sign-in.component.css'],
   standalone: true,
   imports: [
-    RouterModule,
     ReactiveFormsModule,
     MatCardModule,
     MatFormFieldModule,
@@ -38,6 +37,7 @@ export class SignInComponent implements OnInit {
 
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
+  private cartService = inject(CartService);
   private router = inject(Router);
 
   constructor() {
@@ -66,13 +66,21 @@ export class SignInComponent implements OnInit {
           this.isLoading = false;
           console.log('Login successful', response);
 
-          const user = this.authService.currentUserValue;
+          localStorage.setItem('token', response.token);
+
+          if (response.user) {
+            localStorage.setItem('currentUser', JSON.stringify(response.user));
+            this.authService.updateCurrentUserInStorage(response.user);
+          }
+
+          this.cartService.loadCart();
+
+          const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
           if (user?.role === 'SELLER') {
-            localStorage.setItem('token', response.token);
-            this.router.navigate(['/profile']);
+            this.router.navigate(['/seller-dashboard']);
           } else {
-            localStorage.setItem('token', response.token);
-            this.router.navigate(['/profile']);
+            this.router.navigate(['/']);
           }
         },
         error: (error) => {

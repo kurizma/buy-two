@@ -260,7 +260,7 @@ export class OrderListComponent implements OnInit {
       this.snackBar.open('Order permanently removed.', 'Close', {
         duration: 3000,
         horizontalPosition: 'center',
-        verticalPosition: 'bottom',
+        verticalPosition: 'top',
         panelClass: ['custom-snackbar'],
       });
     });
