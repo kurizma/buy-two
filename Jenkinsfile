@@ -360,7 +360,6 @@ pipeline {
                             try { withCredentials([string(credentialsId: 'r2-endpoint', variable: 'X')]) { echo "✅ Found: r2-endpoint" } } catch(e) { error "❌ MISSING: r2-endpoint" }
                             try { withCredentials([string(credentialsId: 'r2-access-key', variable: 'X')]) { echo "✅ Found: r2-access-key" } } catch(e) { error "❌ MISSING: r2-access-key" }
                             try { withCredentials([string(credentialsId: 'r2-secret-key', variable: 'X')]) { echo "✅ Found: r2-secret-key" } } catch(e) { error "❌ MISSING: r2-secret-key" }
-                            try { withCredentials([string(credentialsId: 'gateway-keystore-base64', variable: 'X')]) { echo "✅ Found: gateway-keystore-base64" } } catch(e) { error "❌ MISSING: gateway-keystore-base64" }
 
 							// 1. Secrets Setup
                             echo "--- STEP 1: Setting up Secrets (Batch) ---"
@@ -370,46 +369,24 @@ pipeline {
 								string(credentialsId: 'keystore-password', variable: 'KEYSTORE_PASSWORD'),
 								string(credentialsId: 'r2-endpoint', variable: 'R2_ENDPOINT'),
 								string(credentialsId: 'r2-access-key', variable: 'R2_ACCESS_KEY'),
-								string(credentialsId: 'r2-secret-key', variable: 'R2_SECRET_KEY'),
-								string(credentialsId: 'gateway-keystore-base64', variable: 'KEYSTORE_BASE64')
+								string(credentialsId: 'r2-secret-key', variable: 'R2_SECRET_KEY')
 							]) {
                                 // Diagnostic checks
                                 sh 'echo "DEBUG: Entering Shell Block"'
-                                sh 'which base64 || echo "WARNING: base64 not found"'
-                                sh 'if [ -z "$KEYSTORE_BASE64" ]; then echo "❌ KEYSTORE_BASE64 var is empty"; exit 1; else echo "✅ KEYSTORE_BASE64 var is present"; fi'
 
                                 sh '''
                                     set -e
                                     set -x
                                     
                                     TARGET="/opt/buy-two/secrets/gateway-keystore.p12"
-                                    DIR="/opt/buy-two/secrets"
                                     
-                                    echo "Ensuring directory exists..."
-                                    # Create dir if not exists (will fail if no permissions, but we try)
-                                    [ ! -d "$DIR" ] && mkdir -p "$DIR" || true
-
-                                    echo "Handling Keystore at $TARGET..."
+                                    echo "Verifying existence of Keystore at $TARGET..."
                                     if [ -f "$TARGET" ]; then
-                                        echo "ℹ️ File already exists on host."
-                                        if [ -w "$TARGET" ]; then
-                                             echo "🔄 Overwriting with Jenkins credential version..."
-                                             echo "$KEYSTORE_BASE64" | base64 -d > "$TARGET"
-                                             chmod 600 "$TARGET"
-                                        else
-                                             echo "⚠️ File exists but is NOT writable by Jenkins. Using existing file as-is."
-                                        fi
+                                        echo "✅ File exists on host."
+                                        ls -l "$TARGET"
                                     else
-                                        echo "🆕 Generating new keystore file..."
-                                        echo "$KEYSTORE_BASE64" | base64 -d > "$TARGET"
-                                        chmod 600 "$TARGET"
-                                    fi
-                                    
-                                    if [ -f "$TARGET" ]; then
-                                        echo "✅ Keystore generated at /opt/buy-two/secrets/gateway-keystore.p12"
-                                        ls -l /opt/buy-two/secrets/gateway-keystore.p12
-                                    else
-                                        echo "❌ Keystore file is empty or missing!"
+                                        echo "❌ Keystore MISSING at $TARGET"
+                                        echo "FATAL: Deployment requires this file. Please manually place it there."
                                         exit 1
                                     fi
                                 '''
