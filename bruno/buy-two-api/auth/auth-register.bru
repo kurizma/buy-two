@@ -1,0 +1,29 @@
+meta {
+  name: /auth/register
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "joon@seller.kr",
+    "password": "password123",
+    "name": "Joon Seller",
+    "role": "SELLER"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

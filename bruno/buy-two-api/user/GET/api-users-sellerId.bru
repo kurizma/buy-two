@@ -1,0 +1,20 @@
+meta {
+  name: /api/users/sellerId
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{userUrl}}/api/users/{{specificSellerId}}
+  body: none
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

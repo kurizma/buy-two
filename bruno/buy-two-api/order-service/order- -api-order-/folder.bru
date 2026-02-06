@@ -1,0 +1,18 @@
+meta {
+  name: order: /api/order/
+}
+
+headers {
+  Authorization: Bearer {{clientToken}}
+  X-USER-ID: 697b7c7c46572d7003f412a1
+  X-USER-ROLE: CLIENT
+  Content-Type: application/json
+}
+
+auth {
+  mode: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb29uQGNsaWVudC5rciIsImlkIjoiNjk3YjdjN2M0NjU3MmQ3MDAzZjQxMmExIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc3MDM3NDAyMiwiZXhwIjoxNzcwNDYwNDIyfQ.a1gtejZEQbqBwmRvOH0ERgukT1C2ZEU4ylrZ7tUMG04
+}

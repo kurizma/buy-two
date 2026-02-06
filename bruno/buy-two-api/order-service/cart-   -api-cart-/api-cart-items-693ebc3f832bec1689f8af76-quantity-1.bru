@@ -1,0 +1,23 @@
+meta {
+  name: /api/cart/items/693ebc3f832bec1689f8af76/quantity/1
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/api/cart/items/693ebc3f832bec1689f8af76/quantity/10
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization': Bearer {{clientToken}}
+  X-USER-ID: 697b7c7c46572d7003f412a1
+  X-USER-ROLE: CLIENT
+  Content-Type: application/json
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
