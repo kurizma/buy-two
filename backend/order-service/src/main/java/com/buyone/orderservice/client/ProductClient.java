@@ -20,4 +20,7 @@ public interface ProductClient {
     
     @PostMapping("/products/stock/release")
     ApiResponse<Void> releaseStock(@RequestBody ReleaseStockRequest request);
+    
+    @PostMapping("products/stock/commit/{orderNumber}")
+    ApiResponse<Void> commitStock(@PathVariable("orderNumber") String orderNumber);
 }

@@ -130,6 +130,13 @@ public class ProductController {
                 .build());
     }
     
+    @PostMapping("/stock/commit/{orderNumber}")
+    public ResponseEntity<Void> commitStock(@PathVariable String orderNumber) {
+        productService.commitReservations(orderNumber);  // We'll add this method next
+        return ResponseEntity.ok().build();
+    }
+    
+    
     
     // Helper to build ApiResponse consistently
     private <T> ApiResponse<T> okResponse(String message, T data) {

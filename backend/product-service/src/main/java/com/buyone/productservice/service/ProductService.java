@@ -16,8 +16,9 @@ public interface ProductService {
     
     
     void reserveStock(String productId, int quantity, String orderNumber);
-    
     void releaseStock(String productId, int quantity);
+    void commitReservations(String orderNumber);
+    
 }
 
 

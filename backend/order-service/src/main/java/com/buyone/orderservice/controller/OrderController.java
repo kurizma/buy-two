@@ -98,6 +98,27 @@ public class OrderController {
                 .build());
     }
     
+    @PostMapping("/{orderNumber}/confirm")
+    @Operation(summary = "Buyer confirms PENDING order", description = "Pay on Delivery final step")
+    public ResponseEntity<ApiResponse<OrderResponse>> confirmOrder(
+            @PathVariable String orderNumber,
+            @RequestHeader("X-USER-ID") String userId,
+            @RequestHeader("X-USER-ROLE") String role) {
+        validateRole(role, "CLIENT");
+        
+        OrderResponse confirmed = orderService.confirmOrder(orderNumber, userId)
+                .map(this::mapToOrderResponse)
+                .orElseThrow(() -> new BadRequestException("Order not found or cannot confirm"));
+        
+        return ResponseEntity.ok(ApiResponse.<OrderResponse>builder()
+                .success(true)
+                .message("Order confirmed successfully!")
+                .data(confirmed)
+                .build());
+    }
+    
+    
+    
     @PostMapping("/{orderNumber}/cancel")
     @Operation(summary = "Cancel PENDING order")
     public ResponseEntity<ApiResponse<Void>> cancelOrder(

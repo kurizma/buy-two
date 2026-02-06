@@ -23,6 +23,8 @@ public interface OrderService {
     
     Page<Order> getSellerOrders(String sellerId, Pageable pageable);
     
+    Optional<Order> confirmOrder(String orderNumber, String userId);
+    
     void cancelOrder(String orderNumber, String userId);  // Only PENDING → CANCELLED
     
     Optional<Order> redoOrder(String orderNumber, String userId);   // CANCELLED → new cart → new order

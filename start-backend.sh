@@ -47,9 +47,9 @@ wait_for_http "http://localhost:8567/actuator/health" "product-service" || exit 
 start_service_script "./media-service/start.sh"
 wait_for_http "http://localhost:8678/actuator/health" "media-service" || exit 1
 
-# 5. order-service :8678
+# 5. order-service :8789
 start_service_script "./order-service/start.sh"
-wait_for_http "http://localhost:8678/actuator/health" "order-service" || exit 1
+wait_for_http "http://localhost:8789/actuator/health" "order-service" || exit 1
 
 cd ..
 

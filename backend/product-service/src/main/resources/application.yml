@@ -9,6 +9,9 @@ spring:
   data:
     mongodb:
       uri: ${ATLAS_URI}
+      reactive:
+        repositories:
+          enabled: true
   transaction:
     manager: mongodb
   security:

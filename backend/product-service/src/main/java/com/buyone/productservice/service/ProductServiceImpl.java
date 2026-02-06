@@ -1,7 +1,9 @@
 package com.buyone.productservice.service;
 
 import com.buyone.productservice.model.Product;
+import com.buyone.productservice.model.Reservation;
 import com.buyone.productservice.repository.ProductRepository;
+import com.buyone.productservice.repository.ReservationRepository;
 import com.buyone.productservice.request.CreateProductRequest;
 import com.buyone.productservice.request.UpdateProductRequest;
 import com.buyone.productservice.response.ProductResponse;
@@ -22,11 +24,13 @@ import lombok.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 public class ProductServiceImpl implements ProductService {
     
     private final ProductRepository productRepository;
+    private final ReservationRepository reservationRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private static final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
     
@@ -38,8 +42,11 @@ public class ProductServiceImpl implements ProductService {
     @Value("${app.kafka.topic.product-deleted}")
     private String productDeletedTopic;
     
-    public ProductServiceImpl(ProductRepository productRepository, KafkaTemplate<String, Object> kafkaTemplate) {
+    public ProductServiceImpl(ProductRepository productRepository,
+                              ReservationRepository reservationRepository,
+                              KafkaTemplate<String, Object> kafkaTemplate) {
         this.productRepository = productRepository;
+        this.reservationRepository = reservationRepository;
         this.kafkaTemplate = kafkaTemplate;
     }
     
@@ -215,6 +222,15 @@ public class ProductServiceImpl implements ProductService {
         product.setQuantity(product.getQuantity() - quantity);
         productRepository.save(product);
         
+        // Create & save reservation (TTL=30min=1800s handled by @Indexed) (Check Reservation.java for time)
+        Reservation reservation = Reservation.builder()
+                .productId(productId)
+                .quantity(quantity)
+                .orderNumber(orderNumber)
+                .createdAt(LocalDateTime.now())
+                .build();
+        reservationRepository.save(reservation);
+        
         log.info("Reserved {} units of {} (order={})", quantity, productId, orderNumber);
     }
     
@@ -230,6 +246,15 @@ public class ProductServiceImpl implements ProductService {
         
         log.info("Released {} units of {}", quantity, productId);
     }
+    
+    @Override
+    @Transactional
+    public void commitReservations(String orderNumber) {
+        // Bulk delete ALL reservations for this order (multi-product support)
+        reservationRepository.deleteByOrderNumber(orderNumber);
+        log.info("Committed reservations for orderNumber={}", orderNumber);
+    }
+    
     
     
     // Helper: Map Product entity to ProductResponse DTO
