@@ -57,8 +57,7 @@ export class HeroComponent implements OnInit, OnDestroy {
       id: '2',
       title: 'Shop from Creative Sellers',
       subtitle: 'Browse unique tees from talented designers worldwide',
-      image:
-        'https://i.etsystatic.com/44936127/r/il/96cced/5115358786/il_fullxfull.5115358786_9e3l.jpg',
+      image: 'assets/images/DeveloperTeeHeroSection.jpg',
     },
     {
       id: '3',
@@ -71,8 +70,7 @@ export class HeroComponent implements OnInit, OnDestroy {
       id: '4',
       title: 'Where Creators & Fans Connect',
       subtitle: 'A curated marketplace for bold, tech-inspired designs',
-      image:
-        'https://images.unsplash.com/photo-1533835825768-478d38555d95?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8dCUyMHNoaXJ0JTIwZGVzaWdufGVufDB8fDB8fHwww=1200',
+      image: 'assets/images/TechShirtDesignHeroSection.jpeg',
     },
   ];
   currentSlide = 0;
