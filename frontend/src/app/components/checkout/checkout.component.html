@@ -46,9 +46,9 @@
 
           <div class="form-row">
             <mat-form-field class="form-field-half">
-              <input matInput formControlName="zip" placeholder="ZIP Code">
-              <mat-error *ngIf="(checkoutForm.get('zip')?.touched)
-                                && checkoutForm.get('zip')?.hasError('required')">
+              <input matInput formControlName="zipCode" placeholder="ZIP Code">
+              <mat-error *ngIf="(checkoutForm.get('zipCode')?.touched)
+                                && checkoutForm.get('zipCode')?.hasError('required')">
                 ZIP Code is required.
               </mat-error>
             </mat-form-field>

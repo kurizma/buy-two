@@ -16,8 +16,10 @@ import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatRadioModule } from '@angular/material/radio';
 import { RouterLink, Router } from '@angular/router';
-import { OrderItem } from '../../models/order/order-item.model';
-import { Order, OrderStatus, PaymentMethod, Address } from '../../models/order/order.model';
+import { OrderService } from '../../services/order.service';
+import { CreateOrderRequest } from '../../models/order/createOrderRequest.model';
+import { PaymentMethod } from '../../models/order/order.model';
+import { Address } from '../../models/order/address.model';
 
 @Component({
   selector: 'app-checkout',
@@ -38,38 +40,39 @@ import { Order, OrderStatus, PaymentMethod, Address } from '../../models/order/o
   ],
 })
 export class CheckoutComponent implements OnInit {
-  checkoutForm: FormGroup;
+  checkoutForm!: FormGroup;
+  reviewForm!: FormGroup;
+  selectedPayment: PaymentMethod = PaymentMethod.PAY_ON_DELIVERY;
+  reviewConfirmed = false;
   cartItems: any[] = [];
   total = 0;
   formSubmitted = false;
 
   public readonly authService: AuthService = inject(AuthService);
   public readonly cartService: CartService = inject(CartService);
+  private readonly orderService: OrderService = inject(OrderService);
   private readonly router = inject(Router);
   private readonly fb: FormBuilder = inject(FormBuilder);
 
-  reviewForm: FormGroup;
-  selectedPayment: PaymentMethod = PaymentMethod.PAY_ON_DELIVERY;
-  reviewConfirmed = false;
-
-  constructor() {
+  ngOnInit(): void {
     this.checkoutForm = this.fb.group({
-      firstname: ['', Validators.required],
-      lastname: ['', Validators.required],
       street: ['', Validators.required],
       city: ['', Validators.required],
-      zip: ['', Validators.required],
+      state: [''],
+      zipCode: ['', [Validators.required, Validators.pattern('^[0-9]{5}$')]],
       country: ['', Validators.required],
-      phone: ['', [Validators.required, Validators.pattern('^[0-9]+$')]],
+      phone: ['', [Validators.required, Validators.pattern('^[+]?[0-9]{10,15}$')]],
     });
+
     this.reviewForm = this.fb.group({
       confirmed: [false, Validators.requiredTrue],
     });
-  }
 
-  ngOnInit() {
-    this.cartItems = this.cartService.cartItems; // Load from service/localStorage
-    this.total = this.cartService.getTotal();
+    // ✅ Subscribe to cart changes
+    this.cartService.cartItems$.subscribe((items) => {
+      this.cartItems = items;
+      this.total = this.cartService.getTotal();
+    });
   }
 
   confirmReview(stepper: MatStepper): void {
@@ -77,38 +80,34 @@ export class CheckoutComponent implements OnInit {
     stepper.next();
   }
 
-  placeOrder() {
-    const mockOrderId = `ORD-${Date.now()}`;
+  placeOrder(): void {
+    if (this.checkoutForm.valid && this.reviewForm.valid) {
+      const request: CreateOrderRequest = {
+        shippingAddress: this.makeAddress(),
+      };
 
-    const orderData: Order = {
-      id: mockOrderId,
-      userId: this.authService.getUserId() || 'user123',
-      orderNumber: mockOrderId,
-      items: this.cartService.cartItems as OrderItem[],
-      status: OrderStatus.CONFIRMED,
-      paymentMethod: PaymentMethod.PAY_ON_DELIVERY,
-      shippingAddress: this.makeAddress(), // Helper
-      subtotal: this.cartService.getSubtotal(),
-      tax: this.cartService.getVatAmount(),
-      total: this.cartService.getTotalInclVat(),
-      createdAt: new Date().toISOString(),
-    };
-
-    localStorage.setItem(`order_${orderData.id}`, JSON.stringify(orderData));
-    this.cartService.clearCartAfterOrder();
-    this.router.navigate(['/order-detail', orderData.id]);
+      console.log('🚀 Calling REAL API createOrder');
+      this.orderService.createOrder(request).subscribe({
+        next: (response) => {
+          if (response.success && response.data?.orderNumber) {
+            this.cartService.clearCartAfterOrder();
+            this.router.navigate(['/order-detail', response.data.orderNumber]);
+          }
+        },
+        error: (err) => console.error('Order failed:', err), // ✅ Snackbar later
+      });
+    }
   }
 
-  private makeAddress() {
+  private makeAddress(): Address {
     const form = this.checkoutForm.value;
     return {
-      firstname: form.firstname,
-      lastname: form.lastname,
       street: form.street,
       city: form.city,
-      zip: form.zip,
+      state: form.state || '',
+      zipCode: form.zipCode,
       country: form.country,
       phone: form.phone,
-    } as Address;
+    };
   }
 }
