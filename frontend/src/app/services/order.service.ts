@@ -2,9 +2,10 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { Order } from '../models/order/order.model';
+import { Order, OrderStatus } from '../models/order/order.model';
 import { CreateOrderRequest } from '../models/order/createOrderRequest.model';
 import { environment } from '../../environments/environment.docker';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,7 @@ import { environment } from '../../environments/environment.docker';
 export class OrderService {
   private readonly baseUrl = `${environment.apiBaseUrl}/api/orders`;
   private readonly http = inject(HttpClient);
+  private readonly authService = inject(AuthService);
 
   // ✅ POST /api/orders/checkout
   createOrder(req: CreateOrderRequest): Observable<{ success: boolean; data: Order }> {
@@ -34,13 +36,40 @@ export class OrderService {
     );
   }
 
-  // ✅ GET /api/orders/buyer (interceptor adds headers)
+  // ✅ GET /api/orders/seller or /api/orders/buyer
   getMyOrders(): Observable<Order[]> {
-    return this.http
-      .get<{ success: boolean; data: Order[] }>(
-        `${this.baseUrl}/buyer`,
-        // No headers needed - interceptor handles!
-      )
-      .pipe(map((res) => res.data));
+    const endpoint = this.authService.isSeller()
+      ? `${this.baseUrl}/seller`
+      : `${this.baseUrl}/buyer`;
+
+    return this.http.get<any>(endpoint).pipe(
+      map((res) => {
+        // Handle Page<> wrapper for seller
+        if (this.authService.isSeller() && res.data?.content) {
+          return res.data.content; // Page.content = Order[]
+        }
+        return res.data || []; // Buyer = direct array
+      }),
+    );
+  }
+
+  // ✅ GET /api/orders/{orderNumber}/cancel
+  cancelOrder(orderNumber: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${orderNumber}/cancel`, {});
+  }
+
+  // ✅ GET /api/orders/{orderNumber}/redo
+  redoOrder(orderNumber: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${orderNumber}/redo`, {});
+  }
+
+  // ✅ POST /api/orders/{orderNumber}/confirm
+  confirmOrder(orderNumber: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/${orderNumber}/confirm`, {});
+  }
+
+  // ✅ PUT /api/orders/{orderNumber}/status
+  updateStatus(orderNumber: string, status: OrderStatus): Observable<Order> {
+    return this.http.put<Order>(`${this.baseUrl}/${orderNumber}/status?status=${status}`, {});
   }
 }

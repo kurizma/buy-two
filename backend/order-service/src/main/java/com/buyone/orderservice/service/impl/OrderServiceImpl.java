@@ -96,15 +96,15 @@ public class OrderServiceImpl implements OrderService {
         reserveInventory(saved.getItems(), saved.getOrderNumber());
         
 //        // 2. NEW: auto-confirm Pay on Delivery
-       if (saved.getPaymentMethod() == PaymentMethod.PAY_ON_DELIVERY) {
-           saved.setStatus(OrderStatus.CONFIRMED);
-           saved.setUpdatedAt(LocalDateTime.now());
-           saved = orderRepository.save(saved);  // Save CONFIRMED
+    //    if (saved.getPaymentMethod() == PaymentMethod.PAY_ON_DELIVERY) {
+    //        saved.setStatus(OrderStatus.CONFIRMED);
+    //        saved.setUpdatedAt(LocalDateTime.now());
+    //        saved = orderRepository.save(saved);  // Save CONFIRMED
             
             // Commit: delete reservations, qty stays deducted ✅
-           productClient.commitStock(saved.getOrderNumber());
-           log.info("Auto-confirmed Pay on Delivery order {}", saved.getOrderNumber());
-       }
+    //        productClient.commitStock(saved.getOrderNumber());
+    //        log.info("Auto-confirmed Pay on Delivery order {}", saved.getOrderNumber());
+    //    }
         
         cartService.clearCart(userId);
         

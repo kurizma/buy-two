@@ -427,7 +427,18 @@ mat-chip {
   font-size: 0.8rem;
 }
 
-
+.confirm-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--success-color);  /* Green */
+  border: 0.5px solid var(--success-color);
+  border-radius: 4px;
+}
+.confirm-btn:hover {
+  background-color: var(--success-hover) !important;
+  color: white !important;
+}
 
 /* ========== Responsive ========== */
 @media (max-width: 768px) {
