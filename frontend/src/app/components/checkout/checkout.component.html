@@ -14,7 +14,7 @@
         <form class="checkout-form" [formGroup]="checkoutForm">
 
           <mat-form-field class="form-field-half">
-            <input matInput formControlName="fullName" placeholder="Full Name">
+            <input matInput formControlName="fullName" placeholder="Recipient's Full Name">
             <mat-error *ngIf="(checkoutForm.get('fullName')?.touched) && checkoutForm.get('fullName')?.hasError('required')">
               Full Name is required.
             </mat-error>
