@@ -157,7 +157,7 @@
         <div class="summary-row">
             <span>Shipping:</span>
             <strong>
-                <span *ngIf="order.shippingCost === 0; else shippingPaid">FREE</span>
+                <span *ngIf="order.shippingCost === 0 || order.shippingCost === null; else shippingPaid">FREE</span>
                 <ng-template #shippingPaid>
                 {{ order.shippingCost | currency:'EUR' }}
                 </ng-template>

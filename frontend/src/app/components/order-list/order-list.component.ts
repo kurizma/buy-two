@@ -254,7 +254,7 @@ export class OrderListComponent implements OnInit {
 
   // Permissions
   canCancel(order: Order): boolean {
-    return order.status === OrderStatus.PENDING;
+    return order.status === OrderStatus.PENDING || order.status === OrderStatus.CONFIRMED;
   }
 
   canRedo(order: Order): boolean {
