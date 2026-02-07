@@ -132,6 +132,7 @@ public class CartServiceImpl implements CartService {
                 .items(new ArrayList<>())
                 .subtotal(BigDecimal.ZERO)
                 .tax(BigDecimal.ZERO)
+                .shippingCost(BigDecimal.ZERO)
                 .total(BigDecimal.ZERO)
                 .updatedAt(LocalDateTime.now())
                 .build());
@@ -143,6 +144,7 @@ public class CartServiceImpl implements CartService {
                         .id(userId)
                         .userId(userId)
                         .items(new ArrayList<>())
+                        .shippingCost(BigDecimal.ZERO)
                         .build());
     }
     
@@ -158,10 +160,17 @@ public class CartServiceImpl implements CartService {
         
         // VAT amount = totalInclVat - subtotalExclVat
         BigDecimal vatAmount = totalInclVat.subtract(subtotalExclVat);
+
+        BigDecimal shippingCost = totalInclVat.compareTo(BigDecimal.valueOf(50)) >= 0 
+            ? BigDecimal.ZERO 
+            : BigDecimal.valueOf(4.9);
+        
+        BigDecimal grandTotal = totalInclVat.add(shippingCost);
         
         cart.setSubtotal(subtotalExclVat);    // €17.74
         cart.setTax(vatAmount);               // €4.26  
-        cart.setTotal(totalInclVat);          // €22.00
+        cart.setShippingCost(shippingCost);  // €4.90 or €0.00
+        cart.setTotal(grandTotal);            // €26.90 or €22.00
         cart.setUpdatedAt(LocalDateTime.now());
         
         return cartRepository.save(cart);

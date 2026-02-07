@@ -23,6 +23,7 @@ export interface Order {
   shippingAddress?: Address;
   subtotal?: number;
   tax?: number;
+  shippingCost?: number;
   total?: number;
   createdAt?: string;
   updatedAt?: string;

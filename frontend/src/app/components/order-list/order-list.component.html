@@ -97,7 +97,7 @@
           @if (isSeller && order.shippingAddress) {
             <p class="customer-info">
               <mat-icon>person</mat-icon>
-              Customer: {{ order.shippingAddress.firstname }} {{ order.shippingAddress.lastname }}
+              Customer: {{ order.shippingAddress.fullName }}
             </p>
           }
         </div>

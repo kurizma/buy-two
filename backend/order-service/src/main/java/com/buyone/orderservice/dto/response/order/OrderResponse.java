@@ -14,7 +14,7 @@ import java.util.List;
 public class OrderResponse {
     private String orderNumber;
     private OrderStatus status;
-    private BigDecimal total, subtotal, tax;
+    private BigDecimal total, subtotal, tax, shippingCost;
     private LocalDateTime createdAt;
     private Address shippingAddress;
     private List<OrderItemResponse> items;

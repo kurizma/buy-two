@@ -208,6 +208,7 @@ public class OrderController {
                 .total(order.getTotal())
                 .subtotal(order.getSubtotal())
                 .tax(order.getTax())
+                .shippingCost(order.getShippingCost())
                 .createdAt(order.getCreatedAt())
                 .shippingAddress(order.getShippingAddress())
                 .items(items)
