@@ -85,12 +85,12 @@
             <h2>Items ({{ order.items.length }})</h2>
             @for (item of order.items; track item) {
             <div class="order-item">
-                <img [src]="item.imageUrl || '/assets/placeholder.jpg'" 
+                <img [src]="item.imageUrl || '/assets/images/placeholder.png'" 
                     [alt]="item.productName" 
                     class="item-image">
                 <div class="item-details">
                 <h3>{{ item.productName }}</h3>
-                <p class="seller">Sold by: <strong>{{ item.sellerName }}</strong></p>
+                <p class="seller">Sold by: <strong>{{cartService.getSellerName(item.sellerId) | async }}</strong></p>
                 <p class="quantity">Quantity: {{ item.quantity }}</p>
                 </div>
                 <div class="item-price">
@@ -108,15 +108,14 @@
                 <h3><mat-icon>local_shipping</mat-icon> Shipping Address</h3>
                 @if (order.shippingAddress) {
                 <div class="address-content">
-                    <p class="recipient-name">
-                    {{ order.shippingAddress.firstname }} 
-                    <strong>{{ order.shippingAddress.lastname }}</strong>
+                    <p class="fullname">
+                    <strong>{{ order.shippingAddress.fullName }}</strong>
                     </p>
                     <p class="address-line">
                     {{ order.shippingAddress.street }}
                     </p>
                     <p class="address-line">
-                    {{ order.shippingAddress.city }}, {{ order.shippingAddress.zip }}
+                    {{ order.shippingAddress.city }}, {{ order.shippingAddress.zipCode }}
                     </p>
                     <p class="address-line">
                     {{ order.shippingAddress.country }}

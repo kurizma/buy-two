@@ -198,6 +198,7 @@ public class OrderController {
                         .sellerId(item.getSellerId())
                         .price(item.getPrice())
                         .quantity(item.getQuantity())
+                        .imageUrl(item.getImageUrl())
                         .build())
                 .collect(Collectors.toList());
         

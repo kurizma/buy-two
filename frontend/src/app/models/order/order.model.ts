@@ -1,4 +1,5 @@
 import { OrderItem } from './order-item.model';
+import { Address } from './address.model';
 
 export enum OrderStatus {
   PENDING = 'PENDING',
@@ -10,16 +11,6 @@ export enum OrderStatus {
 
 export enum PaymentMethod {
   PAY_ON_DELIVERY = 'PAY_ON_DELIVERY',
-}
-
-export interface Address {
-  firstname?: string;
-  lastname?: string;
-  street?: string;
-  city?: string;
-  zip?: string;
-  country?: string;
-  phone?: string;
 }
 
 export interface Order {

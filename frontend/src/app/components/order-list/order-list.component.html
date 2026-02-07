@@ -111,7 +111,7 @@
         @if (isSeller) {
           <!-- Seller View: Show only their products -->
           <div class="item-preview" *ngFor="let item of getSellerItems(order).slice(0, 3)">
-            <img [src]="item.imageUrl || '/assets/placeholder.jpg'" 
+            <img [src]="item.imageUrl || '/assets/images/placeholder.png'" 
                 [alt]="item.productName"
                 class="item-thumb">
             <div class="item-info">
@@ -132,7 +132,7 @@
         } @else {
           <!-- ✅ Client View: Show all items -->
           <div class="item-preview" *ngFor="let item of order.items.slice(0, 3)">
-            <img [src]="item.imageUrl || '/assets/placeholder.jpg'" 
+            <img [src]="item.imageUrl || '/assets/images/placeholder.png'" 
                 [alt]="item.productName"
                 class="item-thumb">
             <div class="item-info">
