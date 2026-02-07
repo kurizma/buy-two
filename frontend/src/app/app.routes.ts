@@ -49,7 +49,7 @@ export const routes: Routes = [
     canActivate: [ClientOnlyGuard], //Client + has items in cart
   },
   {
-    path: 'order-detail/:id',
+    path: 'order-detail/:orderNumber',
     component: OrderDetailComponent,
     canActivate: [ClientOnlyGuard], // Assuming only clients can view order details
   },

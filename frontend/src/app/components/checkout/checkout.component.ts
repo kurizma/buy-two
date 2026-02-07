@@ -56,6 +56,7 @@ export class CheckoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.checkoutForm = this.fb.group({
+      fullName: ['', Validators.required],
       street: ['', Validators.required],
       city: ['', Validators.required],
       state: [''],
@@ -102,6 +103,7 @@ export class CheckoutComponent implements OnInit {
   private makeAddress(): Address {
     const form = this.checkoutForm.value;
     return {
+      fullName: form.fullName,
       street: form.street,
       city: form.city,
       state: form.state || '',

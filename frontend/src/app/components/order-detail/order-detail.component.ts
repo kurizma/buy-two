@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
+import { CartService } from '../../services/cart.service';
 import { Order, OrderStatus } from '../../models/order/order.model';
 import { OrderService } from '../../services/order.service';
 
@@ -23,21 +24,22 @@ export class OrderDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private orderService = inject(OrderService);
+  readonly cartService = inject(CartService); // For displaying seller names
 
   // For displaying status colors
   OrderStatus = OrderStatus;
 
   ngOnInit(): void {
-    const orderId = this.route.snapshot.paramMap.get('id');
+    const orderNumber = this.route.snapshot.paramMap.get('orderNumber');
 
-    if (!orderId) {
+    if (!orderNumber) {
       this.error = true;
       this.loading = false;
       return;
     }
 
     // Load order from localStorage via service
-    this.orderService.getOrder(orderId).subscribe({
+    this.orderService.getOrder(orderNumber).subscribe({
       next: (order) => {
         this.order = order;
         this.loading = false;

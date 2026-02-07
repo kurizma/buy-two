@@ -13,21 +13,12 @@
 
         <form class="checkout-form" [formGroup]="checkoutForm">
 
-          <div class="form-row">
-            <mat-form-field class="form-field-half">
-              <input matInput formControlName="firstname" placeholder="First Name">
-              <mat-error *ngIf="(checkoutForm.get('firstname')?.touched) && checkoutForm.get('firstname')?.hasError('required')">
-                First Name is required.
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field class="form-field-half">
-              <input matInput formControlName="lastname" placeholder="Last Name">
-            <mat-error *ngIf="(checkoutForm.get('lastname')?.touched) && checkoutForm.get('lastname')?.hasError('required')">
-                Last Name is required.
-              </mat-error>
-            </mat-form-field>
-          </div>
+          <mat-form-field class="form-field-half">
+            <input matInput formControlName="fullName" placeholder="Full Name">
+            <mat-error *ngIf="(checkoutForm.get('fullName')?.touched) && checkoutForm.get('fullName')?.hasError('required')">
+              Full Name is required.
+            </mat-error>
+          </mat-form-field>
 
           <mat-form-field >
             <input matInput formControlName="street" placeholder="Address">

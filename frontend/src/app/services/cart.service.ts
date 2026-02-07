@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BehaviorSubject, catchError, firstValueFrom, of } from 'rxjs';
+import { BehaviorSubject, catchError, firstValueFrom, map, of, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment.docker';
 
@@ -262,6 +262,20 @@ export class CartService {
 
   getItemCount(): number {
     return this.cartItemsSubject.value.reduce((sum, item) => sum + item.quantity, 0);
+  }
+
+  getSellerName(sellerId: string): Observable<string> {
+    if (this.sellerCache[sellerId]?.name) {
+      return of(this.sellerCache[sellerId].name);
+    }
+    return this.userService.getUserById(sellerId).pipe(
+      map((user) => {
+        const name = user?.name || 'Seller';
+        this.sellerCache[sellerId] = { name, avatar: user?.avatar || '/assets/user-default.png' };
+        return name;
+      }),
+      catchError(() => of('Seller')),
+    );
   }
 
   clearCartAfterOrder(): void {
