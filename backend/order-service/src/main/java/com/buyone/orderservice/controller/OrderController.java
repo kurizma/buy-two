@@ -99,12 +99,12 @@ public class OrderController {
     }
     
     @PostMapping("/{orderNumber}/confirm")
-    @Operation(summary = "Buyer confirms PENDING order", description = "Pay on Delivery final step")
+    @Operation(summary = "Seller confirms PENDING order", description = "Pay on Delivery final step")
     public ResponseEntity<ApiResponse<OrderResponse>> confirmOrder(
             @PathVariable String orderNumber,
             @RequestHeader("X-USER-ID") String userId,
             @RequestHeader("X-USER-ROLE") String role) {
-        validateRole(role, "CLIENT");
+        validateRole(role, "SELLER");
         
         OrderResponse confirmed = orderService.confirmOrder(orderNumber, userId)
                 .map(this::mapToOrderResponse)
@@ -208,7 +208,7 @@ public class OrderController {
                 .total(order.getTotal())
                 .subtotal(order.getSubtotal())
                 .tax(order.getTax())
-                .shippingCost(order.getShippingCost())
+                
                 .createdAt(order.getCreatedAt())
                 .shippingAddress(order.getShippingAddress())
                 .items(items)

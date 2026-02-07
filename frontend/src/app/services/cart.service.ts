@@ -37,7 +37,7 @@ export class CartService {
 
   // Public methods (what component calls)
 
-  /** Load cart from API */
+  /** // ✅ GET /api/cart */
   loadCart(): void {
     console.log('🔄 Loading cart from:', this.baseUrl); // Debug
 
@@ -115,17 +115,16 @@ export class CartService {
         price: Number.parseFloat(item.price) || 0,
         quantity: Number.parseInt(item.quantity, 10) || 1,
         categoryId, // Now real ID!
-        categorySlug: this.categoryService.getCategorySlug(categoryId), // ✅ "tees"!
+        categorySlug: this.categoryService.getCategorySlug(categoryId),
         imageUrl: item.imageUrl || '/assets/product-default.png',
       };
     });
 
     const frontendItems = await Promise.all(frontendItemsPromises);
-    console.log('✅ Cart mapped with slugs:', frontendItems);
     this.cartItemsSubject.next(frontendItems);
   }
 
-  /** Add product to cart */
+  /** // ✅ POST /api/cart/items */
   addProductToCart(product: any): void {
     this.addToCart({
       productId: product._id || product.id,
@@ -176,7 +175,7 @@ export class CartService {
       });
   }
 
-  /** Update quantity */
+  /** // ✅ PUT /api/cart/items/{productId}/quantity/{quantity} */
   updateQuantity(productId: string, quantity: number): void {
     if (quantity < 1) {
       this.removeItem(productId);
@@ -196,7 +195,7 @@ export class CartService {
       });
   }
 
-  /** Remove item */
+  /** // ✅ DELETE /api/cart/items/{productId} */
   removeItem(productId: string): void {
     this.http
       .delete<ApiResponse<CartResponse>>(`${this.baseUrl}/items/${productId}`)
@@ -261,7 +260,7 @@ export class CartService {
   }
 
   getItemCount(): number {
-    return this.cartItemsSubject.value.reduce((sum, item) => sum + item.quantity, 0);
+    return this.cartItemsSubject.value.length;
   }
 
   getSellerName(sellerId: string): Observable<string> {

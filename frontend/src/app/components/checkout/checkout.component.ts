@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, AfterViewInit, inject } from '@angular/core';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -39,7 +39,7 @@ import { Address } from '../../models/order/address.model';
     FormsModule, // for ngModel
   ],
 })
-export class CheckoutComponent implements OnInit {
+export class CheckoutComponent implements OnInit, AfterViewInit {
   checkoutForm!: FormGroup;
   reviewForm!: FormGroup;
   selectedPayment: PaymentMethod = PaymentMethod.PAY_ON_DELIVERY;
@@ -53,6 +53,8 @@ export class CheckoutComponent implements OnInit {
   private readonly orderService: OrderService = inject(OrderService);
   private readonly router = inject(Router);
   private readonly fb: FormBuilder = inject(FormBuilder);
+
+  savedAddressKey = `saved-address-${this.authService.getUserId()}`;
 
   ngOnInit(): void {
     this.checkoutForm = this.fb.group({
@@ -73,6 +75,19 @@ export class CheckoutComponent implements OnInit {
     this.cartService.cartItems$.subscribe((items) => {
       this.cartItems = items;
       this.total = this.cartService.getTotal();
+    });
+
+    // Load saved address if exists
+    const savedAddress = localStorage.getItem(this.savedAddressKey);
+    if (savedAddress) {
+      this.checkoutForm.patchValue(JSON.parse(savedAddress));
+    }
+  }
+
+  // On field change → auto-save
+  ngAfterViewInit() {
+    this.checkoutForm.valueChanges.subscribe((values) => {
+      localStorage.setItem(this.savedAddressKey, JSON.stringify(values));
     });
   }
 

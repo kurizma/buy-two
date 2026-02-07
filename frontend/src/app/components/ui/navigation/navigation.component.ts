@@ -24,6 +24,16 @@ export class NavigationComponent implements OnInit {
       this.currentUserName = user?.name || null;
       this.currentUserAvatar = user?.avatar || null;
     });
+
+    // Live cart count
+
+    this.cartSubs = this.cartService.cartItems$.subscribe((items) => {
+      this.cartItemCount = items.length;
+    });
+  }
+
+  ngOnDestroy() {
+    this.cartSubs?.unsubscribe();
   }
 
   onLogout() {

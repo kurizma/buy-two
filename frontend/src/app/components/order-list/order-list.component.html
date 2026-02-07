@@ -19,24 +19,26 @@
       </button>
     </div>
     <div class="filters-row">
+      <!-- Reactive: searchCtrl -->
       <mat-form-field class="search-field">
         <mat-label>Search orders</mat-label>
         <input matInput 
-              [(ngModel)]="searchTerm" 
-              (ngModelChange)="onSearch()"
+              [formControl]="searchCtrl"
               placeholder="Order number or product name">
         <mat-icon matPrefix>search</mat-icon>
       </mat-form-field>
 
+      <!-- Reactive: statusFilter -->
       <mat-form-field class="status-field">
         <mat-label>Status</mat-label>
-        <mat-select [(ngModel)]="selectedStatus" (ngModelChange)="onStatusChange()">
+        <mat-select [formControl]="statusFilter">
           <mat-option *ngFor="let status of statusOptions" [value]="status">
             {{ status === 'ALL' ? 'All Orders' : status }}
           </mat-option>
         </mat-select>
       </mat-form-field>
-
+      
+      <!-- Template-driven dates  -->
       <mat-form-field class="date-field">
         <mat-label>From Date</mat-label>
         <input matInput 
@@ -66,14 +68,15 @@
     <p>Showing {{ filteredOrders.length }} of {{ orders.length }} orders</p>
   </div>
 
+
   <!-- Empty State -->
   <div *ngIf="filteredOrders.length === 0" class="empty-state">
     <mat-icon>shopping_bag</mat-icon>
     <h2>No Orders Found</h2>
-    <p *ngIf="searchTerm || selectedStatus !== 'ALL' || startDate || endDate">
+    <p *ngIf="searchCtrl.value || statusFilter.value !== 'ALL' || startDate || endDate">
       Try adjusting your filters
     </p>
-    <p *ngIf="!searchTerm && selectedStatus === 'ALL' && !startDate && !endDate">
+    <p *ngIf="!searchCtrl.value && statusFilter.value === 'ALL' && !startDate && !endDate">
       {{ isSeller ? 'No customer orders yet' : 'You haven\'t placed any orders yet' }}
     </p>
     <button mat-raised-button color="primary" routerLink="/" *ngIf="!isSeller">
@@ -172,7 +175,7 @@
             <!-- Client actions: Cancel, Remove, Reorder -->
             <button mat-button 
                     *ngIf="canCancel(order)"
-                    (click)="cancelOrder(order, $event)"
+                    (click)="cancelOrder(order.orderNumber, $event)"
                     class="cancel-btn">
               <mat-icon>cancel</mat-icon>
               Cancel
@@ -180,7 +183,7 @@
             
             <button mat-button 
                     *ngIf="canRemove(order)"
-                    (click)="removeOrder(order, $event)"
+                    (click)="removeOrder(order.orderNumber, $event)"
                     class="remove-btn">
               <mat-icon>delete</mat-icon>
               Remove
@@ -188,18 +191,26 @@
             
             <button mat-button 
                     *ngIf="canRedo(order)"
-                    (click)="redoOrder(order, $event)"
+                    (click)="redoOrder(order.orderNumber, $event)"
                     class="redo-btn">
               <mat-icon>refresh</mat-icon>
               Reorder
             </button>
             
             <button mat-raised-button 
-                    (click)="viewOrderDetail(order.id)"
+                    (click)="viewOrderDetail(order.orderNumber)"
                     class="view-btn">
               View Details
             </button>
-          }
+          } @else {
+            <!-- NEW: Confirm button for pending orders -->
+            <button mat-button *ngIf="canConfirm(order)" 
+                    (click)="confirmOrder(order.orderNumber, $event)" 
+                    class="confirm-btn">
+              <mat-icon>check</mat-icon>
+              Confirm
+            </button>
+          } 
         </div>
       </div>
     </mat-card>
