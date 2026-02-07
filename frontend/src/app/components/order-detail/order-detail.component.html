@@ -90,7 +90,7 @@
                     class="item-image">
                 <div class="item-details">
                 <h3>{{ item.productName }}</h3>
-                <p class="seller">Sold by: <strong>{{cartService.getSellerName(item.sellerId) | async }}</strong></p>
+                <p class="seller">Sold by: <strong>{{cartService.getSellerName(item.sellerId)}}</strong></p>
                 <p class="quantity">Quantity: {{ item.quantity }}</p>
                 </div>
                 <div class="item-price">
@@ -153,6 +153,15 @@
         <div class="summary-row">
             <span>Tax (VAT):</span>
             <strong>{{ order.tax | currency:'EUR' }}</strong>
+        </div>
+        <div class="summary-row">
+            <span>Shipping:</span>
+            <strong>
+                <span *ngIf="order.shippingCost === 0; else shippingPaid">FREE</span>
+                <ng-template #shippingPaid>
+                {{ order.shippingCost | currency:'EUR' }}
+                </ng-template>
+            </strong>
         </div>
         <div class="summary-row grand-total">
             <span>Total:</span>

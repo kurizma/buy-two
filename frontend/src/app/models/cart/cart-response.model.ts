@@ -6,6 +6,7 @@ export interface CartResponse {
   items: CartItem[];
   subtotal: number;
   tax: number;
+  shippingCost: number;
   total: number;
   updatedAt: string;
 }

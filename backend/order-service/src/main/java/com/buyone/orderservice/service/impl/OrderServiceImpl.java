@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -62,8 +63,15 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
         
         // Precise money calculations
-        BigDecimal subtotal = calculateSubtotal(orderItems);
-        BigDecimal tax = calculateTax(subtotal);
+        BigDecimal totalInclVat = calculateSubtotal(orderItems); // €135.00 (incl VAT)
+        BigDecimal tax = calculateTax(totalInclVat);             // €13.50
+        BigDecimal subtotal = totalInclVat.subtract(tax);        // €121.50 (excl VAT)
+        
+         BigDecimal shippingCost = totalInclVat.compareTo(BigDecimal.valueOf(50)) >= 0 
+            ? BigDecimal.ZERO 
+            : BigDecimal.valueOf(4.9);
+  
+        BigDecimal grandTotal = totalInclVat.add(shippingCost);
         
         // Build order
         String orderNumber = generateOrderNumber();
@@ -76,26 +84,27 @@ public class OrderServiceImpl implements OrderService {
                 .shippingAddress(shippingAddress)
                 .subtotal(subtotal)
                 .tax(tax)
-                .total(subtotal.add(tax))
+                .shippingCost(shippingCost)
+                .total(grandTotal)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
         
-        Order saved = orderRepository.save(order);
+        Order saved = Objects.requireNonNull(orderRepository.save(order), "Failed to save order");
         
         // Post-checkout actions
         reserveInventory(saved.getItems(), saved.getOrderNumber());
         
 //        // 2. NEW: auto-confirm Pay on Delivery
-//        if (saved.getPaymentMethod() == PaymentMethod.PAY_ON_DELIVERY) {
-//            saved.setStatus(OrderStatus.CONFIRMED);
-//            saved.setUpdatedAt(LocalDateTime.now());
-//            saved = orderRepository.save(saved);  // Save CONFIRMED
+       if (saved.getPaymentMethod() == PaymentMethod.PAY_ON_DELIVERY) {
+           saved.setStatus(OrderStatus.CONFIRMED);
+           saved.setUpdatedAt(LocalDateTime.now());
+           saved = orderRepository.save(saved);  // Save CONFIRMED
             
             // Commit: delete reservations, qty stays deducted ✅
-//            productClient.commitStock(saved.getOrderNumber());
-//            log.info("Auto-confirmed Pay on Delivery order {}", saved.getOrderNumber());
-//        }
+           productClient.commitStock(saved.getOrderNumber());
+           log.info("Auto-confirmed Pay on Delivery order {}", saved.getOrderNumber());
+       }
         
         cartService.clearCart(userId);
         
@@ -187,7 +196,9 @@ public class OrderServiceImpl implements OrderService {
      * 10% tax, rounded to 2 decimals (business rule).
      */
     private BigDecimal calculateTax(BigDecimal subtotal) {
-        return subtotal.multiply(BigDecimal.valueOf(0.1)).setScale(2, RoundingMode.HALF_UP);
+    // Reverse VAT: totalInclVat = subtotal * 1.24
+        BigDecimal subtotalExclVat = subtotal.divide(BigDecimal.valueOf(1.24), 2, RoundingMode.HALF_UP);
+        return subtotal.subtract(subtotalExclVat);  // VAT amount
     }
     
     /**
