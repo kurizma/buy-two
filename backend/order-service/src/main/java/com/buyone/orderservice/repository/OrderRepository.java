@@ -59,7 +59,7 @@ public interface OrderRepository extends MongoRepository<Order, String> {
     @Aggregation(value = {
             "{ $match: { userId: ?0, status: { $in: ['DELIVERED', 'CONFIRMED'] } } }",
             "{ $unwind: '$items' }",
-            "{ $group: { _id: '$items.category', totalSpent: { $sum: { $multiply: [ '$items.price', '$items.quantity' ] } } } }",
+            "{ $group: { _id: '$items.category', totalSpent: { $sum: { $multiply: [ { $toDouble: '$items.price' }, { $toDouble: '$items.quantity' } ] } } } }",
             "{ $sort: { totalSpent: -1 } }",
             "{ $limit: 5 }"
     })
@@ -70,7 +70,7 @@ public interface OrderRepository extends MongoRepository<Order, String> {
             "{ $match: { status: { $in: ['DELIVERED', 'CONFIRMED'] } } }",
             "{ $unwind: '$items' }",
             "{ $match: { 'items.sellerId': ?0 } }",
-            "{ $group: { _id: null, totalRevenue: { $sum: { $multiply: [ '$items.price', '$items.quantity' ] } } } }"
+            "{ $group: { _id: null, totalRevenue: { $sum: { $multiply: [ { $toDouble: '$items.price' }, { $toDouble: '$items.quantity' } ] } } } }"
     })
     List<SellerTotalRevenue> getSellerTotalRevenue(String sellerId);
     
@@ -78,7 +78,7 @@ public interface OrderRepository extends MongoRepository<Order, String> {
             "{ $match: { status: { $in: ['DELIVERED', 'CONFIRMED'] } } }",
             "{ $unwind: '$items' }",
             "{ $match: { 'items.sellerId': ?0 } }",
-            "{ $group: { _id: { productId: '$items.productId', name: '$items.productName' }, revenue: { $sum: { $multiply: [ '$items.price', '$items.quantity' ] } }, unitsSold: { $sum: '$items.quantity' } } }",
+            "{ $group: { _id: { productId: '$items.productId', name: '$items.productName' }, revenue: { $sum: { $multiply: [ { $toDouble: '$items.price' }, { $toDouble: '$items.quantity' } ] } }, unitsSold: { $sum: '$items.quantity' } } }",
             "{ $sort: { revenue: -1 } }",
             "{ $limit: 5 }"
     })

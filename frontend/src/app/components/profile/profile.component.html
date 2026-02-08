@@ -177,6 +177,18 @@
           </a>
         </div>
       </div>
+
+      <!-- Analytics Dashboard - after password form, replace "Connected Accounts" -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <app-profile-analytics
+            [role]="userRole!"
+            [totalAmount]="analyticsData?.totalAmount || 0"
+            [items]="transformedAnalyticsItems"
+            [categories]="analyticsData?.categories || []">
+          </app-profile-analytics>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -3,7 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ChartData, ChartOptions, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-import { AnalyticsItem } from '../../models/profile/analytics-item';
+import { AnalyticsItem } from '../../models/analytics/analytics.model';
 
 @Component({
   selector: 'app-profile-analytics',
