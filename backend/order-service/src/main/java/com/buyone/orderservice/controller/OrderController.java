@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -208,7 +209,7 @@ public class OrderController {
                 .total(order.getTotal())
                 .subtotal(order.getSubtotal())
                 .tax(order.getTax())
-                
+                .shippingCost(order.getShippingCost() != null ? order.getShippingCost() : BigDecimal.valueOf(4.9))
                 .createdAt(order.getCreatedAt())
                 .shippingAddress(order.getShippingAddress())
                 .items(items)

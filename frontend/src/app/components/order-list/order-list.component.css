@@ -174,6 +174,11 @@ mat-chip {
   background-color: var(--link-hover) !important;
 }
 
+.status-pending {
+  border: 1.5px solid var(--link-hover);
+  background-color: transparent !important;
+}
+
 .status-confirmed {
   background-color: var(--link-hover) !important;
 }
@@ -432,11 +437,12 @@ mat-chip {
   align-items: center;
   gap: 5px;
   color: var(--success-color);  /* Green */
+  background-color: var(--link-hover) !important;
   border: 0.5px solid var(--success-color);
   border-radius: 4px;
 }
 .confirm-btn:hover {
-  background-color: var(--success-hover) !important;
+  background-color: var(--primary) !important;
   color: white !important;
 }
 
