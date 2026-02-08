@@ -6,6 +6,7 @@ import { Order, OrderStatus } from '../models/order/order.model';
 import { CreateOrderRequest } from '../models/order/createOrderRequest.model';
 import { environment } from '../../environments/environment.docker';
 import { AuthService } from './auth.service';
+import { ApiResponse } from '../models/api-response/api-response.model';
 
 @Injectable({
   providedIn: 'root',
@@ -42,13 +43,19 @@ export class OrderService {
       ? `${this.baseUrl}/seller`
       : `${this.baseUrl}/buyer`;
 
-    return this.http.get<any>(endpoint).pipe(
+    return this.http.get<ApiResponse<any>>(endpoint).pipe(
       map((res) => {
-        // Handle Page<> wrapper for seller
+        if (!res.success || !res.data) {
+          return [];
+        }
         if (this.authService.isSeller() && res.data?.content) {
           return res.data.content; // Page.content = Order[]
         }
         return res.data || []; // Buyer = direct array
+      }),
+      catchError((err) => {
+        console.error('❌ Error fetching orders:', err);
+        return of([]); // Return empty array on error
       }),
     );
   }
@@ -64,12 +71,28 @@ export class OrderService {
   }
 
   // ✅ POST /api/orders/{orderNumber}/confirm
-  confirmOrder(orderNumber: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/${orderNumber}/confirm`, {});
-  }
+  // confirmOrder(orderNumber: string): Observable<any> {
+  //   const currentUser = this.authService.currentUserValue;
+  //   const userId = currentUser?.id || '';
+  //   const headers = {
+  //     'X-USER-ID': userId,
+  //     'X-USER-ROLE': this.authService.isSeller() ? 'SELLER' : 'CLIENT',
+  //   };
+  //   return this.http.post(`${this.baseUrl}/${orderNumber}/confirm`, {}, { headers });
+  // }
 
   // ✅ PUT /api/orders/{orderNumber}/status
   updateStatus(orderNumber: string, status: OrderStatus): Observable<Order> {
-    return this.http.put<Order>(`${this.baseUrl}/${orderNumber}/status?status=${status}`, {});
+    const currentUser = this.authService.currentUserValue;
+    const userId = currentUser?.id || '';
+    const headers = {
+      'X-USER-ID': userId,
+      'X-USER-ROLE': this.authService.isSeller() ? 'SELLER' : 'CLIENT',
+    };
+    return this.http.put<Order>(
+      `${this.baseUrl}/${orderNumber}/status?status=${status}`,
+      {},
+      { headers },
+    );
   }
 }

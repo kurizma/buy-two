@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -96,15 +97,15 @@ public class OrderServiceImpl implements OrderService {
         reserveInventory(saved.getItems(), saved.getOrderNumber());
         
 //        // 2. NEW: auto-confirm Pay on Delivery
-    //    if (saved.getPaymentMethod() == PaymentMethod.PAY_ON_DELIVERY) {
-    //        saved.setStatus(OrderStatus.CONFIRMED);
-    //        saved.setUpdatedAt(LocalDateTime.now());
-    //        saved = orderRepository.save(saved);  // Save CONFIRMED
+       if (saved.getPaymentMethod() == PaymentMethod.PAY_ON_DELIVERY) {
+           saved.setStatus(OrderStatus.CONFIRMED);
+           saved.setUpdatedAt(LocalDateTime.now());
+           saved = orderRepository.save(saved);  // Save CONFIRMED
             
             // Commit: delete reservations, qty stays deducted ✅
-    //        productClient.commitStock(saved.getOrderNumber());
-    //        log.info("Auto-confirmed Pay on Delivery order {}", saved.getOrderNumber());
-    //    }
+           productClient.commitStock(saved.getOrderNumber());
+           log.info("Auto-confirmed Pay on Delivery order {}", saved.getOrderNumber());
+       }
         
         cartService.clearCart(userId);
         
@@ -279,8 +280,8 @@ public class OrderServiceImpl implements OrderService {
             throw new BadRequestException("Not your order");
         }
         
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new IllegalStateException("Only PENDING orders can be cancelled");
+        if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.CONFIRMED) {
+            throw new IllegalStateException("Only PENDING or CONFIRMED orders can be cancelled");
         }
         
         order.setStatus(OrderStatus.CANCELLED);
@@ -302,20 +303,66 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public Optional<Order> redoOrder(String orderNumber, String userId) {
-        return getOrder(orderNumber)  // Optional chain
-                .filter(order -> userId.equals(order.getUserId()))  // Ownership
-                .filter(order -> order.getStatus() == OrderStatus.CANCELLED)
-                .map(oldOrder -> {
-                    List<CartItem> newItems = oldOrder.getItems().stream()
-                            .map(this::orderItemToCartItem)
-                            .collect(Collectors.toList());
-                    Cart newCart = Cart.builder()
-                            .userId(userId)
-                            .items(newItems)
-                            .build();
-                    cartService.saveCart(newCart);
-                    return createOrderFromCart(userId, oldOrder.getShippingAddress());  // Reuse original
-                });
+        return getOrder(orderNumber)
+            .filter(order -> userId.equals(order.getUserId()))  // Ownership
+            .filter(order -> order.getStatus() == OrderStatus.CANCELLED)
+            .map(oldOrder -> {
+                // ✅ Validate ALL items have sufficient stock BEFORE creating cart
+                List<String> unavailableItems = new ArrayList<>();
+                
+                for (OrderItem item : oldOrder.getItems()) {
+                    if (!isProductStillAvailable(item)) {
+                        unavailableItems.add(item.getProductName() + " (requested: " + item.getQuantity() + ")");
+                    }
+                }
+                
+                // ❌ If ANY item fails, abort entire redo
+                if (!unavailableItems.isEmpty()) {
+                    String itemsList = String.join(", ", unavailableItems);
+                    throw new BadRequestException(
+                        "Cannot redo order - insufficient stock for: " + itemsList
+                    );
+                }
+                
+                // ✅ All items available → proceed with redo
+                List<CartItem> newItems = oldOrder.getItems().stream()
+                    .map(this::orderItemToCartItem)
+                    .collect(Collectors.toList());
+                
+                Cart newCart = Cart.builder()
+                    .userId(userId)
+                    .items(newItems)
+                    .build();
+                cartService.saveCart(newCart);
+                
+                return createOrderFromCart(userId, oldOrder.getShippingAddress());
+            });
+    }
+
+    
+    private boolean isProductStillAvailable(OrderItem item) {
+        try {
+            ApiResponse<ProductResponse> response = productClient.getById(item.getProductId());
+            
+            if (!response.isSuccess() || response.getData() == null) {
+                log.warn("Product {} not found", item.getProductId());
+                return false;
+            }
+            
+            ProductResponse product = response.getData();
+            boolean hasStock = product.getQuantity() >= item.getQuantity();
+            
+            if (!hasStock) {
+                log.warn("Product {} insufficient stock: requested {}, available {}",
+                    item.getProductId(), item.getQuantity(), product.getQuantity());
+            }
+            
+            return hasStock;
+            
+        } catch (Exception e) {
+            log.error("Failed to check stock for product {}: {}", item.getProductId(), e.getMessage());
+            return false;  // Treat errors as unavailable
+        }
     }
     
     @Override

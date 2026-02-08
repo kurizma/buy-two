@@ -191,7 +191,32 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public void saveCart(Cart cart) {
-        cartRepository.save(cart);
+        // Find existing cart by userId
+        Optional<Cart> existingCartOpt = cartRepository.findById(cart.getUserId());
+        
+        if (existingCartOpt.isPresent()) {
+            // ✅ Update existing cart
+            Cart existingCart = existingCartOpt.get();
+            
+            // Clear old items (MongoDB will delete them)
+            existingCart.getItems().clear();
+            
+            // Add new items to the TRACKED entity
+            if (cart.getItems() != null) {
+                existingCart.getItems().addAll(cart.getItems());
+            }
+            
+            // Update timestamps
+            existingCart.setUpdatedAt(LocalDateTime.now());
+            
+            // Save the managed entity
+            cartRepository.save(existingCart);
+        } else {
+            // ✅ New cart - set id = userId for consistency
+            cart.setId(cart.getUserId());
+            cart.setUpdatedAt(LocalDateTime.now());
+            cartRepository.save(cart);
+        }
     }
-    
+        
 }
