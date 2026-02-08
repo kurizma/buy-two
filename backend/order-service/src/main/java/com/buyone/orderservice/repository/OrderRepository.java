@@ -17,6 +17,7 @@ import com.buyone.orderservice.dto.response.analytics.SellerBestProduct;
 import com.buyone.orderservice.dto.response.analytics.SellerTotalUnits;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +38,27 @@ public interface OrderRepository extends MongoRepository<Order, String> {
             "{ 'status': ?2 } ] }",
             sort = "{ 'createdAt': -1 }")
     Page<Order> findBuyerOrdersSearch(String userId, String keyword, OrderStatus status, Pageable pageable);
+
+    @Query("{ $and: [ " +
+            "{ 'userId': ?0 }, " +
+            "{ $or: [ " +
+            "  { 'orderNumber': { $regex: ?1, $options: 'i' } }, " +
+            "  { 'items.productName': { $regex: ?1, $options: 'i' } } " +
+            "] }, " +
+            "{ 'createdAt': { $gte: ?2, $lte: ?3 } }, " +
+            "{ $or: [ " +
+            "  { 'status': ?4 }, " +
+            "  { $expr: { $eq: [?4, null] } } " +
+            "] } " +
+            "] }")
+    Page<Order> findFacetedOrders(
+            String userId,
+            String keyword,
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            OrderStatus status,
+            Pageable pageable
+    );
     
     @Query("{ 'items.sellerId': ?0 }")
     Page<Order> findSellerOrders(String sellerId, Pageable pageable);

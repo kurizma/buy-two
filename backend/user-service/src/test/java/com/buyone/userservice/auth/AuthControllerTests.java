@@ -1,6 +1,9 @@
 package com.buyone.userservice.auth;
 
 import com.buyone.userservice.exception.GlobalExceptionHandler;
+import com.buyone.userservice.model.Role;
+import com.buyone.userservice.response.LoginResponse;
+import com.buyone.userservice.response.UserResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -140,5 +145,57 @@ class AuthControllerTests {
                         .content(body))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.details.password").exists());
+    }
+    
+    // -------- POST /auth/register - happy path --------
+    
+    @Test
+    void register_returns201_whenValid() throws Exception {
+        UserResponse created = UserResponse.builder()
+                .id("u1").name("Alice").email("alice@example.com").role(Role.CLIENT).build();
+        when(authService.register(any())).thenReturn(created);
+        
+        String body = """
+            {
+                "name": "Alice",
+                "email": "alice@example.com",
+                "password": "password123",
+                "role": "CLIENT"
+            }
+            """;
+        
+        mockMvc.perform(post("/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value("u1"))
+                .andExpect(jsonPath("$.name").value("Alice"))
+                .andExpect(jsonPath("$.email").value("alice@example.com"));
+    }
+    
+    // -------- POST /auth/login - happy path --------
+    
+    @Test
+    void login_returns200_whenValid() throws Exception {
+        UserResponse user = UserResponse.builder()
+                .id("u1").name("Alice").email("alice@example.com").role(Role.CLIENT).build();
+        LoginResponse loginRes = LoginResponse.builder()
+                .message("Login successful").token("jwt-token-123").user(user).build();
+        when(authService.login(any())).thenReturn(loginRes);
+        
+        String body = """
+            {
+                "email": "alice@example.com",
+                "password": "password123"
+            }
+            """;
+        
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").value("jwt-token-123"))
+                .andExpect(jsonPath("$.message").value("Login successful"))
+                .andExpect(jsonPath("$.user.name").value("Alice"));
     }
 }

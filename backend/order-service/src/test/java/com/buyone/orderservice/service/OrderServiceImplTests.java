@@ -321,14 +321,17 @@ class OrderServiceImplTests {
         assertThat(result).isEmpty();
     }
     
-    // -------- searchBuyerOrders --------
+    // -------- searchBuyerOrders (faceted) --------
     
     @Test
-    void searchBuyerOrders_returnsPaginatedResults() {
+    void searchBuyerOrders_withKeywordOnly_usesDefaultDatesAndNullStatus() {
         Order order = Order.builder().orderNumber("ORD-001").userId("user-1").build();
         Page<Order> page = new PageImpl<>(List.of(order));
         
-        when(orderRepository.findBuyerOrdersSearch(eq("user-1"), eq("laptop"), eq(null), any(Pageable.class)))
+        when(orderRepository.findFacetedOrders(
+                eq("user-1"), eq("laptop"),
+                any(LocalDateTime.class), any(LocalDateTime.class),
+                eq(null), any(Pageable.class)))
                 .thenReturn(page);
         
         OrderSearchRequest req = OrderSearchRequest.builder()
@@ -338,6 +341,61 @@ class OrderServiceImplTests {
         Page<Order> result = orderService.searchBuyerOrders("user-1", req);
         
         assertThat(result.getContent()).hasSize(1);
+        verify(orderRepository).findFacetedOrders(
+                eq("user-1"), eq("laptop"),
+                any(LocalDateTime.class), any(LocalDateTime.class),
+                eq(null), any(Pageable.class));
+    }
+    
+    @Test
+    void searchBuyerOrders_withStatus_passesEnumToRepository() {
+        Page<Order> page = new PageImpl<>(List.of());
+        
+        when(orderRepository.findFacetedOrders(
+                eq("user-1"), eq(""),
+                any(LocalDateTime.class), any(LocalDateTime.class),
+                eq(OrderStatus.PENDING), any(Pageable.class)))
+                .thenReturn(page);
+        
+        OrderSearchRequest req = OrderSearchRequest.builder()
+                .status("PENDING").page(0).size(10)
+                .build();
+        
+        Page<Order> result = orderService.searchBuyerOrders("user-1", req);
+        
+        assertThat(result.getContent()).isEmpty();
+        verify(orderRepository).findFacetedOrders(
+                eq("user-1"), eq(""),
+                any(LocalDateTime.class), any(LocalDateTime.class),
+                eq(OrderStatus.PENDING), any(Pageable.class));
+    }
+    
+    @Test
+    void searchBuyerOrders_withDateRange_parsesIsoDatesAndReturnsEmpty() {
+        Page<Order> page = new PageImpl<>(List.of());
+        
+        LocalDateTime expectedStart = LocalDateTime.parse("2025-01-01T00:00:00");
+        LocalDateTime expectedEnd = LocalDateTime.parse("2025-01-02T23:59:59");
+        
+        when(orderRepository.findFacetedOrders(
+                eq("user-1"), eq(""),
+                eq(expectedStart), eq(expectedEnd),
+                eq(null), any(Pageable.class)))
+                .thenReturn(page);
+        
+        OrderSearchRequest req = OrderSearchRequest.builder()
+                .startDate("2025-01-01T00:00:00")
+                .endDate("2025-01-02T23:59:59")
+                .page(0).size(10)
+                .build();
+        
+        Page<Order> result = orderService.searchBuyerOrders("user-1", req);
+        
+        assertThat(result.getContent()).isEmpty();
+        verify(orderRepository).findFacetedOrders(
+                eq("user-1"), eq(""),
+                eq(expectedStart), eq(expectedEnd),
+                eq(null), any(Pageable.class));
     }
     
     // -------- getSellerOrders --------
@@ -383,6 +441,64 @@ class OrderServiceImplTests {
         when(orderRepository.findByOrderNumber("ORD-001")).thenReturn(Optional.of(order));
         
         Optional<Order> result = orderService.redoOrder("ORD-001", "user-2");
+        
+        assertThat(result).isEmpty();
+    }
+    
+    @Test
+    void redoOrder_recreatesOrder_whenCancelledAndOwner() {
+        // Old cancelled order
+        OrderItem oldItem = OrderItem.builder()
+                .productId("p1").productName("Widget").sellerId("seller-1")
+                .price(BigDecimal.TEN).quantity(2).build();
+        Order oldOrder = Order.builder()
+                .orderNumber("ORD-001").userId("user-1")
+                .status(OrderStatus.CANCELLED)
+                .shippingAddress(Address.builder()
+                        .street("123 Main").city("NYC")
+                        .zipCode("10001").country("US").build())
+                .items(List.of(oldItem))
+                .build();
+        when(orderRepository.findByOrderNumber("ORD-001")).thenReturn(Optional.of(oldOrder));
+        
+        // Cart will be fetched by createOrderFromCart
+        CartItem cartItem = CartItem.builder()
+                .productId("p1").productName("Widget").sellerId("seller-1")
+                .price(BigDecimal.TEN).quantity(2).build();
+        Cart savedCart = Cart.builder()
+                .userId("user-1").items(new ArrayList<>(List.of(cartItem)))
+                .subtotal(BigDecimal.valueOf(20)).build();
+        when(cartService.getCart("user-1")).thenReturn(Optional.of(savedCart));
+        
+        // Product client for fresh snap
+        ProductResponse pr = new ProductResponse();
+        pr.setId("p1");
+        pr.setName("Widget");
+        pr.setPrice(BigDecimal.TEN);
+        pr.setQuantity(100);
+        pr.setUserId("seller-1");
+        pr.setImages(List.of("img.jpg"));
+        when(productClient.getById("p1")).thenReturn(
+                ApiResponse.<ProductResponse>builder().success(true).data(pr).build());
+        when(productClient.reserveStock(any(ReserveStockRequest.class))).thenReturn(
+                ApiResponse.<Void>builder().success(true).build());
+        
+        Order newOrder = Order.builder()
+                .orderNumber("ORD-NEW").userId("user-1")
+                .status(OrderStatus.PENDING).build();
+        when(orderRepository.save(any(Order.class))).thenReturn(newOrder);
+        
+        Optional<Order> result = orderService.redoOrder("ORD-001", "user-1");
+        
+        assertThat(result).isPresent();
+        verify(cartService).saveCart(any(Cart.class));
+    }
+    
+    @Test
+    void redoOrder_returnsEmpty_whenOrderNotFound() {
+        when(orderRepository.findByOrderNumber("MISSING")).thenReturn(Optional.empty());
+        
+        Optional<Order> result = orderService.redoOrder("MISSING", "user-1");
         
         assertThat(result).isEmpty();
     }

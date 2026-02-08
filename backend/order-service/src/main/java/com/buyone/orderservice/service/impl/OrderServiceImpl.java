@@ -309,11 +309,26 @@ public class OrderServiceImpl implements OrderService {
     
     @Override
     public Page<Order> searchBuyerOrders(String userId, OrderSearchRequest req) {
-        OrderStatus status = req.getStatus() != null
+        // 1. Handle Keyword (default to empty string for broad match)
+        String searchKey = (req.getKeyword() == null) ? "" : req.getKeyword();
+
+        // 2. Handle Date Facets (default to wide range if missing)
+        LocalDateTime start = (req.getStartDate() == null)
+                ? LocalDateTime.now().minusYears(10)
+                : LocalDateTime.parse(req.getStartDate());
+        LocalDateTime end = (req.getEndDate() == null)
+                ? LocalDateTime.now()
+                : LocalDateTime.parse(req.getEndDate());
+
+        // 3. Handle Status Facet
+        OrderStatus status = (req.getStatus() != null)
                 ? OrderStatus.valueOf(req.getStatus().toUpperCase())
                 : null;
-        Pageable pageable = PageRequest.of(req.getPage(), req.getSize());
-        return orderRepository.findBuyerOrdersSearch(userId, req.getKeyword(), status, pageable);
+
+        Pageable pageable = PageRequest.of(req.getPage(), req.getSize(),
+                org.springframework.data.domain.Sort.by("createdAt").descending());
+
+        return orderRepository.findFacetedOrders(userId, searchKey, start, end, status, pageable);
     }
     
     @Override
