@@ -208,6 +208,22 @@ public class ProductServiceImpl implements ProductService {
     }
     
     @Override
+    public org.springframework.data.domain.Page<ProductResponse> searchProducts(
+            String keyword, 
+            java.math.BigDecimal minPrice, 
+            java.math.BigDecimal maxPrice, 
+            String categoryId, 
+            org.springframework.data.domain.Pageable pageable) {
+        
+        String searchKey = (keyword == null || keyword.trim().isEmpty()) ? "" : keyword;
+        java.math.BigDecimal minP = (minPrice == null) ? java.math.BigDecimal.ZERO : minPrice;
+        java.math.BigDecimal maxP = (maxPrice == null) ? new java.math.BigDecimal("9999999") : maxPrice;
+        
+        return productRepository.findByFacetedSearch(searchKey, minP, maxP, categoryId, pageable)
+            .map(this::toProductResponse);
+    }
+    
+    @Override
     @Transactional  // MongoDB single-doc ACID
     public void reserveStock(String productId, int quantity, String orderNumber) {
         Product product = productRepository.findById(productId)

@@ -140,10 +140,37 @@ Expected Error Response (400):
   "code": "400",
   "message": "Validation failed",
   "details": {
-    "price": "Price must be non-negative",
-    "quantity": "Quantity must be zero or greater"
+    "price": "Price must be at least 0.01",
+    "quantity": "Quantity must be at least 1"
   }
 }
+```
+
+#### Test 3b: Zero or Decimal Quantity (Product Creation)
+```
+POST https://localhost:8080/products
+
+Headers:
+Content-Type: application/json
+Authorization: Bearer <your-jwt-token>
+
+Body (JSON) - INVALID:
+{
+  "name": "Test Product",
+  "price": 29.99,
+  "quantity": 0
+}
+
+Expected Error Response (400):
+{
+  "code": "400",
+  "message": "Validation failed",
+  "details": {
+    "quantity": "Quantity must be at least 1"
+  }
+}
+
+Note: Decimal values like 0.11 will be rejected by type validation since quantity is Integer.
 ```
 
 ### 🔴 401 Unauthorized - Missing/Invalid Token
@@ -385,6 +412,68 @@ Expected Success Response (200):
     },
     ...
   ]
+}
+```
+
+### Search Products with Filters (Public - Faceted Search)
+```
+GET https://localhost:8080/products/search
+
+Query Parameters (all optional):
+- keyword: Search in name/description (e.g., "laptop", "wireless")
+- minPrice: Minimum price filter (e.g., 100)
+- maxPrice: Maximum price filter (e.g., 500)
+- categoryId: Filter by category ID
+- page: Page number (default: 0)
+- size: Items per page (default: 10)
+
+Example 1 - Keyword Search:
+GET https://localhost:8080/products/search?keyword=laptop
+
+Example 2 - Price Range:
+GET https://localhost:8080/products/search?minPrice=100&maxPrice=500
+
+Example 3 - Category Filter:
+GET https://localhost:8080/products/search?categoryId=electronics-123
+
+Example 4 - Combined Filters with Pagination:
+GET https://localhost:8080/products/search?keyword=mouse&minPrice=20&maxPrice=50&page=0&size=20
+
+Example 5 - Only Min Price (max defaults to 9999999):
+GET https://localhost:8080/products/search?minPrice=50
+
+Expected Success Response (200):
+{
+  "success": true,
+  "message": "Search results fetched successfully",
+  "data": {
+    "content": [
+      {
+        "id": "...",
+        "name": "Wireless Mouse",
+        "price": 29.99,
+        "description": "Ergonomic wireless mouse",
+        ...
+      },
+      ...
+    ],
+    "pageable": {
+      "pageNumber": 0,
+      "pageSize": 10,
+      "sort": {...},
+      "offset": 0,
+      "paged": true,
+      "unpaged": false
+    },
+    "totalPages": 5,
+    "totalElements": 47,
+    "last": false,
+    "size": 10,
+    "number": 0,
+    "numberOfElements": 10,
+    "first": true,
+    "empty": false
+  }
 }
 ```
 

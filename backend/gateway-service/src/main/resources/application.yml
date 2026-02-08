@@ -38,6 +38,13 @@ spring:
           filters:
             - JwtHeader
 
+        # Public product search endpoint (no auth)
+        - id: product-service-search
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/products/search
+            - Method=GET
+
         - id: product-service
           uri: lb://PRODUCT-SERVICE
           predicates:

@@ -20,10 +20,10 @@ public class UpdateProductRequest {
     @Size(max = 500, message = "Description must be less than 500 characters")
     private String description;
     
-    @DecimalMin(value = "0.0", inclusive = true, message = "Price must be non-negative")
+    @DecimalMin(value = "0.01", inclusive = true, message = "Price must be at least 0.01")
     private BigDecimal price;
     
-    @Min(value = 0, message = "Quantity must be zero or greater")
+    @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;
     
     private String categoryId;

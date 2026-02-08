@@ -13,10 +13,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
-
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -43,6 +45,30 @@ public class ProductController {
         return ResponseEntity.ok(okResponse("Products fetched successfully", products));
     }
 
+    // GET /products/search (public - faceted search with pagination)
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<ProductResponse>>> searchProducts(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) String categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<ProductResponse> results = productService.searchProducts(
+            keyword, minPrice, maxPrice, categoryId, pageable
+        );
+        
+        return ResponseEntity.ok(
+            ApiResponse.<Page<ProductResponse>>builder()
+                .success(true)
+                .message("Search results fetched successfully")
+                .data(results)
+                .build()
+        );
+    }
+    
     
     // GET /products/{id} (public)
     @GetMapping("/{id}")
