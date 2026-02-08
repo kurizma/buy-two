@@ -202,15 +202,16 @@
                     class="view-btn">
               View Details
             </button>
-          } @else {
+          } 
+          <!-- @else { -->
             <!-- NEW: Confirm button for pending orders -->
-            <button mat-button *ngIf="canConfirm(order)" 
+            <!-- <button mat-button *ngIf="canConfirm(order)" 
                     (click)="confirmOrder(order.orderNumber, $event)" 
                     class="confirm-btn">
               <mat-icon>check</mat-icon>
               Confirm
-            </button>
-          } 
+            </button> -->
+          <!-- }  -->
         </div>
       </div>
     </mat-card>

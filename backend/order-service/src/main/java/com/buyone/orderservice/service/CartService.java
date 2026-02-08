@@ -13,5 +13,4 @@ public interface CartService {
     Cart removeItem(@NotBlank String userId, String productId);
     Cart clearCart(@NotBlank String userId);
     void saveCart(Cart cart);
-    
 }

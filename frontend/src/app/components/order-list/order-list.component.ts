@@ -150,11 +150,11 @@ export class OrderListComponent implements OnInit {
     event.stopPropagation();
 
     if (
-      ![OrderStatus.PENDING].includes(
+      ![OrderStatus.PENDING, OrderStatus.CONFIRMED].includes(
         this.orders.find((o) => o.orderNumber === orderNumber)?.status!,
       )
     ) {
-      this.snackBar.open('Only PENDING orders can be cancelled', 'OK', {
+      this.snackBar.open('Only PENDING or CONFIRMED orders can be cancelled', 'OK', {
         duration: 4000,
         horizontalPosition: 'right',
         verticalPosition: 'top',
@@ -325,7 +325,7 @@ export class OrderListComponent implements OnInit {
 
   // Permissions
   canCancel(order: Order): boolean {
-    return order.status === OrderStatus.PENDING;
+    return order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.PENDING;
   }
 
   canRedo(order: Order): boolean {
