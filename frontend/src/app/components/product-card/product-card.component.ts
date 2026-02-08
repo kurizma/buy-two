@@ -35,17 +35,44 @@ export class ProductCardComponent implements OnInit {
   errorMessage: string | null = null;
 
   addToCart(product: any): void {
+    // STOCK CHECK BEFORE ADDING TO CART
+    const availableStock = product.quantity || 0;
+    const currentInCart = this.cartService.getProductQuantity(product._id || product.id);
+
+    if (availableStock < 1) {
+      this.snackBar.open('❌ Out of stock!', '', {
+        duration: 3000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
+      return;
+    }
+
+    if (currentInCart + 1 > availableStock) {
+      this.snackBar.open(`⚠️ Only ${availableStock} left in stock!`, '', {
+        duration: 3000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
+      return;
+    }
+
+    // Safe to add
     const cartProduct = {
       ...product,
       sellerName: this.seller ? this.seller.name : 'Unknown Seller',
       sellerAvatarUrl: this.seller?.avatar || undefined,
     };
-    console.log('Adding to cart:', cartProduct.sellerName);
+
+    console.log('✅ Adding to cart:', cartProduct.sellerName, 'Stock:', availableStock);
     this.cartService.addProductToCart(cartProduct);
-    // Show success message/toast
+
+    // Success toast
     this.snackBar.open(`${product.name} added to cart!`, '', {
       duration: 2000,
-      horizontalPosition: 'end',
+      horizontalPosition: 'right',
       verticalPosition: 'top',
       panelClass: ['custom-snackbar'],
     });

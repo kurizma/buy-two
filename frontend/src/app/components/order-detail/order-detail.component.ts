@@ -38,12 +38,16 @@ export class OrderDetailComponent implements OnInit {
       return;
     }
 
-    // Load order from localStorage via service
     this.orderService.getOrder(orderNumber).subscribe({
       next: (order) => {
         this.order = order;
         this.loading = false;
         this.error = !order;
+
+        if (order?.items) {
+          const uniqueSellers = [...new Set(order.items.map((item: any) => item.sellerId))];
+          uniqueSellers.forEach((id) => this.cartService.getSellerName(id).subscribe());
+        }
       },
       error: () => {
         this.error = true;

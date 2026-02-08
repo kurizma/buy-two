@@ -5,11 +5,12 @@ import { CartItem } from '../../models/cart/cart-item.model';
 import { CartService } from '../../services/cart.service';
 import { CategoryService } from '../../services/category.service';
 import { Subscription } from 'rxjs';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, RouterLink],
+  imports: [CommonModule, CurrencyPipe, RouterLink, MatSnackBarModule],
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css'],
 })
@@ -19,6 +20,7 @@ export class CartComponent implements OnInit, OnDestroy {
   public readonly cartService = inject(CartService);
   private readonly router = inject(Router);
   private readonly categoryService = inject(CategoryService);
+  private readonly snackBar = inject(MatSnackBar);
 
   ngOnInit() {
     console.log('🛒 CartComponent init - loading from API'); // Debug
@@ -51,6 +53,15 @@ export class CartComponent implements OnInit, OnDestroy {
   increaseQuantity(productId: string): void {
     const item = this.cartItems.find((i) => i.productId === productId);
     if (item) {
+      if (item.quantity && item.quantity + 1 > item.quantity) {
+        this.snackBar.open(`Max ${item.quantity} available!`, 'OK', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+          panelClass: ['custom-snackbar'],
+        });
+        return;
+      }
       this.updateQuantity(productId, item.quantity + 1);
     }
   }
