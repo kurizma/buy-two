@@ -97,7 +97,12 @@ export class OrderListComponent implements OnInit {
         },
         error: (err) => {
           console.error('Load orders failed:', err);
-          this.snackBar.open('Failed to load orders', 'Retry', { duration: 3000 });
+          this.snackBar.open('Failed to load orders', 'Retry', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+            panelClass: ['custom-snackbar'],
+          });
           this.loading = false;
         },
       });
@@ -149,21 +154,41 @@ export class OrderListComponent implements OnInit {
         this.orders.find((o) => o.orderNumber === orderNumber)?.status!,
       )
     ) {
-      this.snackBar.open('Only PENDING orders can be cancelled', 'OK');
+      this.snackBar.open('Only PENDING orders can be cancelled', 'OK', {
+        duration: 4000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
       return;
     }
-
     this.snackBar
-      .open(`Cancel ${orderNumber}?`, 'Confirm', { duration: 4000 })
+      .open(`Cancel ${orderNumber}?`, 'Confirm', {
+        duration: 4000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      })
       .onAction()
       .subscribe(() => {
         // POST /api/orders/{orderNumber}/cancel
         this.orderService.cancelOrder(orderNumber).subscribe({
           next: () => {
             this.loadOrders();
-            this.snackBar.open('Cancelled!', 'OK');
+            this.snackBar.open('Cancelled!', 'OK', {
+              duration: 4000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+              panelClass: ['custom-snackbar'],
+            });
           },
-          error: () => this.snackBar.open('Cancel failed', 'OK'),
+          error: () =>
+            this.snackBar.open('Cancel failed', 'OK', {
+              duration: 4000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+              panelClass: ['custom-snackbar'],
+            }),
         });
       });
   }
@@ -174,20 +199,41 @@ export class OrderListComponent implements OnInit {
     if (
       !this.orders.some((o) => o.orderNumber === orderNumber && o.status === OrderStatus.CANCELLED)
     ) {
-      this.snackBar.open('Only CANCELLED orders can be redone', 'OK');
+      this.snackBar.open('Only CANCELLED orders can be redone', 'OK', {
+        duration: 4000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
       return;
     }
 
     this.snackBar
-      .open(`Redo ${orderNumber}?`, 'Redo', { duration: 4000 })
+      .open(`Redo ${orderNumber}?`, 'Redo', {
+        duration: 4000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      })
       .onAction()
       .subscribe(() => {
         this.orderService.redoOrder(orderNumber).subscribe({
           next: () => {
             this.loadOrders();
-            this.snackBar.open('Order redone - check your cart!', 'OK');
+            this.snackBar.open('Order redone - check your cart!', 'OK', {
+              duration: 4000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+              panelClass: ['custom-snackbar'],
+            });
           },
-          error: () => this.snackBar.open('Redo failed', 'OK'),
+          error: () =>
+            this.snackBar.open('Redo failed', 'OK', {
+              duration: 4000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+              panelClass: ['custom-snackbar'],
+            }),
         });
       });
   }
@@ -196,13 +242,23 @@ export class OrderListComponent implements OnInit {
     event.stopPropagation();
 
     this.snackBar
-      .open(`Remove ${orderNumber}?`, 'Confirm', { duration: 4000 })
+      .open(`Remove ${orderNumber}?`, 'Confirm', {
+        duration: 4000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      })
       .onAction()
       .subscribe(() => {
         // DELETE /api/orders/{orderNumber} or localStorage.removeItem
         localStorage.removeItem(`order_${orderNumber}`);
         this.loadOrders();
-        this.snackBar.open('Order removed!', 'OK');
+        this.snackBar.open('Order removed!', 'OK', {
+          duration: 4000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+          panelClass: ['custom-snackbar'],
+        });
       });
   }
 
@@ -236,17 +292,32 @@ export class OrderListComponent implements OnInit {
   confirmOrder(orderNumber: string, event: Event): void {
     event.stopPropagation();
     this.snackBar
-      .open(`Confirm order ${orderNumber}?`, 'Confirm', { duration: 4000 })
+      .open(`Confirm order ${orderNumber}?`, 'Confirm', {
+        duration: 4000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      })
       .onAction()
       .subscribe(() => {
         this.orderService.updateStatus(orderNumber, OrderStatus.CONFIRMED).subscribe({
           next: () => {
             this.loadOrders(); // Reload to show updated status
-            this.snackBar.open('Order confirmed!', 'OK');
+            this.snackBar.open('Order confirmed!', 'OK', {
+              duration: 4000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+              panelClass: ['custom-snackbar'],
+            });
           },
           error: (err) => {
             console.error('Confirm failed', err);
-            this.snackBar.open('Confirm failed', 'OK');
+            this.snackBar.open('Confirm failed', 'OK', {
+              duration: 4000,
+              horizontalPosition: 'right',
+              verticalPosition: 'top',
+              panelClass: ['custom-snackbar'],
+            });
           },
         });
       });
@@ -254,7 +325,7 @@ export class OrderListComponent implements OnInit {
 
   // Permissions
   canCancel(order: Order): boolean {
-    return order.status === OrderStatus.PENDING || order.status === OrderStatus.CONFIRMED;
+    return order.status === OrderStatus.PENDING;
   }
 
   canRedo(order: Order): boolean {

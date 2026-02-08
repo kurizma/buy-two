@@ -90,7 +90,7 @@
                     class="item-image">
                 <div class="item-details">
                 <h3>{{ item.productName }}</h3>
-                <p class="seller">Sold by: <strong>{{cartService.getSellerName(item.sellerId)}}</strong></p>
+                <p class="seller">Sold by: <strong>{{cartService.getCachedSellerName(item.sellerId)}}</strong></p>
                 <p class="quantity">Quantity: {{ item.quantity }}</p>
                 </div>
                 <div class="item-price">

@@ -153,6 +153,16 @@ export class CartService {
     sellerName: string;
     sellerAvatarUrl?: string;
   }): void {
+    // FRONTEND STOCK CHECK
+    if (params.availableStock !== undefined && params.availableStock < 1) {
+      this.snackBar.open('❌ Out of stock!', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'right',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
+      return;
+    }
     const cartItem = {
       productId: params.productId,
       sellerId: params.sellerId,
@@ -164,13 +174,19 @@ export class CartService {
       imageUrl: params.imageUrl || '/assets/product-default.png',
     };
 
+    // Backend handles final stock validation (CartServiceImpl)
     this.http
       .post<ApiResponse<CartResponse>>(`${this.baseUrl}/items`, cartItem)
       .pipe(catchError(this.handleApiError.bind(this)))
       .subscribe((response) => {
         if (response.success && response.data?.items) {
           this.loadSellersForCart(response.data.items);
-          this.snackBar.open('✅ Item added to cart', 'Close', { duration: 2000 });
+          this.snackBar.open('✅ Item added to cart', 'Close', {
+            duration: 2000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+            panelClass: ['custom-snackbar'],
+          });
         }
       });
   }
@@ -182,17 +198,33 @@ export class CartService {
       return;
     }
 
-    this.http
-      .put<ApiResponse<CartResponse>>(
-        `${this.baseUrl}/items/${productId}/quantity/${quantity}`,
-        null,
-      )
-      .pipe(catchError(this.handleApiError.bind(this)))
-      .subscribe((response) => {
-        if (response.success && response.data?.items) {
-          this.loadSellersForCart(response.data.items);
-        }
-      });
+    // Get product stock BEFORE API call
+    this.productService.getProductById(productId).subscribe((product) => {
+      const availableStock = product.quantity || 0;
+
+      if (quantity > availableStock) {
+        this.snackBar.open(`⚠️ Max ${availableStock} available`, 'OK', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+          panelClass: ['custom-snackbar'],
+        });
+        return;
+      }
+
+      // Safe to update
+      this.http
+        .put<ApiResponse<CartResponse>>(
+          `${this.baseUrl}/items/${productId}/quantity/${quantity}`,
+          null,
+        )
+        .pipe(catchError(this.handleApiError.bind(this)))
+        .subscribe((response) => {
+          if (response.success && response.data?.items) {
+            this.loadSellersForCart(response.data.items);
+          }
+        });
+    });
   }
 
   /** // ✅ DELETE /api/cart/items/{productId} */
@@ -216,7 +248,7 @@ export class CartService {
   clearCart(): void {
     const snackBarRef = this.snackBar.open('Clear entire cart?', 'Confirm', {
       duration: 5000,
-      horizontalPosition: 'center',
+      horizontalPosition: 'right',
       verticalPosition: 'top',
       panelClass: ['custom-snackbar'],
     });
@@ -230,7 +262,7 @@ export class CartService {
             this.loadSellersForCart([]);
             this.snackBar.open('🛒 Cart cleared!', 'Close', {
               duration: 3000,
-              horizontalPosition: 'center',
+              horizontalPosition: 'right',
               verticalPosition: 'top',
               panelClass: ['custom-snackbar'],
             });
@@ -275,6 +307,10 @@ export class CartService {
       }),
       catchError(() => of('Seller')),
     );
+  }
+
+  getCachedSellerName(sellerId: string): string {
+    return this.sellerCache[sellerId]?.name || 'Seller';
   }
 
   clearCartAfterOrder(): void {
@@ -329,7 +365,12 @@ export class CartService {
   private handleApiError(error: any) {
     console.error('Cart API error:', error);
     const message = error.error?.message || 'Cart operation failed. Try again.';
-    this.snackBar.open(message, 'Close', { duration: 4000 });
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'right',
+      verticalPosition: 'top',
+      panelClass: ['custom-snackbar'],
+    });
     return of({ success: false, message: message, data: null } as ApiResponse<null>);
   }
 }
