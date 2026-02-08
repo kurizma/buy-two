@@ -14,7 +14,6 @@ import { AuthGuard } from './guards/auth.guard';
 import { CartComponent } from './components/cart/cart.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { ClientOnlyGuard } from './guards/client-only.guard';
-import { EmptyCartGuard } from './guards/empty-cart.guard';
 import { OrderDetailComponent } from './components/order-detail/order-detail.component';
 import { OrderListComponent } from './components/order-list/order-list.component';
 

@@ -13,8 +13,9 @@ import {
   AbstractControl,
 } from '@angular/forms';
 import { ProfileAnalyticsComponent } from '../profile-analytics/profile-analytics.component';
-import { AnalyticsItem } from '../../models/profile/analytics-item';
-import { Order, OrderStatus } from '../../models/order/order.model';
+import { AnalyticsService } from '../../services/analytics.service';
+import { AnalyticsResponse } from '../../models/analytics/analytics-response.model';
+import { AnalyticsItem } from '../../models/analytics/analytics.model';
 
 @Component({
   selector: 'app-profile',
@@ -28,7 +29,7 @@ export class ProfileComponent implements OnInit {
 
   get userRole(): 'client' | 'seller' | null {
     if (!this.currentUser?.role) return null;
-    return this.currentUser.role === 'CLIENT' ? 'client' : 'seller';
+    return this.currentUser.role.toUpperCase() === 'CLIENT' ? 'client' : 'seller';
   }
 
   profileForm: FormGroup;
@@ -45,101 +46,12 @@ export class ProfileComponent implements OnInit {
   userService = inject(UserService);
   mediaService = inject(MediaService);
   authService = inject(AuthService);
-
+  analyticsService = inject(AnalyticsService);
   fb = inject(FormBuilder);
 
-  // ************* Mock analytics data *****************
-  getAnalyticsItems(role: 'client' | 'seller'): AnalyticsItem[] {
-    if (!this.currentUser) return [];
-
-    const orders = this.getAllOrders();
-    const userId = this.currentUser.id;
-
-    // Aggregate product data from orders
-    const productMap: Map<
-      string,
-      {
-        name: string;
-        categories: string;
-        count: number;
-        amount: number;
-      }
-    > = new Map();
-
-    orders.forEach((order) => {
-      // Skip cancelled orders
-      if (order.status === OrderStatus.CANCELLED) return;
-
-      if (role === 'client') {
-        // For clients: only their own orders
-        if (order.userId !== userId) return;
-
-        order.items.forEach((item) => {
-          const key = item.productId;
-          const existing = productMap.get(key);
-
-          if (existing) {
-            existing.count += item.quantity;
-            existing.amount += item.price * item.quantity;
-          } else {
-            productMap.set(key, {
-              name: item.productName,
-              categories: item.categoryId || 'Uncategorized',
-              count: item.quantity,
-              amount: item.price * item.quantity,
-            });
-          }
-        });
-      } else if (role === 'seller') {
-        // For sellers: only items they sold
-        order.items.forEach((item) => {
-          if (item.sellerId !== userId) return;
-
-          const key = item.productId;
-          const existing = productMap.get(key);
-
-          if (existing) {
-            existing.count += item.quantity;
-            existing.amount += item.price * item.quantity;
-          } else {
-            productMap.set(key, {
-              name: item.productName,
-              categories: item.categoryId || 'Uncategorized',
-              count: item.quantity,
-              amount: item.price * item.quantity,
-            });
-          }
-        });
-      }
-    });
-
-    return Array.from(productMap.values());
-  }
-
-  getTotalAmount(role: 'client' | 'seller'): number {
-    const items = this.getAnalyticsItems(role);
-    return items.reduce((sum, item) => sum + item.amount, 0);
-  }
-
-  private getAllOrders(): Order[] {
-    const orders: Order[] = [];
-
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (!key?.startsWith('order_')) continue;
-
-      try {
-        const orderData = localStorage.getItem(key);
-        if (orderData) {
-          orders.push(JSON.parse(orderData));
-        }
-      } catch (error) {
-        console.error('Error parsing order:', error);
-      }
-    }
-
-    return orders;
-  }
+  analyticsData: AnalyticsResponse | null = null;
+  analyticsLoading = false;
+  analyticsError = '';
 
   constructor() {
     this.profileForm = this.fb.group({
@@ -162,20 +74,64 @@ export class ProfileComponent implements OnInit {
       { validator: this.passwordsMatch },
     );
   }
-
   ngOnInit() {
-    this.userService.getCurrentUser().subscribe((user) => {
-      if (user) {
-        this.currentUser = user;
-        this.profileForm.patchValue({ name: user.name, email: user.email });
-        this.profileForm.get('email')?.disable(); // Disable email field
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        console.log('✅ User loaded:', user.id, user.role);
 
-        this.avatar = user.avatar || null;
-        this.avatarPreview = this.avatar;
-        this.avatarMediaId = this.extractMediaId(user.avatar);
-      }
-      this.loaded = true; // render avatar only after this
+        if (user) {
+          this.currentUser = user;
+          this.profileForm.patchValue({ name: user.name, email: user.email });
+          this.profileForm.get('email')?.disable();
+          this.avatar = user.avatar || null;
+          this.avatarPreview = this.avatar;
+          this.avatarMediaId = this.extractMediaId(user.avatar);
+
+          // ✅ Calculate role directly
+          const role = user.role.toUpperCase() === 'CLIENT' ? 'client' : 'seller';
+          if (role && user.id) {
+            this.loadAnalytics(user.id, role); // Pass explicitly
+          } else {
+            console.error('⚠️ Skipping analytics: missing user id or role', {
+              role,
+              userId: user.id,
+            });
+          }
+        }
+        this.loaded = true;
+      },
+      error: (err) => {
+        console.error('❌ Failed to load current user:', err);
+        this.analyticsError = 'Failed to load user profile.';
+        this.loaded = true;
+      },
     });
+  }
+
+  private loadAnalytics(userId: string, role: 'client' | 'seller') {
+    console.log('🚀 loadAnalytics:', userId, role);
+    this.analyticsLoading = true;
+    const analytics$ =
+      role === 'client'
+        ? this.analyticsService.getClientAnalytics(userId)
+        : this.analyticsService.getSellerAnalytics(userId);
+
+    analytics$.subscribe({
+      next: (data) => {
+        console.log('📊 Analytics loaded:', data);
+        this.analyticsData = data;
+        this.analyticsLoading = false;
+      },
+      error: (err) => {
+        console.error('❌ Analytics error:', err);
+        this.analyticsError = err.message;
+        this.analyticsLoading = false;
+      },
+    });
+  }
+
+  get transformedAnalyticsItems(): AnalyticsItem[] {
+    return this.analyticsData?.items || [];
   }
 
   onAvatarSelect(event: any): void {

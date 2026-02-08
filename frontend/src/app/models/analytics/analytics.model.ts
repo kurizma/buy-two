@@ -1,10 +1,16 @@
-// ************* Mock analytics data *****************
+export interface AnalyticsItem {
+  productId?: string;
+  name: string;
+  count: number;
+  amount?: number;
+  categories?: string | string[];
+}
 
-export const analyticsClientItems = [
-  { name: 'Code Wizard Tee', categories: 'CAT-001', count: 2, amount: 58 },
-  { name: 'Keep Coding Tee', categories: 'CAT-001', count: 1, amount: 28 },
-  { name: 'Action Noir Tee', categories: 'CAT-006', count: 1, amount: 45 },
-];
+// export const analyticsClientItems = [
+//   { name: 'Code Wizard Tee', categories: 'CAT-001', count: 2, amount: 58 },
+//   { name: 'Keep Coding Tee', categories: 'CAT-001', count: 1, amount: 28 },
+//   { name: 'Action Noir Tee', categories: 'CAT-006', count: 1, amount: 45 },
+// ];
 
 /*
 I want to test with 4 users ( 1 active seller, 1 active client, a new seller, and a new client:
