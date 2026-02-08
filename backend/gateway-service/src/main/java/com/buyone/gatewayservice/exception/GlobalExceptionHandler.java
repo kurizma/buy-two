@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
         Map<String, String> details = ex.getBindingResult()
             .getFieldErrors()
             .stream()
-            .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+            .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage, (m1, m2) -> m1 + "; " + m2));
         return buildError(HttpStatus.BAD_REQUEST, "Validation failed", details);
     }
 
