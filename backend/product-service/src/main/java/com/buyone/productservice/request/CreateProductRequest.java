@@ -25,7 +25,7 @@ public class CreateProductRequest {
     private String description;
     
     @NotNull(message = "Price is required")
-    @DecimalMin(value = "0.01", inclusive = true, message = "Price must be at least 0.01")
+    @DecimalMin(value = "0.0", inclusive = true, message = "Price must be non-negative")
     private BigDecimal price;
     
     @NotNull(message = "Quantity is required")
