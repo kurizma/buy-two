@@ -4,7 +4,6 @@ pipeline {
 		githubPush()
 	}
 	options {
-		failFast true
 		timestamps()
 		timeout(time: 20, unit: 'MINUTES')
 		throttleJobProperty(
