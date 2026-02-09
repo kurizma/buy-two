@@ -45,7 +45,7 @@ public class CartController {
     public ResponseEntity<ApiResponse<Optional<Cart>>> getCart(
             @RequestHeader("X-USER-ID") String userId,
             @RequestHeader("X-USER-ROLE") String role) {
-        validateRole(role, CLIENT_ROLE);
+        
         Optional<Cart> cartOpt = cartService.getCart(userId);
         if (cartOpt.isEmpty()) {
             return ResponseEntity.ok(ApiResponse.<Optional<Cart>>builder()

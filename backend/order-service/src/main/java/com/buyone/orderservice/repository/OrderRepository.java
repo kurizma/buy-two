@@ -46,11 +46,14 @@ public interface OrderRepository extends MongoRepository<Order, String> {
                         "{ $match: { userId: ?0, status: { $in: ['DELIVERED', 'CONFIRMED'] } } }",
                         "{ $unwind: '$items' }",
                         "{ $addFields: { 'items.productObjectId': { $toObjectId: '$items.productId' } } }",
+                        // ⭐ 1st lookup: Get product
                         "{ $lookup: { from: 'products', localField: 'items.productObjectId', foreignField: '_id', as: 'productDetails' } }",
                         "{ $unwind: { path: '$productDetails', preserveNullAndEmptyArrays: true } }",
-                        "{ $addFields: { 'items.categoryId': '$productDetails.categoryId' } }",
+                        // ⭐ 2nd lookup: Get category by product.categoryId
+                        "{ $lookup: { from: 'categories', localField: 'productDetails.categoryId', foreignField: '_id', as: 'categoryDetails' } }",
+                        "{ $unwind: { path: '$categoryDetails', preserveNullAndEmptyArrays: true } }",
                         "{ $group: { " +
-                                        "  _id: { productId: '$items.productId', name: '$items.productName', category: '$productDetails.name' }, "
+                                        "  _id: { productId: '$items.productId', name: '$items.productName', category: { $ifNull: ['$categoryDetails.name', 'Uncategorized'] } }, "
                                         +
                                         "  totalQty: { $sum: '$items.quantity' }, " +
                                         "  totalAmount: { $sum: { $multiply: [ { $toDouble: '$items.price' }, { $toDouble: '$items.quantity' } ] } } "
@@ -128,20 +131,18 @@ public interface OrderRepository extends MongoRepository<Order, String> {
                         "{ $addFields: { 'items.productObjectId': { $toObjectId: '$items.productId' } } }",
                         "{ $lookup: { from: 'products', localField: 'items.productObjectId', foreignField: '_id', as: 'productDetails' } }",
                         "{ $unwind: { path: '$productDetails', preserveNullAndEmptyArrays: true } }",
+                        "{ $lookup: { from: 'categories', localField: 'productDetails.categoryId', foreignField: '_id', as: 'categoryDetails' } }",
+                        "{ $unwind: { path: '$categoryDetails', preserveNullAndEmptyArrays: true } }",
                         "{ $group: { " +
-                                        "  _id: { productId: '$items.productId', name: '$items.productName', category: '$productDetails.name' }, "
+                                        "  _id: { productId: '$items.productId', name: '$items.productName', category: { $ifNull: ['$categoryDetails.name', 'Uncategorized'] } }, "
                                         +
                                         "  revenue: { $sum: { $multiply: [ { $toDouble: '$items.price' }, { $toDouble: '$items.quantity' } ] } }, "
                                         +
                                         "  unitsSold: { $sum: '$items.quantity' } " +
                                         "} }",
                         "{ $project: { " +
-                                        "  _id: 0, " +
-                                        "  productId: '$_id.productId', " +
-                                        "  name: '$_id.name', " +
-                                        "  category: '$_id.category', " +
-                                        "  revenue: 1, " +
-                                        "  unitsSold: 1 " +
+                                        "  _id: 0, productId: '$_id.productId', name: '$_id.name', category: '$_id.category', revenue: 1, unitsSold: 1 "
+                                        +
                                         "} }",
                         "{ $sort: { revenue: -1 } }",
                         "{ $limit: 5 }"

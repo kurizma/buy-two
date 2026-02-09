@@ -23,8 +23,13 @@ export class ProfileAnalyticsComponent implements OnChanges {
   pieChartData: ChartData<'pie'> = { labels: [], datasets: [{ data: [] }] };
   barType: ChartType = 'bar';
   pieType: ChartType = 'pie';
-  bestLabel = '';
+  barChartLabel = '';
+  pieChartLabel = '';
   private readonly router = inject(Router);
+
+  trackByProductId(index: number, item: AnalyticsItem): string {
+    return item.productId || `${item.name}-${index}`;
+  }
 
   barOptions: ChartOptions<'bar'> = {
     responsive: true,
@@ -45,8 +50,8 @@ export class ProfileAnalyticsComponent implements OnChanges {
         display: 'auto',
         anchor: 'end',
         align: 'top',
-        font: { size: 12, weight: 'bold' },
-        formatter: () => this.bestLabel,
+        font: { size: 14, weight: 'bold' },
+        formatter: () => this.barChartLabel,
         color: 'black',
       },
     },
@@ -57,7 +62,7 @@ export class ProfileAnalyticsComponent implements OnChanges {
     plugins: {
       title: {
         display: true,
-        text: this.role === 'client' ? 'Top Categories by Spend' : 'Top Categories by Revenue',
+        text: this.pieChartLabel,
       },
       legend: {
         display: true,
@@ -68,7 +73,7 @@ export class ProfileAnalyticsComponent implements OnChanges {
           label: (context: any) => {
             const label = context.label || '';
             const value = context.parsed || 0;
-            return `${label}: €${value.toFixed(2)}`; // ✅ Show euro amount
+            return `${label}: €${value.toFixed(2)}`;
           },
         },
       },
@@ -87,15 +92,9 @@ export class ProfileAnalyticsComponent implements OnChanges {
       if (item.count === maxCount) maxIndices.push(idx);
     });
 
-    console.log(
-      '📊 Sorted USER:',
-      sortedItems.map((i) => `${i.name}(${i.count})`),
-    );
-
     // ⭐ Bar chart best label
-    this.bestLabel = this.role === 'client' ? 'Most bought item' : 'Best seller';
+    this.barChartLabel = this.role === 'client' ? 'Most bought item' : 'Best seller';
 
-    // update bar title based on role
     this.barOptions = {
       ...this.barOptions,
       plugins: {
@@ -108,8 +107,8 @@ export class ProfileAnalyticsComponent implements OnChanges {
           display: (context: any) => maxIndices.includes(context.dataIndex),
           anchor: 'end',
           align: 'top',
-          font: { size: 12, weight: 'bold' },
-          formatter: () => this.bestLabel,
+          font: { size: 14, weight: 'bold' },
+          formatter: () => this.barChartLabel,
           color: 'black',
         },
       },
@@ -125,12 +124,24 @@ export class ProfileAnalyticsComponent implements OnChanges {
       ],
     };
 
-    // ⭐ Pie chart using backend categoryAmounts (recommended)
-    if (this.categories && this.categories.length > 0) {
-      console.log('📊 Categories:', this.categories);
-      console.log('📊 Backend amounts:', this.categoryAmounts);
+    // ⭐ Pie chart label
+    this.pieChartLabel =
+      this.role === 'client' ? 'Top Categories by Spend' : 'Top Categories by Revenue';
 
-      // ✅ Safely validate amounts match categories
+    // Update pie chart title
+    this.pieOptions = {
+      ...this.pieOptions,
+      plugins: {
+        ...this.pieOptions.plugins,
+        title: {
+          display: true,
+          text: this.pieChartLabel,
+        },
+      },
+    };
+
+    // ⭐ Pie chart using backend categoryAmounts
+    if (this.categories && this.categories.length > 0) {
       const amounts =
         this.categoryAmounts?.length === this.categories.length &&
         this.categoryAmounts.every((a) => !Number.isNaN(a) && a > 0)
