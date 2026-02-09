@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BehaviorSubject, catchError, firstValueFrom, map, of, Observable } from 'rxjs';
+import { BehaviorSubject, catchError, firstValueFrom, map, of, Observable, EMPTY, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment.docker';
 
@@ -10,6 +10,7 @@ import { CategoryService } from './category.service';
 import { CartItem } from '../models/cart/cart-item.model';
 import { CartResponse } from '../models/cart/cart-response.model';
 import { ApiResponse } from '../models/api-response/api-response.model';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +24,7 @@ export class CartService {
   private readonly userService = inject(UserService);
   private readonly categoryService = inject(CategoryService);
   private readonly productService = inject(ProductService);
+  private readonly authService = inject(AuthService);
   private sellerCache: { [sellerId: string]: { name: string; avatar: string } } = {};
 
   private cartItemsSubject = new BehaviorSubject<CartItem[]>(this.loadCartFromStorage());
@@ -39,21 +41,28 @@ export class CartService {
 
   /** // ✅ GET /api/cart */
   loadCart(): void {
-    console.log('🔄 Loading cart from:', this.baseUrl); // Debug
+    console.log('🔄 Loading cart from:', this.baseUrl);
 
+    if (!this.authService.isAuthenticated()) {
+      console.log('👤 Not logged in - empty cart');
+      this.cartItemsSubject.next([]);
+      return;
+    }
+    
     this.http
-      // .get<ApiResponse<CartResponse>>(this.baseUrl)
       .get<ApiResponse<any>>(this.baseUrl)
       .pipe(catchError(this.handleApiError.bind(this)))
       .subscribe({
         next: (response) => {
-          console.log('📦 Raw backend response:', response); // Debug
-
-          if (response.success && response.data?.items?.length) {
+          if (response.success && response.data?.items?.length > 0) {
             this.loadSellersForCart(response.data.items);
           } else {
             this.cartItemsSubject.next([]);
           }
+        },
+        error: (error) => {
+          console.warn('🛒 Cart 400 - user has no cart yet:', error);
+          this.cartItemsSubject.next([]); // Silent fallback
         },
       });
   }
@@ -73,7 +82,6 @@ export class CartService {
     missingSellers.forEach((sellerId) => {
       this.userService.getUserById(sellerId).subscribe({
         next: (user) => {
-          console.log('Full seller object:', user);
           if (user) {
             this.sellerCache[user.id] = {
               name: user.name || 'Seller',
@@ -364,13 +372,16 @@ export class CartService {
   /** API Error handler */
   private handleApiError(error: any) {
     console.error('Cart API error:', error);
-    const message = error.error?.message || 'Cart operation failed. Try again.';
-    this.snackBar.open(message, 'Close', {
+    // ⭐ SILENT for 400 (empty cart normal)
+    if (error.status === 400) {
+      return EMPTY; // No snackbar!
+    }
+    this.snackBar.open('Cart operation failed. Try again.', 'Close', {
       duration: 4000,
       horizontalPosition: 'right',
       verticalPosition: 'top',
       panelClass: ['custom-snackbar'],
     });
-    return of({ success: false, message: message, data: null } as ApiResponse<null>);
+    return throwError(() => error);
   }
 }

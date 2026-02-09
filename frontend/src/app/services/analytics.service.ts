@@ -14,7 +14,6 @@ export class AnalyticsService {
 
   // ✅ GET /api/analytics/client/{userId}
   getClientAnalytics(userId: string): Observable<AnalyticsResponse> {
-    console.log('📡 AnalyticsService.getClientAnalytics:', userId);
     return this.http.get<ApiResponse<any>>(`${this.apiUrl}/client/${userId}`).pipe(
       map((apiResponse: ApiResponse<any>) => {
         console.log('📥 Raw response:', apiResponse);
@@ -22,7 +21,6 @@ export class AnalyticsService {
           throw new Error(apiResponse.message || 'Client analytics failed');
         }
         const data = apiResponse.data;
-        console.log('🔍 topCategories raw:', data.topCategories); // ✅ Debug
 
         return {
           totalAmount: Number(data.totalSpent || 0),
@@ -43,7 +41,6 @@ export class AnalyticsService {
 
   // ✅ GET /api/analytics/seller/{userId}
   getSellerAnalytics(userId: string): Observable<AnalyticsResponse> {
-    console.log('📡 AnalyticsService.getSellerAnalytics:', userId);
     return this.http.get<ApiResponse<any>>(`${this.apiUrl}/seller/${userId}`).pipe(
       map((apiResponse: ApiResponse<any>) => {
         console.log('📥 Raw response:', apiResponse);
@@ -51,7 +48,6 @@ export class AnalyticsService {
           throw new Error(apiResponse.message || 'Seller analytics failed');
         }
         const data = apiResponse.data;
-        console.log('🔍 seller topCategories raw:', data.topCategories); // ✅ Debug
 
         return {
           totalAmount: Number(data.totalRevenue || 0),
