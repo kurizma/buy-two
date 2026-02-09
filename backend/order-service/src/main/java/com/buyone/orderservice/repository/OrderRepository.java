@@ -45,16 +45,22 @@ public interface OrderRepository extends MongoRepository<Order, String> {
         @Aggregation(value = {
                         "{ $match: { userId: ?0, status: { $in: ['DELIVERED', 'CONFIRMED'] } } }",
                         "{ $unwind: '$items' }",
+                        "{ $addFields: { 'items.productObjectId': { $toObjectId: '$items.productId' } } }",
+                        "{ $lookup: { from: 'products', localField: 'items.productObjectId', foreignField: '_id', as: 'productDetails' } }",
+                        "{ $unwind: { path: '$productDetails', preserveNullAndEmptyArrays: true } }",
+                        "{ $addFields: { 'items.categoryId': '$productDetails.categoryId' } }",
                         "{ $group: { " +
-                                        "  _id: { productId: '$items.productId', name: '$items.productName' }, " +
+                                        "  _id: { productId: '$items.productId', name: '$items.productName', category: '$productDetails.name' }, "
+                                        +
                                         "  totalQty: { $sum: '$items.quantity' }, " +
                                         "  totalAmount: { $sum: { $multiply: [ { $toDouble: '$items.price' }, { $toDouble: '$items.quantity' } ] } } "
                                         +
                                         "} }",
-                        "{ $project: { " + // ✅ Added $project to flatten structure
+                        "{ $project: { " +
                                         "  _id: 0, " +
                                         "  productId: '$_id.productId', " +
                                         "  name: '$_id.name', " +
+                                        "  category: '$_id.category', " +
                                         "  totalQty: 1, " +
                                         "  totalAmount: 1 " +
                                         "} }",
@@ -116,19 +122,24 @@ public interface OrderRepository extends MongoRepository<Order, String> {
         List<SellerTotalRevenue> getSellerTotalRevenue(String sellerId);
 
         @Aggregation(value = {
-                        "{ $match: { status: 'CONFIRMED' } }", // ✅ Changed to CONFIRMED only
+                        "{ $match: { status: 'CONFIRMED' } }",
                         "{ $unwind: '$items' }",
                         "{ $match: { 'items.sellerId': ?0 } }",
+                        "{ $addFields: { 'items.productObjectId': { $toObjectId: '$items.productId' } } }",
+                        "{ $lookup: { from: 'products', localField: 'items.productObjectId', foreignField: '_id', as: 'productDetails' } }",
+                        "{ $unwind: { path: '$productDetails', preserveNullAndEmptyArrays: true } }",
                         "{ $group: { " +
-                                        "  _id: { productId: '$items.productId', name: '$items.productName' }, " +
-                                        "  revenue: { $sum: { $multiply: [ { $toDouble: '$items.price' }, '$items.quantity' ] } }, "
+                                        "  _id: { productId: '$items.productId', name: '$items.productName', category: '$productDetails.name' }, "
+                                        +
+                                        "  revenue: { $sum: { $multiply: [ { $toDouble: '$items.price' }, { $toDouble: '$items.quantity' } ] } }, "
                                         +
                                         "  unitsSold: { $sum: '$items.quantity' } " +
                                         "} }",
-                        "{ $project: { " + // ✅ Added $project to flatten structure
+                        "{ $project: { " +
                                         "  _id: 0, " +
                                         "  productId: '$_id.productId', " +
                                         "  name: '$_id.name', " +
+                                        "  category: '$_id.category', " +
                                         "  revenue: 1, " +
                                         "  unitsSold: 1 " +
                                         "} }",

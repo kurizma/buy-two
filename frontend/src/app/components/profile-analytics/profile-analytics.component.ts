@@ -136,7 +136,6 @@ export class ProfileAnalyticsComponent implements OnChanges {
         this.categoryAmounts.every((a) => !Number.isNaN(a) && a > 0)
           ? this.categoryAmounts
           : this.categories.map(() => 1);
-      console.log('📊 Final pie data:', { labels: this.categories, data: amounts });
 
       this.pieChartData = {
         labels: this.categories,

@@ -4,8 +4,6 @@ import { Observable, throwError, map, catchError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ApiResponse } from '../models/api-response/api-response.model';
 import { AnalyticsResponse } from '../models/analytics/analytics-response.model';
-import { ClientMostBought, ClientTopCategory } from '../models/analytics/client-analytics.model';
-import { SellerTopCategory } from '../models/analytics/seller-analytics.model';
 
 @Injectable({
   providedIn: 'root',
@@ -28,11 +26,11 @@ export class AnalyticsService {
 
         return {
           totalAmount: Number(data.totalSpent || 0),
-          items: data.mostBoughtProducts.map((p: any, index: number) => ({
+          items: data.mostBoughtProducts.map((p: any) => ({
             name: p.name,
             count: p.totalQty,
             amount: p.totalAmount ? Number(p.totalAmount) : 0,
-            categories: [data.topCategories[index]?.category || 'N/A'],
+            categories: [p.category || 'N/A'],
             productId: p.productId, // Optional
           })),
           categories: (data.topCategories || []).map((c: any) => c.category),
@@ -58,12 +56,12 @@ export class AnalyticsService {
         return {
           totalAmount: Number(data.totalRevenue || 0),
           items:
-            data.bestSellingProducts?.map((p: any, index: number) => ({
+            data.bestSellingProducts?.map((p: any) => ({
               // Adjust field name
               name: p.name,
               count: p.unitsSold,
               amount: p.revenue ? Number(p.revenue) : 0,
-              categories: [data.topCategories[index]?.category || 'N/A'],
+              categories: [p.category || 'N/A'],
               productId: p.productId,
             })) || [],
           categories: (data.topCategories || []).map((c: any) => c.category),
