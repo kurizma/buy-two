@@ -1,19 +1,17 @@
-properties([
-	throttleJobProperty(
-		categories: ['buy-two-serial'],
-		throttleEnabled: true,
-		throttleOption: 'category'
-	)
-])
-
 pipeline {
 	agent any
 	triggers {
 		githubPush()
 	}
 	options {
+		failFast true
 		timestamps()
 		timeout(time: 20, unit: 'MINUTES')
+		throttleJobProperty(
+			categories: ['buy-two-serial'],
+			throttleEnabled: true,
+			throttleOption: 'category'
+		)
 	}
 
 	// Global configuration
