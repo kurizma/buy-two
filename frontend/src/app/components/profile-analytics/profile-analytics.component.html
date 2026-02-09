@@ -65,7 +65,7 @@
             <thead class ="table-head">
                 <tr>
                 <th>Product</th>
-                <th>Categories</th>
+                <th>Category</th>
                 <th>{{ role === 'client' ? 'Bought(qty)' : 'Sold(qty)' }}</th>
                 <th>Amount</th>
                 </tr>
@@ -73,7 +73,9 @@
             <tbody>
                 <tr *ngFor="let item of items">
                 <td>{{ item.name }}</td>
-                <td>{{ getCategorySlug(item.categories || []) }}</td>
+                <td class="category-cell">
+                    {{ item.categories || [] }}
+                </td>
                 <td>{{ item.count }}</td>
                 <td>{{ item.amount | currency:'EUR' }}</td>
                 </tr>

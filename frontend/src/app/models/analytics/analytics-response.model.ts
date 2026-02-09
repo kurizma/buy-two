@@ -4,4 +4,5 @@ export interface AnalyticsResponse {
   totalAmount: number;
   items: AnalyticsItem[];
   categories?: string[];
+  categoryAmounts?: number[];
 }

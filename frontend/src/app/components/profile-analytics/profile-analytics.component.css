@@ -63,6 +63,12 @@
     color: var(--text-primary);
 }
 
+.category-cell {
+  width: 1%; 
+  white-space: nowrap; 
+  max-width: 200px; 
+}
+
 .empty-state {
     padding: 3rem 1.5rem;
     background: transparent;

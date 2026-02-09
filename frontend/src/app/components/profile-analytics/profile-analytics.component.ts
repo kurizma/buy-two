@@ -17,6 +17,7 @@ export class ProfileAnalyticsComponent implements OnChanges {
   @Input() totalAmount = 0;
   @Input() items: AnalyticsItem[] = [];
   @Input() categories?: string[];
+  @Input() categoryAmounts?: number[];
 
   barChartData: ChartData<'bar'> = { labels: [], datasets: [] };
   pieChartData: ChartData<'pie'> = { labels: [], datasets: [{ data: [] }] };
@@ -24,20 +25,6 @@ export class ProfileAnalyticsComponent implements OnChanges {
   pieType: ChartType = 'pie';
   bestLabel = '';
   private readonly router = inject(Router);
-
-  private readonly CATEGORY_MAP: Record<string, string> = {
-    'CAT-001': 'code-nerd',
-    'CAT-002': 'anime-pop',
-    'CAT-003': 'code-queen',
-    'CAT-004': 'gaming-esports',
-    'CAT-005': 'geeky-memes',
-    'CAT-006': 'limited-editions',
-  };
-
-  getCategorySlug(categoryId: string | string[]): string {
-    const id = Array.isArray(categoryId) ? categoryId[0] : categoryId;
-    return this.CATEGORY_MAP[id] || id || 'uncategorized';
-  }
 
   barOptions: ChartOptions<'bar'> = {
     responsive: true,
@@ -70,7 +57,20 @@ export class ProfileAnalyticsComponent implements OnChanges {
     plugins: {
       title: {
         display: true,
-        text: 'Category Breakdown (%)',
+        text: this.role === 'client' ? 'Top Categories by Spend' : 'Top Categories by Revenue',
+      },
+      legend: {
+        display: true,
+        position: 'bottom',
+      },
+      tooltip: {
+        callbacks: {
+          label: (context: any) => {
+            const label = context.label || '';
+            const value = context.parsed || 0;
+            return `${label}: €${value.toFixed(2)}`; // ✅ Show euro amount
+          },
+        },
       },
     },
   };
@@ -88,14 +88,14 @@ export class ProfileAnalyticsComponent implements OnChanges {
     });
 
     console.log(
-      'Sorted USER:',
+      '📊 Sorted USER:',
       sortedItems.map((i) => `${i.name}(${i.count})`),
     );
 
     // ⭐ Bar chart best label
     this.bestLabel = this.role === 'client' ? 'Most bought item' : 'Best seller';
 
-    // update bar title CLIENT vs. SELLER
+    // update bar title based on role
     this.barOptions = {
       ...this.barOptions,
       plugins: {
@@ -125,25 +125,33 @@ export class ProfileAnalyticsComponent implements OnChanges {
       ],
     };
 
-    // ⭐ Pie chart data aggregation
-    const catSpend: { [key: string]: number } = {};
-    sortedItems.forEach((item) => {
-      const rawCategory = Array.isArray(item.categories)
-        ? item.categories[0] || 'Uncategorized' // First category or fallback
-        : item.categories || 'Uncategorized';
+    // ⭐ Pie chart using backend categoryAmounts (recommended)
+    if (this.categories && this.categories.length > 0) {
+      console.log('📊 Categories:', this.categories);
+      console.log('📊 Backend amounts:', this.categoryAmounts);
 
-      const category = this.getCategorySlug(rawCategory); // use slug if known
-      catSpend[category] = (catSpend[category] || 0) + item.count;
-    });
+      // ✅ Safely validate amounts match categories
+      const amounts =
+        this.categoryAmounts?.length === this.categories.length &&
+        this.categoryAmounts.every((a) => !Number.isNaN(a) && a > 0)
+          ? this.categoryAmounts
+          : this.categories.map(() => 1);
+      console.log('📊 Final pie data:', { labels: this.categories, data: amounts });
 
-    this.pieChartData = {
-      labels: Object.keys(catSpend),
-      datasets: [
-        {
-          data: Object.values(catSpend).filter((v) => v > 0), // Only positive spends
-          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-        },
-      ],
-    };
+      this.pieChartData = {
+        labels: this.categories,
+        datasets: [
+          {
+            data: amounts,
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+          },
+        ],
+      };
+    } else {
+      this.pieChartData = {
+        labels: ['No data'],
+        datasets: [{ data: [1], backgroundColor: ['#CCCCCC'] }],
+      };
+    }
   }
 }
