@@ -309,6 +309,9 @@ pipeline {
 		}
 
 		stage('Deploy & Verify') {
+			when {
+				branch 'main'
+			}
 			steps {
 				timeout(time: 15, unit: 'MINUTES') {
 					script {
