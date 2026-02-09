@@ -6,6 +6,13 @@
 *.iml
 
 
+# Secrets & Certificates
+*.crt
+*.key
+*.p12
+*.jks
+*.keystore
+
 # Essentials
 node_modules/
 dist/
