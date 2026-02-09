@@ -42,7 +42,7 @@ export class ProductCardComponent implements OnInit {
     if (availableStock < 1) {
       this.snackBar.open('❌ Out of stock!', '', {
         duration: 3000,
-        horizontalPosition: 'right',
+        horizontalPosition: 'center',
         verticalPosition: 'top',
         panelClass: ['custom-snackbar'],
       });
@@ -52,7 +52,7 @@ export class ProductCardComponent implements OnInit {
     if (currentInCart + 1 > availableStock) {
       this.snackBar.open(`⚠️ Only ${availableStock} left in stock!`, '', {
         duration: 3000,
-        horizontalPosition: 'right',
+        horizontalPosition: 'center',
         verticalPosition: 'top',
         panelClass: ['custom-snackbar'],
       });
@@ -68,14 +68,6 @@ export class ProductCardComponent implements OnInit {
 
     console.log('✅ Adding to cart:', cartProduct.sellerName, 'Stock:', availableStock);
     this.cartService.addProductToCart(cartProduct);
-
-    // Success toast
-    this.snackBar.open(`${product.name} added to cart!`, '', {
-      duration: 2000,
-      horizontalPosition: 'right',
-      verticalPosition: 'top',
-      panelClass: ['custom-snackbar'],
-    });
   }
 
   isSeller(): boolean {

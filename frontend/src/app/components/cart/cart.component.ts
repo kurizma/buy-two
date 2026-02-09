@@ -39,8 +39,6 @@ export class CartComponent implements OnInit, OnDestroy {
     this.subscription?.unsubscribe();
   }
 
-  // delegate all cart calculations to CartService
-
   // Cart item actions
   getCategorySlug(categoryId: string): string {
     return this.categoryService.getCategorySlug(categoryId) || '';
@@ -56,7 +54,7 @@ export class CartComponent implements OnInit, OnDestroy {
       if (item.quantity && item.quantity + 1 > item.quantity) {
         this.snackBar.open(`Max ${item.quantity} available!`, 'OK', {
           duration: 3000,
-          horizontalPosition: 'right',
+          horizontalPosition: 'center',
           verticalPosition: 'top',
           panelClass: ['custom-snackbar'],
         });

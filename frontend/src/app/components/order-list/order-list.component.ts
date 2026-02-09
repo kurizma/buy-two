@@ -99,7 +99,7 @@ export class OrderListComponent implements OnInit {
           console.error('Load orders failed:', err);
           this.snackBar.open('Failed to load orders', 'Retry', {
             duration: 3000,
-            horizontalPosition: 'right',
+            horizontalPosition: 'center',
             verticalPosition: 'top',
             panelClass: ['custom-snackbar'],
           });
@@ -156,7 +156,7 @@ export class OrderListComponent implements OnInit {
     ) {
       this.snackBar.open('Only PENDING or CONFIRMED orders can be cancelled', 'OK', {
         duration: 4000,
-        horizontalPosition: 'right',
+        horizontalPosition: 'center',
         verticalPosition: 'top',
         panelClass: ['custom-snackbar'],
       });
@@ -165,7 +165,7 @@ export class OrderListComponent implements OnInit {
     this.snackBar
       .open(`Cancel ${orderNumber}?`, 'Confirm', {
         duration: 4000,
-        horizontalPosition: 'right',
+        horizontalPosition: 'center',
         verticalPosition: 'top',
         panelClass: ['custom-snackbar'],
       })
@@ -177,7 +177,7 @@ export class OrderListComponent implements OnInit {
             this.loadOrders();
             this.snackBar.open('Cancelled!', 'OK', {
               duration: 4000,
-              horizontalPosition: 'right',
+              horizontalPosition: 'center',
               verticalPosition: 'top',
               panelClass: ['custom-snackbar'],
             });
@@ -185,7 +185,7 @@ export class OrderListComponent implements OnInit {
           error: () =>
             this.snackBar.open('Cancel failed', 'OK', {
               duration: 4000,
-              horizontalPosition: 'right',
+              horizontalPosition: 'center',
               verticalPosition: 'top',
               panelClass: ['custom-snackbar'],
             }),
@@ -201,7 +201,7 @@ export class OrderListComponent implements OnInit {
     ) {
       this.snackBar.open('Only CANCELLED orders can be redone', 'OK', {
         duration: 4000,
-        horizontalPosition: 'right',
+        horizontalPosition: 'center',
         verticalPosition: 'top',
         panelClass: ['custom-snackbar'],
       });
@@ -211,7 +211,7 @@ export class OrderListComponent implements OnInit {
     this.snackBar
       .open(`Redo ${orderNumber}?`, 'Redo', {
         duration: 4000,
-        horizontalPosition: 'right',
+        horizontalPosition: 'center',
         verticalPosition: 'top',
         panelClass: ['custom-snackbar'],
       })
@@ -222,7 +222,7 @@ export class OrderListComponent implements OnInit {
             this.loadOrders();
             this.snackBar.open('Order redone - check your cart!', 'OK', {
               duration: 4000,
-              horizontalPosition: 'right',
+              horizontalPosition: 'center',
               verticalPosition: 'top',
               panelClass: ['custom-snackbar'],
             });
@@ -230,7 +230,7 @@ export class OrderListComponent implements OnInit {
           error: () =>
             this.snackBar.open('Redo failed', 'OK', {
               duration: 4000,
-              horizontalPosition: 'right',
+              horizontalPosition: 'center',
               verticalPosition: 'top',
               panelClass: ['custom-snackbar'],
             }),
@@ -244,7 +244,7 @@ export class OrderListComponent implements OnInit {
     this.snackBar
       .open(`Remove ${orderNumber}?`, 'Confirm', {
         duration: 4000,
-        horizontalPosition: 'right',
+        horizontalPosition: 'center',
         verticalPosition: 'top',
         panelClass: ['custom-snackbar'],
       })
@@ -255,7 +255,7 @@ export class OrderListComponent implements OnInit {
         this.loadOrders();
         this.snackBar.open('Order removed!', 'OK', {
           duration: 4000,
-          horizontalPosition: 'right',
+          horizontalPosition: 'center',
           verticalPosition: 'top',
           panelClass: ['custom-snackbar'],
         });
@@ -294,7 +294,7 @@ export class OrderListComponent implements OnInit {
     this.snackBar
       .open(`Confirm order ${orderNumber}?`, 'Confirm', {
         duration: 4000,
-        horizontalPosition: 'right',
+        horizontalPosition: 'center',
         verticalPosition: 'top',
         panelClass: ['custom-snackbar'],
       })
@@ -305,7 +305,7 @@ export class OrderListComponent implements OnInit {
             this.loadOrders(); // Reload to show updated status
             this.snackBar.open('Order confirmed!', 'OK', {
               duration: 4000,
-              horizontalPosition: 'right',
+              horizontalPosition: 'center',
               verticalPosition: 'top',
               panelClass: ['custom-snackbar'],
             });
@@ -314,7 +314,7 @@ export class OrderListComponent implements OnInit {
             console.error('Confirm failed', err);
             this.snackBar.open('Confirm failed', 'OK', {
               duration: 4000,
-              horizontalPosition: 'right',
+              horizontalPosition: 'center',
               verticalPosition: 'top',
               panelClass: ['custom-snackbar'],
             });

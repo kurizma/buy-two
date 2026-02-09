@@ -1,6 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BehaviorSubject, catchError, firstValueFrom, map, of, Observable, EMPTY, throwError } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  firstValueFrom,
+  map,
+  of,
+  Observable,
+  EMPTY,
+  throwError,
+} from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment.docker';
 
@@ -37,7 +46,7 @@ export class CartService {
     });
   }
 
-  // Public methods (what component calls)
+  // Public methods
 
   /** // ✅ GET /api/cart */
   loadCart(): void {
@@ -165,7 +174,7 @@ export class CartService {
     if (params.availableStock !== undefined && params.availableStock < 1) {
       this.snackBar.open('❌ Out of stock!', 'Close', {
         duration: 3000,
-        horizontalPosition: 'right',
+        horizontalPosition: 'center',
         verticalPosition: 'top',
         panelClass: ['custom-snackbar'],
       });
@@ -191,7 +200,7 @@ export class CartService {
           this.loadSellersForCart(response.data.items);
           this.snackBar.open('✅ Item added to cart', 'Close', {
             duration: 2000,
-            horizontalPosition: 'right',
+            horizontalPosition: 'center',
             verticalPosition: 'top',
             panelClass: ['custom-snackbar'],
           });
@@ -213,7 +222,7 @@ export class CartService {
       if (quantity > availableStock) {
         this.snackBar.open(`⚠️ Max ${availableStock} available`, 'OK', {
           duration: 3000,
-          horizontalPosition: 'right',
+          horizontalPosition: 'center',
           verticalPosition: 'top',
           panelClass: ['custom-snackbar'],
         });
@@ -241,8 +250,8 @@ export class CartService {
       .delete<ApiResponse<CartResponse>>(`${this.baseUrl}/items/${productId}`)
       .pipe(catchError(this.handleApiError.bind(this)))
       .subscribe((response) => {
-        if (response.success && response.data?.items) {
-          this.loadSellersForCart(response.data.items);
+        if (response.success) {
+          this.loadCart();
         }
       });
   }
@@ -256,7 +265,7 @@ export class CartService {
   clearCart(): void {
     const snackBarRef = this.snackBar.open('Clear entire cart?', 'Confirm', {
       duration: 5000,
-      horizontalPosition: 'right',
+      horizontalPosition: 'center',
       verticalPosition: 'top',
       panelClass: ['custom-snackbar'],
     });
@@ -267,10 +276,10 @@ export class CartService {
         .pipe(catchError(this.handleApiError.bind(this)))
         .subscribe((response) => {
           if (response.success) {
-            this.loadSellersForCart([]);
+            this.loadCart();
             this.snackBar.open('🛒 Cart cleared!', 'Close', {
               duration: 3000,
-              horizontalPosition: 'right',
+              horizontalPosition: 'center',
               verticalPosition: 'top',
               panelClass: ['custom-snackbar'],
             });
@@ -378,7 +387,7 @@ export class CartService {
     }
     this.snackBar.open('Cart operation failed. Try again.', 'Close', {
       duration: 4000,
-      horizontalPosition: 'right',
+      horizontalPosition: 'center',
       verticalPosition: 'top',
       panelClass: ['custom-snackbar'],
     });

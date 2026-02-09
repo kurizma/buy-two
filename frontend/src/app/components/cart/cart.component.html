@@ -27,11 +27,13 @@
 
               <!-- Product Details -->
               <div class="col-md-4">
-                <h5 class="mb-1">{{ item.productName }}</h5>
+                <a [routerLink]="['/product', item.productId]" class="text-link">
+                  {{ item.productName }}
+                </a>
                 <p class="mb-0">
                   <small class="text">
                     Seller: 
-                    <a routerLink='/seller-shop/{{ item.sellerId }}' class="text-seller-name">
+                    <a routerLink='/seller-shop/{{ item.sellerId }}' class="text-link">
                       <img [src]="item.sellerAvatarUrl || '/assets/avatars/user-default.png'" 
                         [alt]="item.sellerName" 
                         class="rounded-circle me-1" 
@@ -59,9 +61,10 @@
                     type="number" 
                     class="form-control form-control-sm text-qty text-center"
                     [value]="item.quantity"
+                    readonly
                     (change)="updateQuantity(item.productId, +$any($event.target).value)"
                     min="1"
-                    style="max-width: 60px;">
+                    style="max-width: 60px; background-color: transparent;">
                   <button 
                     class="btn btn-outline-primary btn-sm" 
                     type="button"
@@ -84,7 +87,7 @@
               <div class="col-md-1 text-end">
                 <button 
                   class="btn btn-outline-danger btn-sm" 
-                  (click)="cartService.removeItem(item.productId)"
+                  (click)="removeItem(item.productId)"
                   title="Remove item">
                   <i class="fas fa-trash"></i>
                 </button>

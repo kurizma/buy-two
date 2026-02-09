@@ -71,7 +71,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let item of items; trackByProductId">
+                <tr *ngFor="let item of items;">
                 <td>{{ item.name }}</td>
                 <td class="custom-cell">
                     {{ item.categories[0] || 'N/A' }}
