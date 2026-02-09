@@ -48,7 +48,7 @@ export class CartService {
       this.cartItemsSubject.next([]);
       return;
     }
-    
+
     this.http
       .get<ApiResponse<any>>(this.baseUrl)
       .pipe(catchError(this.handleApiError.bind(this)))
