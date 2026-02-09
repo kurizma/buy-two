@@ -185,7 +185,9 @@
             [role]="userRole!"
             [totalAmount]="analyticsData?.totalAmount || 0"
             [items]="transformedAnalyticsItems"
-            [categories]="analyticsData?.categories || []">
+            [categories]="analyticsData?.categories || []"
+            [categoryAmounts]="analyticsData?.categoryAmounts || []"
+          >
           </app-profile-analytics>
         </div>
       </div>

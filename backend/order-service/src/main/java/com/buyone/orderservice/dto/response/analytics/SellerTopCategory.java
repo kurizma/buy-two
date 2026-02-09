@@ -2,4 +2,4 @@ package com.buyone.orderservice.dto.response.analytics;
 
 import java.math.BigDecimal;
 
-public record ClientTotalSpent(BigDecimal totalSpent) {}
+public record SellerTopCategory(String category, BigDecimal totalRevenue) {}
