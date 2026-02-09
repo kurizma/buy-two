@@ -27,10 +27,6 @@ export class ProfileAnalyticsComponent implements OnChanges {
   pieChartLabel = '';
   private readonly router = inject(Router);
 
-  trackByProductId(index: number, item: AnalyticsItem): string {
-    return item.productId || `${item.name}-${index}`;
-  }
-
   barOptions: ChartOptions<'bar'> = {
     responsive: true,
     maintainAspectRatio: false,

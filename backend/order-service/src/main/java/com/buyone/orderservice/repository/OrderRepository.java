@@ -71,19 +71,7 @@ public interface OrderRepository extends MongoRepository<Order, String> {
                         "{ $limit: 5 }"
         })
         List<ClientMostBought> getClientMostBought(String userId);
-
-        // @Aggregation(value = {
-        // "{ $match: { userId: ?0, status: { $in: ['DELIVERED', 'CONFIRMED'] } } }",
-        // "{ $unwind: '$items' }",
-        // "{ $group: { _id: { productId: '$items.productId', name: '$items.productName'
-        // }, totalQty: { $sum: '$items.quantity' } } }, totalAmount: { $sum: {
-        // $multiply: [ { $toDouble: '$items.price' }, { $toDouble: '$items.quantity' }
-        // ] } } }",
-        // "{ $sort: { totalQty: -1 } }",
-        // "{ $limit: 5 }"
-        // })
-        // List<ClientMostBought> getClientMostBought(String userId);
-
+        
         @Aggregation(value = {
                         "{ $match: { userId: ?0, status: 'CONFIRMED' } }",
                         "{ $unwind: '$items' }",

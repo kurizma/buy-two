@@ -1,7 +1,7 @@
 export interface AnalyticsItem {
   productId?: string;
   name: string;
-  count: number; //(totalQty or unitsSold)
-  amount?: number; //(totalAmount or revenue)
+  count: number;
+  amount?: number;
   categories: string[];
 }

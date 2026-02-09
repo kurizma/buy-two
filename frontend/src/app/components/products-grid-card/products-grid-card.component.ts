@@ -49,7 +49,7 @@ export class ProductGridCardComponent {
     if (availableStock < 1) {
       this.snackBar.open('❌ Out of stock!', '', {
         duration: 3000,
-        horizontalPosition: 'right',
+        horizontalPosition: 'center',
         verticalPosition: 'top',
         panelClass: ['custom-snackbar'],
       });
@@ -59,7 +59,7 @@ export class ProductGridCardComponent {
     if (currentInCart + 1 > availableStock) {
       this.snackBar.open(`⚠️ Only ${availableStock} left in stock!`, '', {
         duration: 3000,
-        horizontalPosition: 'right',
+        horizontalPosition: 'center',
         verticalPosition: 'top',
         panelClass: ['custom-snackbar'],
       });
@@ -79,7 +79,7 @@ export class ProductGridCardComponent {
     // Success toast
     this.snackBar.open(`${product.name} added to cart!`, '', {
       duration: 2000,
-      horizontalPosition: 'right',
+      horizontalPosition: 'center',
       verticalPosition: 'top',
       panelClass: ['custom-snackbar'],
     });
