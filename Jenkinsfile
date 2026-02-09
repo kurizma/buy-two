@@ -1,25 +1,20 @@
-properties([
-	throttleJobProperty(
-		categories: ['buy-two-serial'],
-		throttleEnabled: true,
-		throttleOption: 'category'
-	)
-])
-
 pipeline {
 	agent any
-
-	/**********************
-	 * Prevent concurrent builds
-	 **********************/
+	triggers {
+		githubPush()
+	}
 	options {
 		timestamps()
 		timeout(time: 20, unit: 'MINUTES')
+		throttleJobProperty(
+			categories: ['buy-two-serial'],
+			throttleEnabled: true,
+			throttleOption: 'category'
+		)
 	}
 
-	/**********************
-	 * Global configuration
-	 **********************/
+	// Global configuration
+
 	parameters {
 		string(name: 'BRANCH', defaultValue: 'main', description: 'Branch to build')
 	}
@@ -40,18 +35,7 @@ pipeline {
 		MAVEN_OPTS = "-Xmx768m -Xms384m -XX:+UseG1GC -XX:MaxGCPauseMillis=100"
 	}
 
-	// Tools section commented out - using system Maven/Node instead
-	// Uncomment and configure in Jenkins if you want managed tool versions
-	// tools {
-	// 	maven 'maven-3.9'
-	// 	nodejs 'node-20.19.6'
-	// }
-
 	stages {
-
-		/************
-		 * Checkout *
-		 ************/
 		stage('Checkout') {
 			steps {
 				// Checkout is handled automatically by Jenkins Pipeline from SCM
@@ -61,9 +45,6 @@ pipeline {
 			}
 		}
 
-		/******************************
-		 * Clean Maven lock files
-		 ******************************/
 		stage('Clean Maven Cache') {
 			steps {
 				script {
@@ -76,9 +57,6 @@ pipeline {
 			}
 		}
 
-		/*************************
-		 * Backend build (no tests)
-		 *************************/
 		stage('Backend Build - discovery-service') {
 			steps {
 				dir('backend/discovery-service') {
@@ -119,9 +97,6 @@ pipeline {
 			}
 		}
 
-		/***********************
-		 * Backend unit tests  *
-		 ***********************/
 		stage('Backend Tests - discovery-service') {
 			steps {
 				dir('backend/discovery-service') {
@@ -162,9 +137,6 @@ pipeline {
 			}
 		}
 
-		/************
-		 * Frontend *
-		 ************/
 		stage('Frontend - Tests Included') {
 			steps {
 				dir('frontend') {
@@ -177,9 +149,6 @@ pipeline {
 			}
 		}
 
-		/************
-		 * Test Failure Handling → Early Slack → Skip Sonar/deploy → Post FAILURE *
-		 ************/
 		stage('Test Summary') {
 			steps {
 				script {
@@ -323,9 +292,6 @@ pipeline {
 		// 	}
 		// }
 
-		/************************
-		 * Build Docker images  *
-		 ************************/
 		stage('Build Images') {
 			steps {
 				script {
@@ -342,12 +308,12 @@ pipeline {
 			}
 		}
 
-		/******************************
-		 * Deploy, verify, and rollback
-		 ******************************/
 		stage('Deploy & Verify') {
+			when {
+				branch 'main'
+			}
 			steps {
-				timeout(time: 30, unit: 'MINUTES') {
+				timeout(time: 15, unit: 'MINUTES') {
 					script {
 						dir("${env.WORKSPACE}") {
 							def cleanBranch = "${BRANCH ?: GIT_BRANCH ?: 'main'}".replaceAll(/^origin\//, '')
@@ -369,10 +335,10 @@ KEY_STORE_PASSWORD=${KEYSTORE_PASSWORD}
 R2_ENDPOINT=${R2_ENDPOINT}
 R2_ACCESS_KEY=${R2_ACCESS_KEY}
 R2_SECRET_KEY=${R2_SECRET_KEY}
-USER_DB=buy-two
-PRODUCT_DB=buy-two
-MEDIA_DB=buy-two
-ORDER_DB=buy-two
+USER_DB=buy-one
+PRODUCT_DB=buy-one
+MEDIA_DB=buy-one
+ORDER_DB=buy-one
 SPRING_SECURITY_USER_NAME=user
 SPRING_SECURITY_USER_PASSWORD=password
 EOF

@@ -52,7 +52,7 @@ public class SecurityConfig {
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:4200",
                 "https://localhost:4200",
-                "http://localhost:*"  // Allow any local port during development
+                "https://157.180.64.182:4200"      // VM frontend with SSL
         ));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(Arrays.asList("*"));
