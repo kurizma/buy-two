@@ -173,9 +173,7 @@ pipeline {
 			}
 		}
 
-		/****************************
-		* SonarCloud Code Analysis *
-		****************************/
+		// SonarCloud Code Analysis
 		stage('SonarCloud Analysis - Backend') {
 			steps {
 				script {
@@ -218,9 +216,7 @@ pipeline {
 			}
 		}
 
-		/****************************
-		 * Quality Gate Check → Skip deploy → Post FAILURE Slack *
-		 ****************************/
+		// Quality Gate Check → Skip deploy → Post FAILURE Slack
 		stage('Quality Gate Check') {
 			steps {
 				script {
