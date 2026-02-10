@@ -1,8 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ProductImageCarouselComponent } from '../ui/product-image-carousel/product-image-carousel.component';
-import { RouterLink } from '@angular/router';
 
 import { ProductService } from '../../services/product.service';
 import { ProductResponse } from '../../models/products/product-response.model';
@@ -114,15 +113,12 @@ export class ProductCardComponent implements OnInit {
     return this.category ? this.category.name : '';
   }
 
-  addToCart() {
-    alert('Add to Cart feature coming soon!');
-  }
 
   goBack() {
     this.isFading = true;
     setTimeout(() => {
       this.isFading = false;
-      window.history.back();
+      globalThis.history.back();
     }, 350);
   }
 
@@ -135,7 +131,7 @@ export class ProductCardComponent implements OnInit {
         const nextIndex = (currentIndex + 1) % products.length;
         const nextProductId = products[nextIndex].id;
         // Navigate to the next product
-        window.location.href = `/product/${nextProductId}`;
+        globalThis.location.href = `/product/${nextProductId}`;
       });
     }, 350);
   }
