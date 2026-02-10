@@ -6,5 +6,6 @@ import java.util.List;
 public record SellerAnalyticsResponse(
         BigDecimal totalRevenue,
         List<SellerBestProduct> bestSellingProducts,
-        Integer totalUnitsSold
+        Integer totalUnitsSold,
+        List<SellerTopCategory> topCategories
 ) {}

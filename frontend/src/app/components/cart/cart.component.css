@@ -23,19 +23,34 @@
     font-weight: bold;
 }
 
-.text-seller-name {
+.text-link {
     color: var(--link);
+    text-decoration: none !important;
 }
 
-.text-seller-name:hover {
+.text-link:hover {
     cursor: pointer;
     color: var(--link-hover);
 }
 
 .text-qty {
-    color: var(--text-secondary);
+    color: var(--link);
 }
 
 .items-badge {
     margin-top: 25px;
+}
+
+/* Hide the browser's default number spinner arrows (up/down dropdown overlay) */
+/* Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+    appearance: none;
+  -moz-appearance: textfield;
 }

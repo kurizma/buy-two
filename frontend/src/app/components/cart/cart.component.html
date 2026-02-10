@@ -27,11 +27,13 @@
 
               <!-- Product Details -->
               <div class="col-md-4">
-                <h5 class="mb-1">{{ item.productName }}</h5>
+                <a [routerLink]="['/product', item.productId]" class="text-link">
+                  {{ item.productName }}
+                </a>
                 <p class="mb-0">
                   <small class="text">
                     Seller: 
-                    <a routerLink='/seller-shop/{{ item.sellerId }}' class="text-seller-name">
+                    <a routerLink='/seller-shop/{{ item.sellerId }}' class="text-link">
                       <img [src]="item.sellerAvatarUrl || '/assets/avatars/user-default.png'" 
                         [alt]="item.sellerName" 
                         class="rounded-circle me-1" 
@@ -50,7 +52,7 @@
                 <label class="form-label small" for="quantity">Quantity</label>
                 <div class="input-group" style="max-width: 140px;">
                   <button 
-                    class="btn btn-outline-secondary btn-sm" 
+                    class="btn btn-outline-primary btn-sm" 
                     type="button"
                     (click)="decreaseQuantity(item.productId)">
                     -
@@ -59,11 +61,12 @@
                     type="number" 
                     class="form-control form-control-sm text-qty text-center"
                     [value]="item.quantity"
+                    readonly
                     (change)="updateQuantity(item.productId, +$any($event.target).value)"
                     min="1"
-                    style="max-width: 60px;">
+                    style="max-width: 60px; background-color: transparent;">
                   <button 
-                    class="btn btn-outline-secondary btn-sm" 
+                    class="btn btn-outline-primary btn-sm" 
                     type="button"
                     (click)="increaseQuantity(item.productId)">
                     +
@@ -84,7 +87,7 @@
               <div class="col-md-1 text-end">
                 <button 
                   class="btn btn-outline-danger btn-sm" 
-                  (click)="cartService.removeItem(item.productId)"
+                  (click)="removeItem(item.productId)"
                   title="Remove item">
                   <i class="fas fa-trash"></i>
                 </button>
@@ -132,7 +135,8 @@
 
           <!-- Free Shipping Notice -->
           <div *ngIf="cartService.getShippingCost() > 0" class="alert alert-info small mb-3">
-            ✨ Add <strong>{{ 50 - cartService.getTotalInclVat() | currency:'EUR' }}</strong> more for free shipping!
+            <i class="fas fa-truck me-2"></i>
+            Add <strong>{{ 50 - cartService.getTotalInclVat() | currency:'EUR' }}</strong> more for free shipping!
           </div>
           
           <div class="d-flex justify-content-between mb-4 fs-4 fw-bold">
@@ -148,7 +152,7 @@
           </button>
           
           <button 
-            class="btn btn-outline-secondary w-100 mb-2" 
+            class="btn btn-outline-primary w-100 mb-2" 
             routerLink="/product-listing">
             Continue Shopping
           </button>

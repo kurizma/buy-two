@@ -33,7 +33,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
     // Live cart count
 
     this.cartSubs = this.cartService.cartItems$.subscribe((items) => {
-      this.cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
+      this.cartItemCount = items.length;
     });
   }
 

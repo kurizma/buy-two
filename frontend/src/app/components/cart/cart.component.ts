@@ -5,30 +5,30 @@ import { CartItem } from '../../models/cart/cart-item.model';
 import { CartService } from '../../services/cart.service';
 import { CategoryService } from '../../services/category.service';
 import { Subscription } from 'rxjs';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-shopping-cart',
+  selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, RouterLink],
-  templateUrl: './shopping-cart.component.html',
-  styleUrls: ['./shopping-cart.component.css'],
+  imports: [CommonModule, CurrencyPipe, RouterLink, MatSnackBarModule],
+  templateUrl: './cart.component.html',
+  styleUrls: ['./cart.component.css'],
 })
-export class ShoppingCartComponent implements OnInit, OnDestroy {
+export class CartComponent implements OnInit, OnDestroy {
   cartItems: CartItem[] = [];
   private subscription: Subscription | null = null; // Remove 'readonly' here
   public readonly cartService = inject(CartService);
   private readonly router = inject(Router);
   private readonly categoryService = inject(CategoryService);
+  private readonly snackBar = inject(MatSnackBar);
 
   ngOnInit() {
-    // For styling purposes, load mock data
-    // Later replace this with actual service call
-    // this.cartItems = mockCartItems;
-    // console.log('Loaded mock cart items:', this.cartItems);
+    console.log('🛒 CartComponent init - loading from API'); // Debug
 
-    // Uncomment when service is ready
+    this.cartService.loadCart();
 
     this.subscription = this.cartService.cartItems$.subscribe((items) => {
+      console.log('🛒 Cart items updated:', items); // Debug
       this.cartItems = items || [];
     });
 
@@ -38,8 +38,6 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.subscription?.unsubscribe();
   }
-
-  // delegate all cart calculations to CartService
 
   // Cart item actions
   getCategorySlug(categoryId: string): string {
@@ -53,6 +51,15 @@ export class ShoppingCartComponent implements OnInit, OnDestroy {
   increaseQuantity(productId: string): void {
     const item = this.cartItems.find((i) => i.productId === productId);
     if (item) {
+      if (item.quantity && item.quantity + 1 > item.quantity) {
+        this.snackBar.open(`Max ${item.quantity} available!`, 'OK', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+          panelClass: ['custom-snackbar'],
+        });
+        return;
+      }
       this.updateQuantity(productId, item.quantity + 1);
     }
   }

@@ -11,6 +11,7 @@ import { UserResponse } from '../../models/users/user-response.model';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/categories/category.model';
 import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-product-card',
@@ -20,6 +21,7 @@ import { CartService } from '../../services/cart.service';
 })
 export class ProductCardComponent implements OnInit {
   private readonly route: ActivatedRoute = inject(ActivatedRoute);
+  private readonly authService = inject(AuthService);
   private readonly productService: ProductService = inject(ProductService);
   private readonly userService: UserService = inject(UserService);
   private readonly categoryService: CategoryService = inject(CategoryService);
@@ -33,24 +35,43 @@ export class ProductCardComponent implements OnInit {
   errorMessage: string | null = null;
 
   addToCart(product: any): void {
+    // STOCK CHECK BEFORE ADDING TO CART
+    const availableStock = product.quantity || 0;
+    const currentInCart = this.cartService.getProductQuantity(product._id || product.id);
+
+    if (availableStock < 1) {
+      this.snackBar.open('❌ Out of stock!', '', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
+      return;
+    }
+
+    if (currentInCart + 1 > availableStock) {
+      this.snackBar.open(`⚠️ Only ${availableStock} left in stock!`, '', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
+      return;
+    }
+
+    // Safe to add
     const cartProduct = {
       ...product,
       sellerName: this.seller ? this.seller.name : 'Unknown Seller',
       sellerAvatarUrl: this.seller?.avatar || undefined,
     };
-    console.log('Adding to cart:', cartProduct.sellerName);
-    this.cartService.addProductToCart(cartProduct);
-    // Show success message/toast
-    this.snackBar.open(`${product.name} added to cart!`, '', {
-      duration: 2000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-      panelClass: ['custom-snackbar'],
-    });
 
-    // setTimeout(() => {
-    //   this.router.navigate(['/shopping-cart']);
-    // }, 500);
+    console.log('✅ Adding to cart:', cartProduct.sellerName, 'Stock:', availableStock);
+    this.cartService.addProductToCart(cartProduct);
+  }
+
+  isSeller(): boolean {
+    return this.authService.isSeller();
   }
 
   isInCart(productId: string): boolean {

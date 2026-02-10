@@ -51,7 +51,7 @@
 }
 
 .table-head  th{ 
-    background: var(--primary-dark) !important; 
+    background: var(--primary) !important; 
     color: var(--text-primary); 
     width: 100%;
 }
@@ -61,6 +61,12 @@
     border-collapse: collapse; 
     background-color: transparent;
     color: var(--text-primary);
+}
+
+.custom-cell {
+    width: 1%; 
+    white-space: nowrap; 
+    max-width: 300px; 
 }
 
 .empty-state {

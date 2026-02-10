@@ -1,0 +1,185 @@
+<div class="order-detail-container py-4">
+    <!-- Loading State -->
+    @if (loading) {
+    <div class="loading-state">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Loading order details...</p>
+    </div>
+    }
+
+    <!-- Error State -->
+    @if (error && !loading) {
+    <div class="error-state">
+        <mat-icon>error_outline</mat-icon>
+        <h2>Order Not Found</h2>
+        <p>The order you're looking for doesn't exist or has been removed.</p>
+        <button mat-raised-button color="primary" (click)="continueShopping()">
+        Back to Shopping
+        </button>
+    </div>
+    }
+
+    <!-- Order Details -->
+    @if (order && !loading) {
+    <div class="order-content">
+        <!-- Success Header -->
+        <div class="success-header">
+        <mat-icon class="success-icon">check_circle</mat-icon>
+        <h1>Order Placed Successfully!</h1>
+        <p class="order-number">Order #{{ order.orderNumber }}</p>
+        <p class="order-date">{{ order.createdAt | date:'medium' }}</p>
+    </div>
+
+    <!-- Status Timeline -->
+    <div class="order-timeline-section">
+        <mat-card class="status-timeline-card">
+            <h2>Order Status</h2>
+            <div class="timeline">
+                <div class="timeline-item" [class.completed]="isStatusCompleted(OrderStatus.PENDING)">
+                <div class="timeline-icon">
+                    <mat-icon>receipt</mat-icon>
+                </div>
+                <div class="timeline-content">
+                    <strong>Order Placed</strong>
+                    <br>
+                    <small>Your order has been received</small>
+                </div>
+                </div>
+
+                <div class="timeline-item" [class.completed]="isStatusCompleted(OrderStatus.CONFIRMED)">
+                <div class="timeline-icon">
+                    <mat-icon>task_alt</mat-icon>
+                </div>
+                <div class="timeline-content">
+                    <strong>Confirmed</strong>
+                    <br>
+                    <small>Order confirmed by seller</small>
+                </div>
+                </div>
+
+                <div class="timeline-item" [class.completed]="isStatusCompleted(OrderStatus.SHIPPED)">
+                <div class="timeline-icon">
+                    <mat-icon>local_shipping</mat-icon>
+                </div>
+                <div class="timeline-content">
+                    <strong>Shipped</strong>
+                    <br>
+                    <small>Package on the way</small>
+                </div>
+                </div>
+
+                <div class="timeline-item" [class.completed]="isStatusCompleted(OrderStatus.DELIVERED)">
+                <div class="timeline-icon">
+                    <mat-icon>home</mat-icon>
+                </div>
+                <div class="timeline-content">
+                    <strong>Delivered</strong>
+                    <br>
+                    <small>Package delivered</small>
+                </div>
+                </div>
+            </div>
+        </mat-card>
+        <!-- Order Items -->
+        <mat-card class="order-items-card">
+            <h2>Items ({{ order.items.length }})</h2>
+            @for (item of order.items; track item) {
+            <div class="order-item">
+                <img [src]="item.imageUrl || '/assets/images/placeholder.png'" 
+                    [alt]="item.productName" 
+                    class="item-image">
+                <div class="item-details">
+                <h3>{{ item.productName }}</h3>
+                <p class="seller">Sold by: <strong>{{cartService.getCachedSellerName(item.sellerId)}}</strong></p>
+                <p class="quantity">Quantity: {{ item.quantity }}</p>
+                </div>
+                <div class="item-price">
+                <strong>{{ item.price * item.quantity | currency:'EUR' }}</strong>
+                <br>
+                <small>{{ item.quantity }} x {{ item.price | currency:'EUR' }}</small>
+                </div>
+            </div>
+            }
+        </mat-card>
+
+        <!-- Shipping & Payment Info -->
+        <div class="info-cards-row">
+            <mat-card class="shipping-info-card">
+                <h3><mat-icon>local_shipping</mat-icon> Shipping Address</h3>
+                @if (order.shippingAddress) {
+                <div class="address-content">
+                    <p class="fullname">
+                    <strong>{{ order.shippingAddress.fullName }}</strong>
+                    </p>
+                    <p class="address-line">
+                    {{ order.shippingAddress.street }}
+                    </p>
+                    <p class="address-line">
+                    {{ order.shippingAddress.city }}, {{ order.shippingAddress.zipCode }}
+                    </p>
+                    <p class="address-line">
+                    {{ order.shippingAddress.country }}
+                    </p>
+                    <p class="phone-line">
+                    <mat-icon>phone</mat-icon>
+                    {{ order.shippingAddress.phone }}
+                    </p>
+                </div>                
+                }
+            </mat-card>
+
+            <mat-card class="payment-info-card">
+                <h3>
+                    <mat-icon>payment</mat-icon> 
+                    Payment Method
+                </h3>
+                <p>
+                    {{ order.paymentMethod === 'PAY_ON_DELIVERY' ? 'Pay on Delivery' : order.paymentMethod }}
+                </p>
+                <p class="delivery-info">
+                    <mat-icon>local_shipping</mat-icon>
+                    Delivery within 5-7 business days
+                </p>
+            </mat-card>
+        </div>
+
+        <!-- Order Summary -->
+        <mat-card class="summary-card">
+        <h2>Order Summary</h2>
+        <div class="summary-row">
+            <span>Subtotal:</span>
+            <strong>{{ order.subtotal | currency:'EUR' }}</strong>
+        </div>
+        <div class="summary-row">
+            <span>Tax (VAT):</span>
+            <strong>{{ order.tax | currency:'EUR' }}</strong>
+        </div>
+        <div class="summary-row">
+            <span>Shipping:</span>
+            <strong>
+                <span *ngIf="order.shippingCost === 0 || order.shippingCost === null; else shippingPaid">FREE</span>
+                <ng-template #shippingPaid>
+                {{ order.shippingCost | currency:'EUR' }}
+                </ng-template>
+            </strong>
+        </div>
+        <div class="summary-row grand-total">
+            <span>Total:</span>
+            <strong>{{ order.total | currency:'EUR' }}</strong>
+        </div>
+        </mat-card>
+
+        <!-- Actions -->
+        <div class="action-buttons">
+        <button class="btn-primary" mat-raised-button (click)="goToOrders()">
+            View All Orders
+        </button>
+        <button class="btn-primary" mat-raised-button (click)="continueShopping()">
+            Continue Shopping
+        </button>
+        </div>
+        </div>
+    </div>
+    }
+</div>
+

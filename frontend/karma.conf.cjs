@@ -12,7 +12,16 @@ module.exports = function (config) {
       // require('@angular-devkit/build-angular/plugins/karma'),
     ],
     client: { clearContext: false },
-    reporters: ['progress', 'kjhtml', 'junit'],
+    reporters: ['progress', 'kjhtml', 'junit', 'coverage'],
+    coverageReporter: {
+      dir: require('path').join(__dirname, 'coverage'),
+      subdir: '.',
+      reporters: [
+        { type: 'html' },
+        { type: 'lcov' },
+        { type: 'text-summary' },
+      ],
+    },
     junitReporter: {
       outputDir: 'test-results/junit',
       outputFile: 'frontend-tests.xml',

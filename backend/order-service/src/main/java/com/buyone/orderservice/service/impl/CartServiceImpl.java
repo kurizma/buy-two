@@ -33,7 +33,7 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductClient productClient;  //  Fixed: no @Autowired
     
-    @Value("${app.cart.tax-rate:0.1}")  //  Configurable
+    @Value("${app.cart.tax-rate:0.24}")  //  Configurable
     private double taxRate;
     
     @Override
@@ -132,6 +132,7 @@ public class CartServiceImpl implements CartService {
                 .items(new ArrayList<>())
                 .subtotal(BigDecimal.ZERO)
                 .tax(BigDecimal.ZERO)
+                .shippingCost(BigDecimal.ZERO)
                 .total(BigDecimal.ZERO)
                 .updatedAt(LocalDateTime.now())
                 .build());
@@ -143,25 +144,38 @@ public class CartServiceImpl implements CartService {
                         .id(userId)
                         .userId(userId)
                         .items(new ArrayList<>())
+                        .shippingCost(BigDecimal.ZERO)
                         .build());
     }
     
     private Cart recalculateTotals(Cart cart) {
-        BigDecimal subtotal = cart.getItems().stream()
-                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Total price (already incl VAT from product)
+        BigDecimal totalInclVat = cart.getItems().stream()
+            .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
         
-        BigDecimal tax = subtotal.multiply(BigDecimal.valueOf(taxRate))
-                .setScale(2, RoundingMode.HALF_UP);
-        BigDecimal total = subtotal.add(tax);
+        // VAT = 24% of excl VAT price → reverse calculate
+        // totalInclVat = subtotal * 1.24 → subtotal = totalInclVat / 1.24
+        BigDecimal subtotalExclVat = totalInclVat.divide(BigDecimal.valueOf(1.24), 2, RoundingMode.HALF_UP);
         
-        cart.setSubtotal(subtotal);
-        cart.setTax(tax);
-        cart.setTotal(total);
+        // VAT amount = totalInclVat - subtotalExclVat
+        BigDecimal vatAmount = totalInclVat.subtract(subtotalExclVat);
+
+        BigDecimal shippingCost = totalInclVat.compareTo(BigDecimal.valueOf(50)) >= 0 
+            ? BigDecimal.ZERO 
+            : BigDecimal.valueOf(4.9);
+        
+        BigDecimal grandTotal = totalInclVat.add(shippingCost);
+        
+        cart.setSubtotal(subtotalExclVat);    // €17.74
+        cart.setTax(vatAmount);               // €4.26  
+        cart.setShippingCost(shippingCost);  // €4.90 or €0.00
+        cart.setTotal(grandTotal);            // €26.90 or €22.00
         cart.setUpdatedAt(LocalDateTime.now());
         
         return cartRepository.save(cart);
     }
+
     
     private void validateCartItem(CartItem item) {
         if (item.getQuantity() <= 0) {
@@ -177,7 +191,32 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public void saveCart(Cart cart) {
-        cartRepository.save(cart);
+        // Find existing cart by userId
+        Optional<Cart> existingCartOpt = cartRepository.findById(cart.getUserId());
+        
+        if (existingCartOpt.isPresent()) {
+            // ✅ Update existing cart
+            Cart existingCart = existingCartOpt.get();
+            
+            // Clear old items (MongoDB will delete them)
+            existingCart.getItems().clear();
+            
+            // Add new items to the TRACKED entity
+            if (cart.getItems() != null) {
+                existingCart.getItems().addAll(cart.getItems());
+            }
+            
+            // Update timestamps
+            existingCart.setUpdatedAt(LocalDateTime.now());
+            
+            // Save the managed entity
+            cartRepository.save(existingCart);
+        } else {
+            // ✅ New cart - set id = userId for consistency
+            cart.setId(cart.getUserId());
+            cart.setUpdatedAt(LocalDateTime.now());
+            cartRepository.save(cart);
+        }
     }
-    
+        
 }

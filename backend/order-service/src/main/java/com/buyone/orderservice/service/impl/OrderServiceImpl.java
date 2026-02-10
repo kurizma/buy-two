@@ -30,7 +30,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -62,8 +64,15 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
         
         // Precise money calculations
-        BigDecimal subtotal = calculateSubtotal(orderItems);
-        BigDecimal tax = calculateTax(subtotal);
+        BigDecimal totalInclVat = calculateSubtotal(orderItems); // €135.00 (incl VAT)
+        BigDecimal tax = calculateTax(totalInclVat);             // €13.50
+        BigDecimal subtotal = totalInclVat.subtract(tax);        // €121.50 (excl VAT)
+        
+         BigDecimal shippingCost = totalInclVat.compareTo(BigDecimal.valueOf(50)) >= 0 
+            ? BigDecimal.ZERO 
+            : BigDecimal.valueOf(4.9);
+  
+        BigDecimal grandTotal = totalInclVat.add(shippingCost);
         
         // Build order
         String orderNumber = generateOrderNumber();
@@ -76,26 +85,27 @@ public class OrderServiceImpl implements OrderService {
                 .shippingAddress(shippingAddress)
                 .subtotal(subtotal)
                 .tax(tax)
-                .total(subtotal.add(tax))
+                .shippingCost(shippingCost)
+                .total(grandTotal)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
         
-        Order saved = orderRepository.save(order);
+        Order saved = Objects.requireNonNull(orderRepository.save(order), "Failed to save order");
         
         // Post-checkout actions
         reserveInventory(saved.getItems(), saved.getOrderNumber());
         
 //        // 2. NEW: auto-confirm Pay on Delivery
-//        if (saved.getPaymentMethod() == PaymentMethod.PAY_ON_DELIVERY) {
-//            saved.setStatus(OrderStatus.CONFIRMED);
-//            saved.setUpdatedAt(LocalDateTime.now());
-//            saved = orderRepository.save(saved);  // Save CONFIRMED
+       if (saved.getPaymentMethod() == PaymentMethod.PAY_ON_DELIVERY) {
+           saved.setStatus(OrderStatus.CONFIRMED);
+           saved.setUpdatedAt(LocalDateTime.now());
+           saved = orderRepository.save(saved);  // Save CONFIRMED
             
             // Commit: delete reservations, qty stays deducted ✅
-//            productClient.commitStock(saved.getOrderNumber());
-//            log.info("Auto-confirmed Pay on Delivery order {}", saved.getOrderNumber());
-//        }
+           productClient.commitStock(saved.getOrderNumber());
+           log.info("Auto-confirmed Pay on Delivery order {}", saved.getOrderNumber());
+       }
         
         cartService.clearCart(userId);
         
@@ -187,7 +197,9 @@ public class OrderServiceImpl implements OrderService {
      * 10% tax, rounded to 2 decimals (business rule).
      */
     private BigDecimal calculateTax(BigDecimal subtotal) {
-        return subtotal.multiply(BigDecimal.valueOf(0.1)).setScale(2, RoundingMode.HALF_UP);
+    // Reverse VAT: totalInclVat = subtotal * 1.24
+        BigDecimal subtotalExclVat = subtotal.divide(BigDecimal.valueOf(1.24), 2, RoundingMode.HALF_UP);
+        return subtotal.subtract(subtotalExclVat);  // VAT amount
     }
     
     /**
@@ -268,8 +280,8 @@ public class OrderServiceImpl implements OrderService {
             throw new BadRequestException("Not your order");
         }
         
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new IllegalStateException("Only PENDING orders can be cancelled");
+        if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.CONFIRMED) {
+            throw new IllegalStateException("Only PENDING or CONFIRMED orders can be cancelled");
         }
         
         order.setStatus(OrderStatus.CANCELLED);
@@ -291,44 +303,75 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public Optional<Order> redoOrder(String orderNumber, String userId) {
-        return getOrder(orderNumber)  // Optional chain
-                .filter(order -> userId.equals(order.getUserId()))  // Ownership
-                .filter(order -> order.getStatus() == OrderStatus.CANCELLED)
-                .map(oldOrder -> {
-                    List<CartItem> newItems = oldOrder.getItems().stream()
-                            .map(this::orderItemToCartItem)
-                            .collect(Collectors.toList());
-                    Cart newCart = Cart.builder()
-                            .userId(userId)
-                            .items(newItems)
-                            .build();
-                    cartService.saveCart(newCart);
-                    return createOrderFromCart(userId, oldOrder.getShippingAddress());  // Reuse original
-                });
+        return getOrder(orderNumber)
+            .filter(order -> userId.equals(order.getUserId()))  // Ownership
+            .filter(order -> order.getStatus() == OrderStatus.CANCELLED)
+            .map(oldOrder -> {
+                // ✅ Validate ALL items have sufficient stock BEFORE creating cart
+                List<String> unavailableItems = new ArrayList<>();
+                
+                for (OrderItem item : oldOrder.getItems()) {
+                    if (!isProductStillAvailable(item)) {
+                        unavailableItems.add(item.getProductName() + " (requested: " + item.getQuantity() + ")");
+                    }
+                }
+                
+                // ❌ If ANY item fails, abort entire redo
+                if (!unavailableItems.isEmpty()) {
+                    String itemsList = String.join(", ", unavailableItems);
+                    throw new BadRequestException(
+                        "Cannot redo order - insufficient stock for: " + itemsList
+                    );
+                }
+                
+                // ✅ All items available → proceed with redo
+                List<CartItem> newItems = oldOrder.getItems().stream()
+                    .map(this::orderItemToCartItem)
+                    .collect(Collectors.toList());
+                
+                Cart newCart = Cart.builder()
+                    .userId(userId)
+                    .items(newItems)
+                    .build();
+                cartService.saveCart(newCart);
+                
+                return createOrderFromCart(userId, oldOrder.getShippingAddress());
+            });
+    }
+
+    
+    private boolean isProductStillAvailable(OrderItem item) {
+        try {
+            ApiResponse<ProductResponse> response = productClient.getById(item.getProductId());
+            
+            if (!response.isSuccess() || response.getData() == null) {
+                log.warn("Product {} not found", item.getProductId());
+                return false;
+            }
+            
+            ProductResponse product = response.getData();
+            boolean hasStock = product.getQuantity() >= item.getQuantity();
+            
+            if (!hasStock) {
+                log.warn("Product {} insufficient stock: requested {}, available {}",
+                    item.getProductId(), item.getQuantity(), product.getQuantity());
+            }
+            
+            return hasStock;
+            
+        } catch (Exception e) {
+            log.error("Failed to check stock for product {}: {}", item.getProductId(), e.getMessage());
+            return false;  // Treat errors as unavailable
+        }
     }
     
     @Override
     public Page<Order> searchBuyerOrders(String userId, OrderSearchRequest req) {
-        // 1. Handle Keyword (default to empty string for broad match)
-        String searchKey = (req.getKeyword() == null) ? "" : req.getKeyword();
-
-        // 2. Handle Date Facets (default to wide range if missing)
-        LocalDateTime start = (req.getStartDate() == null)
-                ? LocalDateTime.now().minusYears(10)
-                : LocalDateTime.parse(req.getStartDate());
-        LocalDateTime end = (req.getEndDate() == null)
-                ? LocalDateTime.now()
-                : LocalDateTime.parse(req.getEndDate());
-
-        // 3. Handle Status Facet
-        OrderStatus status = (req.getStatus() != null)
+        OrderStatus status = req.getStatus() != null
                 ? OrderStatus.valueOf(req.getStatus().toUpperCase())
                 : null;
-
-        Pageable pageable = PageRequest.of(req.getPage(), req.getSize(),
-                org.springframework.data.domain.Sort.by("createdAt").descending());
-
-        return orderRepository.findFacetedOrders(userId, searchKey, start, end, status, pageable);
+        Pageable pageable = PageRequest.of(req.getPage(), req.getSize());
+        return orderRepository.findBuyerOrdersSearch(userId, req.getKeyword(), status, pageable);
     }
     
     @Override

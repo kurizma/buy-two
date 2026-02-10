@@ -1,0 +1,220 @@
+<div class="orders-container">
+  <div class="page-header">
+    <h1 class="page-title">
+      <mat-icon>receipt_long</mat-icon>
+      {{ isSeller ? 'Sales Orders' : 'My Orders' }}
+    </h1>
+    <p class="subtitle">{{ isSeller ? 'Manage your customer orders' : 'Track and manage your orders' }}</p>
+  </div>
+
+  <!-- Filters Section -->
+  <mat-card class="filters-card">
+    <div class="filters-header">
+      <h3>Filters</h3>
+      <button mat-icon-button 
+              (click)="clearFilters()"
+              class="clear-btn-corner"
+              title="Clear all filters">
+        <mat-icon>filter_alt_off</mat-icon>
+      </button>
+    </div>
+    <div class="filters-row">
+      <!-- Reactive: searchCtrl -->
+      <mat-form-field class="search-field">
+        <mat-label>Search orders</mat-label>
+        <input matInput 
+              [formControl]="searchCtrl"
+              placeholder="Order number or product name">
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+
+      <!-- Reactive: statusFilter -->
+      <mat-form-field class="status-field">
+        <mat-label>Status</mat-label>
+        <mat-select [formControl]="statusFilter">
+          <mat-option *ngFor="let status of statusOptions" [value]="status">
+            {{ status === 'ALL' ? 'All Orders' : status }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      
+      <!-- Template-driven dates  -->
+      <mat-form-field class="date-field">
+        <mat-label>From Date</mat-label>
+        <input matInput 
+              [matDatepicker]="startPicker" 
+              [(ngModel)]="startDate"
+              (ngModelChange)="onDateChange()"
+              placeholder="Start date">
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field class="date-field">
+        <mat-label>To Date</mat-label>
+        <input matInput 
+              [matDatepicker]="endPicker" 
+              [(ngModel)]="endDate"
+              (ngModelChange)="onDateChange()"
+              placeholder="End date">
+        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </mat-card>
+
+  <!-- Results Summary -->
+  <div class="results-summary" *ngIf="filteredOrders.length > 0">
+    <p>Showing {{ filteredOrders.length }} of {{ orders.length }} orders</p>
+  </div>
+
+
+  <!-- Empty State -->
+  <div *ngIf="filteredOrders.length === 0" class="empty-state">
+    <mat-icon>shopping_bag</mat-icon>
+    <h2>No Orders Found</h2>
+    <p *ngIf="searchCtrl.value || statusFilter.value !== 'ALL' || startDate || endDate">
+      Try adjusting your filters
+    </p>
+    <p *ngIf="!searchCtrl.value && statusFilter.value === 'ALL' && !startDate && !endDate">
+      {{ isSeller ? 'No customer orders yet' : 'You haven\'t placed any orders yet' }}
+    </p>
+    <button mat-raised-button color="primary" routerLink="/" *ngIf="!isSeller">
+      Start Shopping
+    </button>
+  </div>
+
+  <!-- Orders List -->
+  <div class="orders-list">
+    <mat-card class="order-card" 
+              *ngFor="let order of filteredOrders">
+      <div class="order-header">
+        <div class="order-info">
+          <h3>Order #{{ order.orderNumber }}</h3>
+          <p class="order-date">
+            <mat-icon>event</mat-icon>
+            {{ order.createdAt | date:'medium' }}
+          </p>
+          
+          <!-- ✅ Seller View: Show Customer Info -->
+          @if (isSeller && order.shippingAddress) {
+            <p class="customer-info">
+              <mat-icon>person</mat-icon>
+              Recipient: {{ order.shippingAddress.fullName }}
+            </p>
+          }
+        </div>
+        <mat-chip [ngClass]="getStatusClass(order.status)">
+          {{ order.status }}
+        </mat-chip>
+      </div>
+
+      <!-- ✅ Different Item Display for Sellers -->
+      <div class="order-items">
+        @if (isSeller) {
+          <!-- Seller View: Show only their products -->
+          <div class="item-preview" *ngFor="let item of getSellerItems(order).slice(0, 3)">
+            <img [src]="item.imageUrl || '/assets/images/placeholder.png'" 
+                [alt]="item.productName"
+                class="item-thumb">
+            <div class="item-info">
+              <p class="item-name">{{ item.productName }}</p>
+              <p class="item-details">
+                <span class="seller-badge">Qty: {{ item.quantity }}</span>
+                x
+                <span class="price-badge">{{ item.price | currency:'EUR' }}</span>
+              </p>
+            </div>
+            <div class="item-revenue">
+              <strong>{{ item.price * item.quantity | currency:'EUR' }}</strong>
+            </div>
+          </div>
+          <p *ngIf="getSellerItems(order).length > 3" class="more-items">
+            +{{ getSellerItems(order).length - 3 }} more of your item(s)
+          </p>
+        } @else {
+          <!-- ✅ Client View: Show all items -->
+          <div class="item-preview" *ngFor="let item of order.items.slice(0, 3)">
+            <img [src]="item.imageUrl || '/assets/images/placeholder.png'" 
+                [alt]="item.productName"
+                class="item-thumb">
+            <div class="item-info">
+              <p class="item-name">{{ item.productName }}</p>
+              <p class="item-details">
+                <span>Qty: {{ item.quantity }} x {{ item.price | currency:'EUR' }}</span>
+              </p>
+            </div>
+          </div>
+          <p *ngIf="order.items.length > 3" class="more-items">
+            +{{ order.items.length - 3 }} more item(s)
+          </p>
+        }
+      </div>
+
+      <div class="order-footer">
+        <!-- ✅ Different Total Display -->
+        <div class="order-total">
+          @if (isSeller) {
+            <div class="seller-revenue">
+              <span>Your Revenue: </span>
+              <strong [class.cancelled-strike]="order.status === OrderStatus.CANCELLED">
+                {{ getSellerRevenue(order) | currency:'EUR' }}
+              </strong>
+            </div>
+          } @else {
+            <span>Total:</span>
+            <strong [class.cancelled-strike]="order.status === OrderStatus.CANCELLED">
+              {{ order.total | currency:'EUR' }}
+            </strong>
+          }
+        </div>
+        
+        <!-- ✅ Different Actions for Seller -->
+        <div class="order-actions">
+          @if (!isSeller) {
+            <!-- Client actions: Cancel, Remove, Reorder -->
+            <button mat-button 
+                    *ngIf="canCancel(order)"
+                    (click)="cancelOrder(order.orderNumber, $event)"
+                    class="cancel-btn">
+              <mat-icon>cancel</mat-icon>
+              Cancel
+            </button>
+            
+            <button mat-button 
+                    *ngIf="canRemove(order)"
+                    (click)="removeOrder(order.orderNumber, $event)"
+                    class="remove-btn">
+              <mat-icon>delete</mat-icon>
+              Remove
+            </button>
+            
+            <button mat-button 
+                    *ngIf="canRedo(order)"
+                    (click)="redoOrder(order.orderNumber, $event)"
+                    class="redo-btn">
+              <mat-icon>refresh</mat-icon>
+              Reorder
+            </button>
+            
+            <button mat-raised-button 
+                    (click)="viewOrderDetail(order.orderNumber)"
+                    class="view-btn">
+              View Details
+            </button>
+          } 
+          <!-- @else { -->
+            <!-- NEW: Confirm button for pending orders -->
+            <!-- <button mat-button *ngIf="canConfirm(order)" 
+                    (click)="confirmOrder(order.orderNumber, $event)" 
+                    class="confirm-btn">
+              <mat-icon>check</mat-icon>
+              Confirm
+            </button> -->
+          <!-- }  -->
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+</div>

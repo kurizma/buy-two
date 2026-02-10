@@ -39,6 +39,7 @@ public class ProfileAnalyticsServiceImpl implements ProfileAnalyticsService {
         List<SellerTotalRevenue> revenueList = orderRepository.getSellerTotalRevenue(sellerId);
         List<SellerBestProduct> bestProducts = orderRepository.getSellerBestProducts(sellerId);
         List<SellerTotalUnits> unitsList = orderRepository.getSellerTotalUnits(sellerId);
+        List<SellerTopCategory> topCategories = orderRepository.getSellerTopCategories(sellerId);
         
         BigDecimal totalRevenue = revenueList.isEmpty()
                 ? BigDecimal.ZERO
@@ -48,9 +49,9 @@ public class ProfileAnalyticsServiceImpl implements ProfileAnalyticsService {
                 ? 0
                 : unitsList.get(0).totalUnits();
         
-        log.info("Seller {} analytics: ${} revenue, {} units, {} top products",
-                sellerId, totalRevenue, totalUnits, bestProducts.size());
+        log.info("Seller {} analytics: ${} revenue, {} units, {} top products, {} top categories",
+                sellerId, totalRevenue, totalUnits, bestProducts.size(), topCategories.size());
         
-        return new SellerAnalyticsResponse(totalRevenue, bestProducts, totalUnits);
+        return new SellerAnalyticsResponse(totalRevenue, bestProducts, totalUnits, topCategories);
     }
 }

@@ -13,5 +13,6 @@ public class CartResponse {
     List<CartItemResponse> items;
     BigDecimal subtotal;
     BigDecimal tax;
+    BigDecimal shippingCost;
     BigDecimal total;
 }

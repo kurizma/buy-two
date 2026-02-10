@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -99,12 +100,12 @@ public class OrderController {
     }
     
     @PostMapping("/{orderNumber}/confirm")
-    @Operation(summary = "Buyer confirms PENDING order", description = "Pay on Delivery final step")
+    @Operation(summary = "Seller confirms PENDING order", description = "Pay on Delivery final step")
     public ResponseEntity<ApiResponse<OrderResponse>> confirmOrder(
             @PathVariable String orderNumber,
             @RequestHeader("X-USER-ID") String userId,
             @RequestHeader("X-USER-ROLE") String role) {
-        validateRole(role, "CLIENT");
+        validateRole(role, "SELLER");
         
         OrderResponse confirmed = orderService.confirmOrder(orderNumber, userId)
                 .map(this::mapToOrderResponse)
@@ -198,6 +199,7 @@ public class OrderController {
                         .sellerId(item.getSellerId())
                         .price(item.getPrice())
                         .quantity(item.getQuantity())
+                        .imageUrl(item.getImageUrl())
                         .build())
                 .collect(Collectors.toList());
         
@@ -207,6 +209,7 @@ public class OrderController {
                 .total(order.getTotal())
                 .subtotal(order.getSubtotal())
                 .tax(order.getTax())
+                .shippingCost(order.getShippingCost() != null ? order.getShippingCost() : BigDecimal.valueOf(4.9))
                 .createdAt(order.getCreatedAt())
                 .shippingAddress(order.getShippingAddress())
                 .items(items)

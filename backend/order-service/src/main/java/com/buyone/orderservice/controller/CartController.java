@@ -1,12 +1,13 @@
 package com.buyone.orderservice.controller;
 
 import com.buyone.orderservice.dto.response.ApiResponse;
+
 import com.buyone.orderservice.model.cart.Cart;
 import com.buyone.orderservice.model.cart.CartItem;
 import com.buyone.orderservice.service.CartService;
 import com.buyone.orderservice.exception.BadRequestException;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class CartController {
     public ResponseEntity<ApiResponse<Optional<Cart>>> getCart(
             @RequestHeader("X-USER-ID") String userId,
             @RequestHeader("X-USER-ROLE") String role) {
-        validateRole(role, CLIENT_ROLE);
+        
         Optional<Cart> cartOpt = cartService.getCart(userId);
         if (cartOpt.isEmpty()) {
             return ResponseEntity.ok(ApiResponse.<Optional<Cart>>builder()

@@ -6,6 +6,7 @@ import { ProductImageCarouselComponent } from '../ui/product-image-carousel/prod
 import { RouterLink, Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-product-grid-card',
@@ -35,28 +36,58 @@ export class ProductGridCardComponent {
   private router = inject(Router);
   private snackBar = inject(MatSnackBar);
   private cartService = inject(CartService);
-
+  private authService = inject(AuthService);
   onView(): void {
     this.view.emit(this.product.id);
   }
 
   addToCart(product: any): void {
+    // STOCK CHECK BEFORE ADDING TO CART
+    const availableStock = product.quantity || 0;
+    const currentInCart = this.cartService.getProductQuantity(product._id || product.id);
+
+    if (availableStock < 1) {
+      this.snackBar.open('❌ Out of stock!', '', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
+      return;
+    }
+
+    if (currentInCart + 1 > availableStock) {
+      this.snackBar.open(`⚠️ Only ${availableStock} left in stock!`, '', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['custom-snackbar'],
+      });
+      return;
+    }
+
+    // Safe to add
     const cartProduct = {
       ...product,
-      sellerName: this.seller?.name || 'Unknown Seller',
+      sellerName: this.seller ? this.seller.name : 'Unknown Seller',
       sellerAvatarUrl: this.seller?.avatar || undefined,
     };
 
+    console.log('✅ Adding to cart:', cartProduct.sellerName, 'Stock:', availableStock);
     this.cartService.addProductToCart(cartProduct);
 
+    // Success toast
     this.snackBar.open(`${product.name} added to cart!`, '', {
       duration: 2000,
-      horizontalPosition: 'end',
+      horizontalPosition: 'center',
       verticalPosition: 'top',
       panelClass: ['custom-snackbar'],
     });
+  }
 
-    // setTimeout(() => this.router.navigate(['/shopping-cart']), 500);
+  isSeller(): boolean {
+    // Assuming AuthService is available for injection
+    return this.authService.isSeller();
   }
 
   isInCart(productId: string): boolean {

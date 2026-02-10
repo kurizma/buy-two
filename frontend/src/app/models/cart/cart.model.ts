@@ -4,6 +4,6 @@ export interface Cart {
   items: CartItem[];
   subtotal: number;
   tax?: number;
-  shipping?: number;
+  shippingCost?: number;
   total: number;
 }

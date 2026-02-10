@@ -27,6 +27,7 @@ public class Cart {
     
     private BigDecimal subtotal;
     private BigDecimal tax;
+    private BigDecimal shippingCost;
     private BigDecimal total;
     private LocalDateTime updatedAt;
 }

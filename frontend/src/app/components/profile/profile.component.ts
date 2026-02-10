@@ -13,7 +13,9 @@ import {
   AbstractControl,
 } from '@angular/forms';
 import { ProfileAnalyticsComponent } from '../profile-analytics/profile-analytics.component';
-import { AnalyticsItem } from '../../models/profile/analytics-item';
+import { AnalyticsService } from '../../services/analytics.service';
+import { AnalyticsResponse } from '../../models/analytics/analytics-response.model';
+import { AnalyticsItem } from '../../models/analytics/analytics.model';
 
 @Component({
   selector: 'app-profile',
@@ -24,9 +26,10 @@ import { AnalyticsItem } from '../../models/profile/analytics-item';
 })
 export class ProfileComponent implements OnInit {
   currentUser: UserResponse | null = null;
+
   get userRole(): 'client' | 'seller' | null {
     if (!this.currentUser?.role) return null;
-    return this.currentUser.role === 'CLIENT' ? 'client' : 'seller';
+    return this.currentUser.role.toUpperCase() === 'CLIENT' ? 'client' : 'seller';
   }
 
   profileForm: FormGroup;
@@ -43,44 +46,12 @@ export class ProfileComponent implements OnInit {
   userService = inject(UserService);
   mediaService = inject(MediaService);
   authService = inject(AuthService);
-
+  analyticsService = inject(AnalyticsService);
   fb = inject(FormBuilder);
 
-  // ************* Mock analytics data *****************
-  getAnalyticsItems(role: 'client' | 'seller'): AnalyticsItem[] {
-    if (!this.currentUser?.email) return [];
-
-    const key = `${role}-${this.currentUser.email}`;
-
-    switch (key) {
-      case 'client-dada@dee.com':
-        return [
-          { name: 'Code Wizard Tee', categories: 'CAT-001', count: 2, amount: 58 },
-          { name: 'Keep Coding Tee', categories: 'CAT-001', count: 1, amount: 28 },
-          { name: 'Action Noir Tee', categories: 'CAT-006', count: 1, amount: 45 },
-        ];
-
-      case 'client-john@doe.com':
-      case 'seller-angu@readme.md':
-        return [];
-
-      case 'seller-joon@kim.kr':
-        return [
-          { name: 'Code Wizard Tee', categories: 'CAT-001', count: 4, amount: 110 },
-          { name: 'Pop Code Queen Tee', categories: 'CAT-003', count: 2, amount: 150 },
-          { name: 'Classic Portrait Tee', categories: 'CAT-006', count: 10, amount: 450 },
-          { name: 'Why Dark Mode Tee', categories: 'CAT-005', count: 1, amount: 35 },
-        ];
-
-      default:
-        return [];
-    }
-  }
-
-  getTotalAmount(role: 'client' | 'seller'): number {
-    const items = this.getAnalyticsItems(role);
-    return items.reduce((sum, item) => sum + item.amount, 0);
-  }
+  analyticsData: AnalyticsResponse | null = null;
+  analyticsLoading = false;
+  analyticsError = '';
 
   constructor() {
     this.profileForm = this.fb.group({
@@ -103,20 +74,64 @@ export class ProfileComponent implements OnInit {
       { validator: this.passwordsMatch },
     );
   }
-
   ngOnInit() {
-    this.userService.getCurrentUser().subscribe((user) => {
-      if (user) {
-        this.currentUser = user;
-        this.profileForm.patchValue({ name: user.name, email: user.email });
-        this.profileForm.get('email')?.disable(); // Disable email field
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        console.log('✅ User loaded:', user.id, user.role);
 
-        this.avatar = user.avatar || null;
-        this.avatarPreview = this.avatar;
-        this.avatarMediaId = this.extractMediaId(user.avatar);
-      }
-      this.loaded = true; // render avatar only after this
+        if (user) {
+          this.currentUser = user;
+          this.profileForm.patchValue({ name: user.name, email: user.email });
+          this.profileForm.get('email')?.disable();
+          this.avatar = user.avatar || null;
+          this.avatarPreview = this.avatar;
+          this.avatarMediaId = this.extractMediaId(user.avatar);
+
+          // ✅ Calculate role directly
+          const role = user.role.toUpperCase() === 'CLIENT' ? 'client' : 'seller';
+          if (role && user.id) {
+            this.loadAnalytics(user.id, role); // Pass explicitly
+          } else {
+            console.error('⚠️ Skipping analytics: missing user id or role', {
+              role,
+              userId: user.id,
+            });
+          }
+        }
+        this.loaded = true;
+      },
+      error: (err) => {
+        console.error('❌ Failed to load current user:', err);
+        this.analyticsError = 'Failed to load user profile.';
+        this.loaded = true;
+      },
     });
+  }
+
+  private loadAnalytics(userId: string, role: 'client' | 'seller') {
+    console.log('🚀 loadAnalytics:', userId, role);
+    this.analyticsLoading = true;
+    const analytics$ =
+      role === 'client'
+        ? this.analyticsService.getClientAnalytics(userId)
+        : this.analyticsService.getSellerAnalytics(userId);
+
+    analytics$.subscribe({
+      next: (data) => {
+        console.log('📊 Analytics loaded:', data);
+        this.analyticsData = data;
+        this.analyticsLoading = false;
+      },
+      error: (err) => {
+        console.error('❌ Analytics error:', err);
+        this.analyticsError = err.message;
+        this.analyticsLoading = false;
+      },
+    });
+  }
+
+  get transformedAnalyticsItems(): AnalyticsItem[] {
+    return this.analyticsData?.items || [];
   }
 
   onAvatarSelect(event: any): void {

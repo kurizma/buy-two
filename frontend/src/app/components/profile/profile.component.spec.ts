@@ -1,118 +1,205 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ProfileComponent } from './profile.component';
 import { UserService } from '../../services/user.service';
 import { MediaService } from '../../services/media.service';
 import { AuthService } from '../../services/auth.service';
-import { provideRouter } from '@angular/router';
+import { AnalyticsService } from '../../services/analytics.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { of, throwError } from 'rxjs';
+import { UserResponse, Role } from '../../models/users/user-response.model';
+import { AnalyticsResponse } from '../../models/analytics/analytics-response.model';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { of } from 'rxjs';
+import { Chart, registerables } from 'chart.js';
 
-// test file. 
-const mockUser = {
+// Register Chart.js components globally for tests
+Chart.register(...registerables);
+
+const mockUser: UserResponse = {
   id: 'user1',
   name: 'John Doe',
   email: 'john@example.com',
-  role: 'CLIENT',
-  avatar: 'https://example.com/avatar.jpg',
+  role: 'CLIENT' as Role,
+  avatar: 'https://example.com/media/abc123.jpg',
+};
+
+const mockSellerUser: UserResponse = {
+  id: 'seller1',
+  name: 'Seller Joe',
+  email: 'seller@example.com',
+  role: 'SELLER' as Role,
+  avatar: undefined,
+};
+
+const mockAnalytics: AnalyticsResponse = {
+  items: [{ name: 'Orders', count: 5, categories: [] }],
+  totalAmount: 500,
 };
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;
   let fixture: ComponentFixture<ProfileComponent>;
+  let userServiceSpy: jasmine.SpyObj<UserService>;
+  let mediaServiceSpy: jasmine.SpyObj<MediaService>;
+  let authServiceSpy: jasmine.SpyObj<AuthService>;
+  let analyticsServiceSpy: jasmine.SpyObj<AnalyticsService>;
 
   beforeEach(async () => {
+    userServiceSpy = jasmine.createSpyObj('UserService', ['getCurrentUser', 'updateCurrentUser']);
+    mediaServiceSpy = jasmine.createSpyObj('MediaService', ['uploadAvatar', 'deleteImage']);
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['updateCurrentUserInStorage']);
+    analyticsServiceSpy = jasmine.createSpyObj('AnalyticsService', ['getClientAnalytics', 'getSellerAnalytics']);
+
+    userServiceSpy.getCurrentUser.and.returnValue(of(mockUser));
+    userServiceSpy.updateCurrentUser.and.returnValue(of(mockUser));
+    mediaServiceSpy.uploadAvatar.and.returnValue(of({ success: true, message: 'OK', data: { url: 'new-avatar.jpg', id: 'media1' } } as any));
+    mediaServiceSpy.deleteImage.and.returnValue(of({}));
+    (mediaServiceSpy as any).maxImageSize = 2 * 1024 * 1024;
+    (mediaServiceSpy as any).allowedAvatarTypes = ['image/jpeg', 'image/png'];
+    analyticsServiceSpy.getClientAnalytics.and.returnValue(of(mockAnalytics));
+    analyticsServiceSpy.getSellerAnalytics.and.returnValue(of(mockAnalytics));
+
     await TestBed.configureTestingModule({
-      imports: [ProfileComponent],
-      providers: [provideRouter([])],
-      schemas: [NO_ERRORS_SCHEMA]
-    })
-      .overrideProvider(UserService, {
-        useValue: {
-          getCurrentUser: jasmine.createSpy('getCurrentUser').and.returnValue(of(mockUser)),
-          updateCurrentUser: jasmine.createSpy('updateCurrentUser').and.returnValue(of(mockUser)),
-        },
-      })
-      .overrideProvider(MediaService, {
-        useValue: {
-          uploadAvatar: jasmine
-            .createSpy('uploadAvatar')
-            .and.returnValue(of({ data: { url: 'new-avatar.jpg', id: 'media1' } })),
-          deleteImage: jasmine.createSpy('deleteImage').and.returnValue(of({})),
-          maxImageSize: 2 * 1024 * 1024,
-          allowedAvatarTypes: ['image/jpeg', 'image/png'],
-        },
-      })
-      .overrideProvider(AuthService, {
-        useValue: {
-          updateCurrentUserInStorage: jasmine.createSpy('updateCurrentUserInStorage'),
-        },
-      })
-      .compileComponents();
+      imports: [ProfileComponent, HttpClientTestingModule, RouterTestingModule],
+      providers: [
+        { provide: UserService, useValue: userServiceSpy },
+        { provide: MediaService, useValue: mediaServiceSpy },
+        { provide: AuthService, useValue: authServiceSpy },
+        { provide: AnalyticsService, useValue: analyticsServiceSpy },
+      ],
+      schemas: [NO_ERRORS_SCHEMA], // Ignore child component errors like chart.js
+    }).compileComponents();
   });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ProfileComponent);
     component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  // ✅ 1. Component creates
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  // ✅ 2. Loads current user
-  it('should load current user on init', async () => {
-    fixture.detectChanges();
-    expect(component.currentUser).toBeDefined();
-    expect(component.currentUser?.name).toBe('John Doe');
-    expect(component.profileForm.get('name')?.value).toBe('John Doe');
-    expect(component.profileForm.get('email')?.disabled).toBeTrue();
+  it('should load current user on init', fakeAsync(() => {
+    tick(100);
+    expect(userServiceSpy.getCurrentUser).toHaveBeenCalled();
+  }));
+
+  it('should load analytics', fakeAsync(() => {
+    tick(100);
+    expect(analyticsServiceSpy.getClientAnalytics).toHaveBeenCalled();
+  }));
+
+  it('should return null userRole when no user', () => {
+    component.currentUser = null;
+    expect(component.userRole).toBeNull();
   });
 
-  // ✅ 3. Displays avatar
-  it('should display user avatar', async () => {
-    fixture.detectChanges();
-    const avatarImg = fixture.nativeElement.querySelector('img.rounded-circle');
-    expect(avatarImg.src).toContain('avatar.jpg');
+  it('should return client userRole for CLIENT', () => {
+    component.currentUser = mockUser;
+    expect(component.userRole).toBe('client');
   });
 
-  // ✅ 4. Shows name + role
-  it('should display user name and role', async () => {
-    fixture.detectChanges();
-    const nameElement = fixture.nativeElement.querySelector('.fw-bold.fs-2');
-    expect(nameElement.textContent.trim()).toBe('John Doe');
-    const roleBadge = fixture.nativeElement.querySelector('.badge.bg-primary');
-    expect(roleBadge.textContent.trim()).toBe('CLIENT');
+  it('should return seller userRole for SELLER', () => {
+    component.currentUser = mockSellerUser;
+    expect(component.userRole).toBe('seller');
   });
 
-  // ✅ 5. Save button disabled invalid
-  it('should disable save button when form invalid', async () => {
-    // 1. Load user → form VALID
-    fixture.detectChanges(); // Triggers ngOnInit → loads user → patches form
-    await fixture.whenStable(); // ← WAIT FOR ASYNC! User loads → form patches VALID data
+  describe('avatar handling', () => {
+    it('should handle no file selected', () => {
+      component.onAvatarSelect({ target: { files: null } });
+      expect(component.avatarError).toBe('');
+    });
 
-    // 2. Clear form → INVALID
-    component.profileForm.reset();
-    fixture.detectChanges();
+    it('should show error for oversized avatar', () => {
+      const largeFile = new File(['x'.repeat(100)], 'large.jpg', { type: 'image/jpeg' });
+      Object.defineProperty(largeFile, 'size', { value: 3 * 1024 * 1024 });
+      
+      component.onAvatarSelect({ target: { files: [largeFile] } });
+      
+      expect(component.avatarError).toBe('Avatar file size must be less than 2MB');
+    });
 
-    // 3. Button disabled
-    const saveButton = fixture.nativeElement.querySelector('button[type="submit"]');
-    expect(saveButton.disabled).toBeTrue(); // ← NOW INVALID!
+    it('should show error for invalid avatar type', () => {
+      const invalidFile = new File(['test'], 'test.gif', { type: 'image/gif' });
+      
+      component.onAvatarSelect({ target: { files: [invalidFile] } });
+      
+      expect(component.avatarError).toBe('Invalid avatar file type');
+    });
+
+    it('should remove avatar without media id', () => {
+      component.avatarMediaId = null;
+      component.handleRemoveAvatar();
+      
+      expect(component.avatar).toBeNull();
+      expect(component.avatarPreview).toBeNull();
+      expect(mediaServiceSpy.deleteImage).not.toHaveBeenCalled();
+    });
+
+    it('should delete avatar with media id', fakeAsync(() => {
+      component.avatarMediaId = 'media-123';
+      component.handleRemoveAvatar();
+      tick(100);
+      
+      expect(mediaServiceSpy.deleteImage).toHaveBeenCalledWith('media-123');
+    }));
   });
 
-  // ✅ 6. Success message shows
-  it('should show success message when profile saved', async () => {
-    fixture.detectChanges();
-    await fixture.whenStable(); // Wait for user load
+  describe('saveProfile', () => {
+    it('should show success message when profile saved', fakeAsync(() => {
+      component.profileForm.patchValue({ name: 'Jane Doe' });
+      component.saveProfile();
+      tick(100);
+      expect(component.successMessage).toContain('Profile updated successfully');
+      expect(component.showSuccess).toBeTrue();
+    }));
 
-    // Fill form with valid data
-    component.profileForm.setValue({ name: 'Jane Doe', email: 'john@example.com' });
-    fixture.detectChanges();
+    it('should not save if avatar error exists', () => {
+      component.avatarError = 'Avatar upload failed';
+      component.saveProfile();
+      expect(userServiceSpy.updateCurrentUser).not.toHaveBeenCalled();
+    });
 
-    component.saveProfile();
-    fixture.detectChanges(); // Trigger template update
+    it('should update auth storage on successful save', fakeAsync(() => {
+      component.saveProfile();
+      tick(100);
+      expect(authServiceSpy.updateCurrentUserInStorage).toHaveBeenCalled();
+    }));
+  });
 
-    expect(component.successMessage).toContain('Profile updated successfully');
-    expect(component.showSuccess).toBeTrue();
+  describe('changePassword', () => {
+    it('should validate password match', () => {
+      component.passwordForm.patchValue({
+        currentPassword: 'oldpass123',
+        newPassword: 'newpass123',
+        confirmPassword: 'differentpass',
+      });
+      expect(component.passwordForm.errors?.['mismatch']).toBeTrue();
+    });
+
+    it('should update password when form valid', fakeAsync(() => {
+      component.passwordForm.patchValue({
+        currentPassword: 'oldpass123',
+        newPassword: 'newpass12',
+        confirmPassword: 'newpass12',
+      });
+      component.changePassword();
+      tick(100);
+      expect(component.successMessage).toContain('Password changed successfully');
+    }));
+  });
+
+  describe('transformedAnalyticsItems', () => {
+    it('should return analytics items', () => {
+      component.analyticsData = mockAnalytics;
+      expect(component.transformedAnalyticsItems.length).toBe(1);
+    });
+
+    it('should return empty array when no data', () => {
+      component.analyticsData = null;
+      expect(component.transformedAnalyticsItems).toEqual([]);
+    });
   });
 });

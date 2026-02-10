@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { CanActivate, Router} from '@angular/router';
+import { CanActivate, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({
@@ -12,6 +12,7 @@ export class ClientOnlyGuard implements CanActivate {
   constructor() {}
 
   canActivate(): boolean {
+    // Check auth + role
     if (this.authService.isClient()) {
       return true;
     }

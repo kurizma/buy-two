@@ -65,17 +65,19 @@
             <thead class ="table-head">
                 <tr>
                 <th>Product</th>
-                <th>Categories</th>
+                <th>Category</th>
                 <th>{{ role === 'client' ? 'Bought(qty)' : 'Sold(qty)' }}</th>
                 <th>Amount</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let item of items">
+                <tr *ngFor="let item of items;">
                 <td>{{ item.name }}</td>
-                <td>{{ getCategorySlug(item.categories) }}</td>
-                <td>{{ item.count }}</td>
-                <td>{{ item.amount | currency:'EUR' }}</td>
+                <td class="custom-cell">
+                    {{ item.categories[0] || 'N/A' }}
+                </td>
+                <td class="custom-cell">{{ item.count }}</td>
+                <td class="custom-cell">{{ item.amount | currency:'EUR' }}</td>
                 </tr>
             </tbody>
             </table>

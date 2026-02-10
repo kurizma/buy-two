@@ -179,10 +179,12 @@
       <div class="row mt-4">
         <div class="col-12">
           <app-profile-analytics
-            *ngIf="userRole"
-            [role]="userRole"
-            [items]="getAnalyticsItems(userRole)"
-            [totalAmount]="getTotalAmount(userRole)">
+            [role]="userRole!"
+            [totalAmount]="analyticsData?.totalAmount || 0"
+            [items]="transformedAnalyticsItems"
+            [categories]="analyticsData?.categories || []"
+            [categoryAmounts]="analyticsData?.categoryAmounts || []"
+          >
           </app-profile-analytics>
         </div>
       </div>
