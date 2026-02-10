@@ -324,7 +324,7 @@ pipeline {
 								string(credentialsId: 'r2-secret-key', variable: 'R2_SECRET_KEY')
 							]) {
 								sh '''
-									cat > .env << EOF
+cat > .env << EOF
 ATLAS_URI=${ATLAS_URI}
 SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_SECRET=${JWT_SECRET}
 KEY_STORE_PASSWORD=${KEYSTORE_PASSWORD}
@@ -352,14 +352,14 @@ EOF
 									sh 'docker compose build frontend || exit 1'
 									sh 'docker compose build --pull --parallel --progress=plain'
 									sh '''
-                                        docker tag frontend:${VERSION} frontend:${STABLE_TAG} frontend:build-${BUILD_NUMBER} || true
-                                        docker tag discovery-service:${VERSION} discovery-service:${STABLE_TAG} discovery-service:build-${BUILD_NUMBER} || true
-                                        docker tag gateway-service:${VERSION} gateway-service:${STABLE_TAG} gateway-service:build-${BUILD_NUMBER} || true
-                                        docker tag user-service:${VERSION} user-service:${STABLE_TAG} user-service:build-${BUILD_NUMBER} || true
-                                        docker tag product-service:${VERSION} product-service:${STABLE_TAG} product-service:build-${BUILD_NUMBER} || true
-                                        docker tag order-service:${VERSION} order-service:${STABLE_TAG} order-service:build-${BUILD_NUMBER} || true
-                                        docker tag media-service:${VERSION} media-service:${STABLE_TAG} media-service:build-${BUILD_NUMBER} || true
-                                    '''
+docker tag frontend:${VERSION} frontend:${STABLE_TAG} frontend:build-${BUILD_NUMBER} || true
+docker tag discovery-service:${VERSION} discovery-service:${STABLE_TAG} discovery-service:build-${BUILD_NUMBER} || true
+docker tag gateway-service:${VERSION} gateway-service:${STABLE_TAG} gateway-service:build-${BUILD_NUMBER} || true
+docker tag user-service:${VERSION} user-service:${STABLE_TAG} user-service:build-${BUILD_NUMBER} || true
+docker tag product-service:${VERSION} product-service:${STABLE_TAG} product-service:build-${BUILD_NUMBER} || true
+docker tag order-service:${VERSION} order-service:${STABLE_TAG} order-service:build-${BUILD_NUMBER} || true
+docker tag media-service:${VERSION} media-service:${STABLE_TAG} media-service:build-${BUILD_NUMBER} || true
+									'''
 
 									// Deploy new version for verification
 									sh 'docker compose up -d'
@@ -367,11 +367,10 @@ EOF
 
 									// Strong health check
 									sh '''
-                                        timeout 30 bash -c "until docker compose ps | grep -q Up && curl -f http://localhost:4200 || curl -f http://localhost:8080/health; do sleep 2; done" || exit 1
-                                        if docker compose ps | grep -q "Exit"; then exit 1; fi
-                                    '''
+timeout 30 bash -c "until docker compose ps | grep -q Up && curl -f http://localhost:4200 || curl -f http://localhost:8080/health; do sleep 2; done" || exit 1
+if docker compose ps | grep -q "Exit"; then exit 1; fi
+									'''
 								}
-								echo "✅ New deploy verified - promoted build-${BUILD_NUMBER} to stable"
 								echo "✅ New deploy verified - promoted build-${BUILD_NUMBER} to stable"
 								currentBuild.result = 'SUCCESS'
 
@@ -382,20 +381,20 @@ EOF
 
 								withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
 									sh """
-                                    curl -sS -X POST -H 'Content-type: application/json' \\
-                                        --data '{\"text\":\"🚨 Rollback #${BUILD_NUMBER} → ${stableTag}\"}' \$SLACK_WEBHOOK
-                                """
+curl -sS -X POST -H 'Content-type: application/json' \\
+--data '{\\"text\\":\\"🚨 Rollback #${BUILD_NUMBER} → ${stableTag}\\"}' \\\$SLACK_WEBHOOK
+									"""
 								}
 
 								// Rollback: Always deploy known stable
 								sh """
-                                STABLE_TAG=\${STABLE_TAG:-latest}
-                                docker compose down || true
-                                IMAGE_TAG=\$STABLE_TAG docker compose up -d --pull never
-                                sleep 10
-                                docker compose ps  # Verify
-                                echo "✅ Rolled back to ${stableTag}"
-                            """
+STABLE_TAG=\\\${STABLE_TAG:-latest}
+docker compose down || true
+IMAGE_TAG=\\\$STABLE_TAG docker compose up -d --pull never
+sleep 10
+docker compose ps # Verify
+echo "✅ Rolled back to ${stableTag}"
+								"""
 								currentBuild.result = 'UNSTABLE'
 								throw e
 							}
