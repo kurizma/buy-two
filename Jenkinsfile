@@ -306,7 +306,9 @@ pipeline {
 
 		stage('Deploy & Verify') {
 			when {
-				branch 'main'
+				expression {
+					env.GIT_BRANCH ==~ /.*\/${BRANCH}/ || env.GIT_BRANCH == BRANCH
+				}
 			}
 			steps {
 				timeout(time: 15, unit: 'MINUTES') {
