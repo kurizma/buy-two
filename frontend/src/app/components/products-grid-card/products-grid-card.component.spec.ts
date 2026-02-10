@@ -28,12 +28,13 @@ describe('ProductGridCardComponent', () => {
   };
 
   beforeEach(async () => {
-    cartServiceSpy = jasmine.createSpyObj('CartService', ['getProductQuantity', 'addProductToCart']);
+    cartServiceSpy = jasmine.createSpyObj('CartService', ['getProductQuantity', 'addProductToCart', 'isInCart']);
     authServiceSpy = jasmine.createSpyObj('AuthService', ['isAuthenticated', 'isSeller']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['open']);
 
     cartServiceSpy.getProductQuantity.and.returnValue(0);
+    cartServiceSpy.isInCart.and.returnValue(false);
 
     await TestBed.configureTestingModule({
       imports: [ProductGridCardComponent, NoopAnimationsModule, HttpClientTestingModule],

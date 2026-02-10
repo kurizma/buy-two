@@ -2,6 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ProfileAnalyticsComponent } from './profile-analytics.component';
 import { AnalyticsItem } from '../../models/analytics/analytics.model';
+import { Chart, registerables } from 'chart.js';
+
+// Register Chart.js components globally for tests
+Chart.register(...registerables);
 
 describe('ProfileAnalyticsComponent', () => {
   let component: ProfileAnalyticsComponent;

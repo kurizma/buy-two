@@ -1,806 +1,458 @@
 <?xml version="1.0"?>
-<testsuite name="Chrome Headless 144.0.0.0 (Mac OS 10.15.7)" package="" timestamp="2026-02-10T01:17:43" id="0" hostname="chan.myint" tests="223" errors="0" failures="46" time="0.616">
+<testsuite name="Chrome Headless 144.0.0.0 (Mac OS 10.15.7)" package="" timestamp="2026-02-10T02:32:42" id="0" hostname="chan.myint" tests="434" errors="0" failures="0" time="1.257">
   <properties>
     <property name="browser.fullName" value="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/144.0.0.0 Safari/537.36"/>
   </properties>
-  <testcase name="ProductListingComponent should load products and categories" time="0.031" classname="ProductListingComponent"/>
-  <testcase name="ProductListingComponent should filter products by search" time="0.012" classname="ProductListingComponent"/>
-  <testcase name="ProductListingComponent should filter by category" time="0.003" classname="ProductListingComponent"/>
+  <testcase name="SignUpComponent UI elements should enable submit button when form valid" time="0.063" classname="SignUpComponent UI elements"/>
+  <testcase name="SignUpComponent UI elements should disable submit button when form invalid" time="0.008" classname="SignUpComponent UI elements"/>
+  <testcase name="SignUpComponent UI elements should show error message when present" time="0.008" classname="SignUpComponent UI elements"/>
+  <testcase name="SignUpComponent UI elements should display default avatar" time="0.006" classname="SignUpComponent UI elements"/>
+  <testcase name="SignUpComponent matchPasswords static method should return error object when passwords do not match" time="0.008" classname="SignUpComponent matchPasswords static method"/>
+  <testcase name="SignUpComponent matchPasswords static method should return null when passwords match" time="0.006" classname="SignUpComponent matchPasswords static method"/>
+  <testcase name="SignUpComponent submit should clear error message before submission" time="0.011" classname="SignUpComponent submit"/>
+  <testcase name="SignUpComponent submit should show generic error on other errors" time="0.006" classname="SignUpComponent submit"/>
+  <testcase name="SignUpComponent submit should navigate to signin on successful signup" time="0.007" classname="SignUpComponent submit"/>
+  <testcase name="SignUpComponent submit should set isLoading to true during submission" time="0.007" classname="SignUpComponent submit"/>
+  <testcase name="SignUpComponent submit should not submit when form is invalid" time="0.005" classname="SignUpComponent submit"/>
+  <testcase name="SignUpComponent submit should show email taken error on 409 status" time="0.006" classname="SignUpComponent submit"/>
+  <testcase name="SignUpComponent submit should call authService.signup with transformed payload" time="0.005" classname="SignUpComponent submit"/>
+  <testcase name="SignUpComponent submit should transform seller role to uppercase" time="0.005" classname="SignUpComponent submit"/>
+  <testcase name="SignUpComponent form initialization should have default avatar" time="0.005" classname="SignUpComponent form initialization"/>
+  <testcase name="SignUpComponent form initialization should have default role as client" time="0.004" classname="SignUpComponent form initialization"/>
+  <testcase name="SignUpComponent form initialization should start with empty error message" time="0.004" classname="SignUpComponent form initialization"/>
+  <testcase name="SignUpComponent form initialization should start with isLoading as false" time="0.005" classname="SignUpComponent form initialization"/>
+  <testcase name="SignUpComponent form initialization should have form with all required fields" time="0.004" classname="SignUpComponent form initialization"/>
+  <testcase name="SignUpComponent should create" time="0.005" classname="SignUpComponent"/>
+  <testcase name="SignUpComponent form validation should require name to be at least 2 characters" time="0.005" classname="SignUpComponent form validation"/>
+  <testcase name="SignUpComponent form validation should require valid email" time="0.004" classname="SignUpComponent form validation"/>
+  <testcase name="SignUpComponent form validation should require password to be at least 8 characters" time="0.004" classname="SignUpComponent form validation"/>
+  <testcase name="SignUpComponent form validation should require password pattern (lowercase and digit)" time="0.005" classname="SignUpComponent form validation"/>
+  <testcase name="SignUpComponent form validation should be invalid when empty" time="0.005" classname="SignUpComponent form validation"/>
+  <testcase name="SignUpComponent form validation should require password" time="0.004" classname="SignUpComponent form validation"/>
+  <testcase name="SignUpComponent form validation should require name" time="0.004" classname="SignUpComponent form validation"/>
+  <testcase name="SignUpComponent form validation should accept valid password" time="0.005" classname="SignUpComponent form validation"/>
+  <testcase name="SignUpComponent form validation should validate matching passwords" time="0.005" classname="SignUpComponent form validation"/>
+  <testcase name="SignUpComponent form validation should be valid when passwords match" time="0.01" classname="SignUpComponent form validation"/>
+  <testcase name="ProductListingComponent should filter by category" time="0.02" classname="ProductListingComponent"/>
+  <testcase name="ProductListingComponent should load products and categories" time="0.003" classname="ProductListingComponent"/>
   <testcase name="ProductListingComponent should sort by price low to high" time="0.002" classname="ProductListingComponent"/>
-  <testcase name="ProductListingComponent should create" time="0.001" classname="ProductListingComponent"/>
+  <testcase name="ProductListingComponent should filter products by search" time="0.005" classname="ProductListingComponent"/>
   <testcase name="ProductListingComponent should show loading state initially" time="0.001" classname="ProductListingComponent"/>
-  <testcase name="EmptyCartGuard canActivate should deny access and redirect when cart is empty" time="0.001" classname="EmptyCartGuard canActivate"/>
-  <testcase name="EmptyCartGuard canActivate should redirect to product listing when empty" time="0" classname="EmptyCartGuard canActivate"/>
-  <testcase name="EmptyCartGuard canActivate should allow checkout with single item" time="0.001" classname="EmptyCartGuard canActivate"/>
-  <testcase name="EmptyCartGuard canActivate should allow access when cart has items" time="0" classname="EmptyCartGuard canActivate"/>
-  <testcase name="EmptyCartGuard should be created" time="0" classname="EmptyCartGuard"/>
-  <testcase name="ProductCardComponent should display product price" time="0.006" classname="ProductCardComponent"/>
-  <testcase name="ProductCardComponent should display product image" time="0.001" classname="ProductCardComponent"/>
-  <testcase name="ProductCardComponent should create" time="0.001" classname="ProductCardComponent"/>
-  <testcase name="ProductCardComponent should display product name" time="0.001" classname="ProductCardComponent"/>
-  <testcase name="CategoryService getCategories should populate categoryMap" time="0.001" classname="CategoryService getCategories"/>
-  <testcase name="CategoryService getCategories should fetch all categories" time="0" classname="CategoryService getCategories"/>
-  <testcase name="CategoryService getCategories should update categories subject" time="0" classname="CategoryService getCategories"/>
-  <testcase name="CategoryService getCategoryById should fetch a single category" time="0.001" classname="CategoryService getCategoryById"/>
-  <testcase name="CategoryService getCategorySlug should fallback to id when not found" time="0" classname="CategoryService getCategorySlug"/>
-  <testcase name="CategoryService getCategorySlug should fallback to subject value" time="0" classname="CategoryService getCategorySlug"/>
-  <testcase name="CategoryService getCategorySlug should return slug from map" time="0.001" classname="CategoryService getCategorySlug"/>
-  <testcase name="CategoryService loadCategories should not reload when categories already loaded" time="0" classname="CategoryService loadCategories"/>
-  <testcase name="CategoryService loadCategories should load categories when map is empty" time="0.001" classname="CategoryService loadCategories"/>
-  <testcase name="CategoryService should be created" time="0" classname="CategoryService"/>
-  <testcase name="OrderDetailComponent getStatusClass should return correct class for PENDING" time="0.008" classname="OrderDetailComponent getStatusClass"/>
-  <testcase name="OrderDetailComponent getStatusClass should return correct class for SHIPPED" time="0.001" classname="OrderDetailComponent getStatusClass"/>
-  <testcase name="OrderDetailComponent getStatusClass should return correct class for DELIVERED" time="0" classname="OrderDetailComponent getStatusClass"/>
-  <testcase name="OrderDetailComponent getStatusClass should return correct class for CONFIRMED" time="0.001" classname="OrderDetailComponent getStatusClass"/>
-  <testcase name="OrderDetailComponent getStatusClass should return correct class for CANCELLED" time="0.001" classname="OrderDetailComponent getStatusClass"/>
-  <testcase name="OrderDetailComponent without order number should show error when no order number" time="0.002" classname="OrderDetailComponent without order number"/>
-  <testcase name="OrderDetailComponent with valid order number should handle order load error" time="0.001" classname="OrderDetailComponent with valid order number"/>
-  <testcase name="OrderDetailComponent with valid order number should load order on init" time="0.004" classname="OrderDetailComponent with valid order number"/>
-  <testcase name="OrderDetailComponent with valid order number should load seller names for order items" time="0.002" classname="OrderDetailComponent with valid order number"/>
-  <testcase name="OrderDetailComponent with valid order number should create" time="0" classname="OrderDetailComponent with valid order number"/>
-  <testcase name="HomeComponent ngOnInit should load products on init" time="0.008" classname="HomeComponent ngOnInit">
-    <failure type="">Expected undefined to be 'img1.jpg'.
-    at &lt;Jasmine&gt;
-    at UserContext.&lt;anonymous&gt; (src/app/components/home/home.component.spec.ts:81:49)
-    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
-    at _ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
-    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
-</failure>
-  </testcase>
-  <testcase name="HomeComponent ngOnInit should load sellers on init" time="0.002" classname="HomeComponent ngOnInit"/>
-  <testcase name="HomeComponent ngOnInit should load categories on init" time="0.002" classname="HomeComponent ngOnInit"/>
-  <testcase name="HomeComponent seller avatar fallback should use default avatar when seller has none" time="0.001" classname="HomeComponent seller avatar fallback"/>
-  <testcase name="HomeComponent onCategoryClick should navigate to category page" time="0.001" classname="HomeComponent onCategoryClick"/>
-  <testcase name="HomeComponent error handling should handle sellers load error" time="0.002" classname="HomeComponent error handling"/>
-  <testcase name="HomeComponent error handling should handle category load error" time="0.001" classname="HomeComponent error handling"/>
-  <testcase name="HomeComponent error handling should handle products load error" time="0.001" classname="HomeComponent error handling"/>
-  <testcase name="HomeComponent should create" time="0" classname="HomeComponent"/>
-  <testcase name="ProductGridCardComponent onView should emit view event with product id" time="0.135" classname="ProductGridCardComponent onView">
-    <failure type="">TypeError: this.cartService.isInCart is not a function
-    at ProductGridCardComponent2.isInCart (src/app/components/products-grid-card/products-grid-card.component.ts:94:29)
-    at ProductGridCardComponent2_Template (ng:///ProductGridCardComponent2.js:114:48)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-</failure>
-  </testcase>
-  <testcase name="ProductGridCardComponent input properties should accept seller input" time="0.002" classname="ProductGridCardComponent input properties">
-    <failure type="">TypeError: this.cartService.isInCart is not a function
-    at ProductGridCardComponent2.isInCart (src/app/components/products-grid-card/products-grid-card.component.ts:94:29)
-    at ProductGridCardComponent2_Template (ng:///ProductGridCardComponent2.js:114:48)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-</failure>
-  </testcase>
-  <testcase name="ProductGridCardComponent input properties should have default showSeller as true" time="0.001" classname="ProductGridCardComponent input properties">
-    <failure type="">TypeError: this.cartService.isInCart is not a function
-    at ProductGridCardComponent2.isInCart (src/app/components/products-grid-card/products-grid-card.component.ts:94:29)
-    at ProductGridCardComponent2_Template (ng:///ProductGridCardComponent2.js:114:48)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-</failure>
-  </testcase>
-  <testcase name="ProductGridCardComponent input properties should accept product input" time="0" classname="ProductGridCardComponent input properties">
-    <failure type="">TypeError: this.cartService.isInCart is not a function
-    at ProductGridCardComponent2.isInCart (src/app/components/products-grid-card/products-grid-card.component.ts:94:29)
-    at ProductGridCardComponent2_Template (ng:///ProductGridCardComponent2.js:114:48)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-</failure>
-  </testcase>
-  <testcase name="ProductGridCardComponent input properties should have default showCategory as true" time="0.001" classname="ProductGridCardComponent input properties">
-    <failure type="">TypeError: this.cartService.isInCart is not a function
-    at ProductGridCardComponent2.isInCart (src/app/components/products-grid-card/products-grid-card.component.ts:94:29)
-    at ProductGridCardComponent2_Template (ng:///ProductGridCardComponent2.js:114:48)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-</failure>
-  </testcase>
-  <testcase name="ProductGridCardComponent input properties should accept categoryName input" time="0.001" classname="ProductGridCardComponent input properties">
-    <failure type="">TypeError: this.cartService.isInCart is not a function
-    at ProductGridCardComponent2.isInCart (src/app/components/products-grid-card/products-grid-card.component.ts:94:29)
-    at ProductGridCardComponent2_Template (ng:///ProductGridCardComponent2.js:114:48)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-</failure>
-  </testcase>
-  <testcase name="ProductGridCardComponent addToCart should show out of stock message when quantity is 0" time="0.001" classname="ProductGridCardComponent addToCart">
-    <failure type="">TypeError: this.cartService.isInCart is not a function
-    at ProductGridCardComponent2.isInCart (src/app/components/products-grid-card/products-grid-card.component.ts:94:29)
-    at ProductGridCardComponent2_Template (ng:///ProductGridCardComponent2.js:114:48)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-</failure>
-  </testcase>
-  <testcase name="ProductGridCardComponent addToCart should show stock limit message when exceeding available stock" time="0.001" classname="ProductGridCardComponent addToCart">
-    <failure type="">TypeError: this.cartService.isInCart is not a function
-    at ProductGridCardComponent2.isInCart (src/app/components/products-grid-card/products-grid-card.component.ts:94:29)
-    at ProductGridCardComponent2_Template (ng:///ProductGridCardComponent2.js:114:48)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-</failure>
-  </testcase>
-  <testcase name="ProductGridCardComponent should create" time="0" classname="ProductGridCardComponent">
-    <failure type="">TypeError: this.cartService.isInCart is not a function
-    at ProductGridCardComponent2.isInCart (src/app/components/products-grid-card/products-grid-card.component.ts:94:29)
-    at ProductGridCardComponent2_Template (ng:///ProductGridCardComponent2.js:114:48)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-</failure>
-  </testcase>
-  <testcase name="SignUpComponent should create" time="0.025" classname="SignUpComponent"/>
-  <testcase name="SignUpComponent should disable submit button when form invalid" time="0.012" classname="SignUpComponent"/>
-  <testcase name="SignUpComponent should enable submit button and show spinner when loading" time="0.008" classname="SignUpComponent"/>
-  <testcase name="SignUpComponent should display default avatar" time="0.006" classname="SignUpComponent"/>
-  <testcase name="SignUpComponent should show error message when present" time="0.006" classname="SignUpComponent"/>
-  <testcase name="SellerDashboardComponent should show Add New Product button" time="0.011" classname="SellerDashboardComponent"/>
-  <testcase name="SellerDashboardComponent should display seller products list" time="0.001" classname="SellerDashboardComponent"/>
-  <testcase name="SellerDashboardComponent should show empty state when no products" time="0.001" classname="SellerDashboardComponent"/>
-  <testcase name="SellerDashboardComponent should display seller name" time="0.001" classname="SellerDashboardComponent"/>
-  <testcase name="SellerDashboardComponent should create" time="0.001" classname="SellerDashboardComponent"/>
-  <testcase name="ProfileAnalyticsComponent empty data should handle empty items" time="0.004" classname="ProfileAnalyticsComponent empty data"/>
-  <testcase name="ProfileAnalyticsComponent seller role should set up chart data for seller" time="0.001" classname="ProfileAnalyticsComponent seller role"/>
-  <testcase name="ProfileAnalyticsComponent client role should set up chart data for client" time="0" classname="ProfileAnalyticsComponent client role"/>
-  <testcase name="ProfileAnalyticsComponent client role should use client colors" time="0.001" classname="ProfileAnalyticsComponent client role"/>
-  <testcase name="ProfileAnalyticsComponent should create" time="0" classname="ProfileAnalyticsComponent"/>
-  <testcase name="CartComponent should create" time="0.009" classname="CartComponent"/>
-  <testcase name="CartComponent ngOnInit should load cart on init" time="0.002" classname="CartComponent ngOnInit">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CartComponent ngOnInit should subscribe to cart items" time="0.002" classname="CartComponent ngOnInit">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CartComponent ngOnInit should load categories on init" time="0.001" classname="CartComponent ngOnInit">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CartComponent clearCart should call cart service clearCart" time="0.001" classname="CartComponent clearCart">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CartComponent ngOnDestroy should unsubscribe on destroy" time="0" classname="CartComponent ngOnDestroy">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CartComponent cart items updates should handle empty cart" time="0.001" classname="CartComponent cart items updates">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CartComponent cart items updates should update items when cart changes" time="0" classname="CartComponent cart items updates">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CartComponent getCategorySlug should return category slug" time="0" classname="CartComponent getCategorySlug">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CartComponent updateQuantity should call cart service updateQuantity" time="0" classname="CartComponent updateQuantity">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CartComponent increaseQuantity should do nothing for non-existent product" time="0" classname="CartComponent increaseQuantity">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CartComponent increaseQuantity should increase quantity by 1" time="0.001" classname="CartComponent increaseQuantity">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CartComponent decreaseQuantity should decrease quantity by 1" time="0.001" classname="CartComponent decreaseQuantity">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CartComponent decreaseQuantity should do nothing for non-existent product" time="0.001" classname="CartComponent decreaseQuantity">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CartComponent removeItem should call cart service removeItem" time="0.001" classname="CartComponent removeItem">
-    <failure type="">TypeError: ctx.cartService.getVatAmount is not a function
-    at CartComponent2_Template (ng:///CartComponent2.js:268:75)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="AboutComponent shopNow should navigate to product-listing" time="0.003" classname="AboutComponent shopNow"/>
-  <testcase name="AboutComponent onSellWithUsClick should logout and redirect to signup for non-seller users" time="0.001" classname="AboutComponent onSellWithUsClick"/>
-  <testcase name="AboutComponent onSellWithUsClick should navigate to seller-dashboard for seller users" time="0" classname="AboutComponent onSellWithUsClick"/>
-  <testcase name="AboutComponent browseCollections should navigate to categories" time="0" classname="AboutComponent browseCollections"/>
-  <testcase name="AboutComponent should create" time="0.001" classname="AboutComponent"/>
-  <testcase name="AboutComponent registerSeller should logout and navigate to signup" time="0" classname="AboutComponent registerSeller"/>
-  <testcase name="ProfileComponent should create" time="0.007" classname="ProfileComponent"/>
-  <testcase name="ProfileComponent should display user name and role" time="0.017" classname="ProfileComponent">
-    <failure type="">TypeError: Cannot read properties of undefined (reading 'subscribe')
-    at _RouterLink.subscribeToNavigationEventsIfNecessary (node_modules/@angular/router/fesm2022/router_module.mjs:240:48)
-    at _RouterLink.ngOnChanges (node_modules/@angular/router/fesm2022/router_module.mjs:291:18)
-    at _RouterLink.rememberChangeHistoryAndInvokeOnChangesHook (node_modules/@angular/core/fesm2022/debug_node.mjs:594:14)
-    at callHookInternal (node_modules/@angular/core/fesm2022/debug_node.mjs:860:14)
-    at callHook (node_modules/@angular/core/fesm2022/debug_node.mjs:891:9)
-    at callHooks (node_modules/@angular/core/fesm2022/debug_node.mjs:841:17)
-    at executeInitAndCheckHooks (node_modules/@angular/core/fesm2022/debug_node.mjs:791:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10176:21)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-</failure>
-  </testcase>
-  <testcase name="ProfileComponent should display user avatar" time="0.002" classname="ProfileComponent">
-    <failure type="">TypeError: Cannot read properties of undefined (reading 'subscribe')
-    at _RouterLink.subscribeToNavigationEventsIfNecessary (node_modules/@angular/router/fesm2022/router_module.mjs:240:48)
-    at _RouterLink.ngOnChanges (node_modules/@angular/router/fesm2022/router_module.mjs:291:18)
-    at _RouterLink.rememberChangeHistoryAndInvokeOnChangesHook (node_modules/@angular/core/fesm2022/debug_node.mjs:594:14)
-    at callHookInternal (node_modules/@angular/core/fesm2022/debug_node.mjs:860:14)
-    at callHook (node_modules/@angular/core/fesm2022/debug_node.mjs:891:9)
-    at callHooks (node_modules/@angular/core/fesm2022/debug_node.mjs:841:17)
-    at executeInitAndCheckHooks (node_modules/@angular/core/fesm2022/debug_node.mjs:791:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10176:21)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-</failure>
-  </testcase>
-  <testcase name="ProfileComponent should disable save button when form invalid" time="0.001" classname="ProfileComponent">
-    <failure type="">TypeError: Cannot read properties of undefined (reading 'subscribe')
-    at _RouterLink.subscribeToNavigationEventsIfNecessary (node_modules/@angular/router/fesm2022/router_module.mjs:240:48)
-    at _RouterLink.ngOnChanges (node_modules/@angular/router/fesm2022/router_module.mjs:291:18)
-    at _RouterLink.rememberChangeHistoryAndInvokeOnChangesHook (node_modules/@angular/core/fesm2022/debug_node.mjs:594:14)
-    at callHookInternal (node_modules/@angular/core/fesm2022/debug_node.mjs:860:14)
-    at callHook (node_modules/@angular/core/fesm2022/debug_node.mjs:891:9)
-    at callHooks (node_modules/@angular/core/fesm2022/debug_node.mjs:841:17)
-    at executeInitAndCheckHooks (node_modules/@angular/core/fesm2022/debug_node.mjs:791:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10176:21)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-</failure>
-  </testcase>
-  <testcase name="ProfileComponent should load current user on init" time="0.001" classname="ProfileComponent">
-    <failure type="">TypeError: Cannot read properties of undefined (reading 'subscribe')
-    at _RouterLink.subscribeToNavigationEventsIfNecessary (node_modules/@angular/router/fesm2022/router_module.mjs:240:48)
-    at _RouterLink.ngOnChanges (node_modules/@angular/router/fesm2022/router_module.mjs:291:18)
-    at _RouterLink.rememberChangeHistoryAndInvokeOnChangesHook (node_modules/@angular/core/fesm2022/debug_node.mjs:594:14)
-    at callHookInternal (node_modules/@angular/core/fesm2022/debug_node.mjs:860:14)
-    at callHook (node_modules/@angular/core/fesm2022/debug_node.mjs:891:9)
-    at callHooks (node_modules/@angular/core/fesm2022/debug_node.mjs:841:17)
-    at executeInitAndCheckHooks (node_modules/@angular/core/fesm2022/debug_node.mjs:791:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10176:21)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-</failure>
-  </testcase>
-  <testcase name="ProfileComponent should show success message when profile saved" time="0.001" classname="ProfileComponent">
-    <failure type="">TypeError: Cannot read properties of undefined (reading 'subscribe')
-    at _RouterLink.subscribeToNavigationEventsIfNecessary (node_modules/@angular/router/fesm2022/router_module.mjs:240:48)
-    at _RouterLink.ngOnChanges (node_modules/@angular/router/fesm2022/router_module.mjs:291:18)
-    at _RouterLink.rememberChangeHistoryAndInvokeOnChangesHook (node_modules/@angular/core/fesm2022/debug_node.mjs:594:14)
-    at callHookInternal (node_modules/@angular/core/fesm2022/debug_node.mjs:860:14)
-    at callHook (node_modules/@angular/core/fesm2022/debug_node.mjs:891:9)
-    at callHooks (node_modules/@angular/core/fesm2022/debug_node.mjs:841:17)
-    at executeInitAndCheckHooks (node_modules/@angular/core/fesm2022/debug_node.mjs:791:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10176:21)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-</failure>
-  </testcase>
-  <testcase name="CategoriesComponent should create" time="0.005" classname="CategoriesComponent"/>
-  <testcase name="CategoriesComponent should load categories on init" time="0.001" classname="CategoriesComponent"/>
-  <testcase name="CategoriesComponent should show loading state" time="0.001" classname="CategoriesComponent"/>
-  <testcase name="AnalyticsService should be created" time="0" classname="AnalyticsService"/>
-  <testcase name="AnalyticsService getSellerAnalytics should fetch and transform seller analytics" time="0.001" classname="AnalyticsService getSellerAnalytics"/>
-  <testcase name="AnalyticsService getSellerAnalytics should handle missing bestSellingProducts" time="0" classname="AnalyticsService getSellerAnalytics"/>
-  <testcase name="AnalyticsService getSellerAnalytics should handle unsuccessful response" time="0.001" classname="AnalyticsService getSellerAnalytics">
-    <failure type="">Expected 'Failed to load analytics' to contain 'analytics failed'.
-    at &lt;Jasmine&gt;
-    at Object.error (src/app/services/analytics.service.spec.ts:116:31)
-    at ConsumerObserver.error (node_modules/rxjs/dist/esm/internal/Subscriber.js:102:33)
-    at SafeSubscriber._error (node_modules/rxjs/dist/esm/internal/Subscriber.js:64:30)
-    at SafeSubscriber.error (node_modules/rxjs/dist/esm/internal/Subscriber.js:40:18)
-</failure>
-  </testcase>
-  <testcase name="AnalyticsService getClientAnalytics should handle HTTP error" time="0.001" classname="AnalyticsService getClientAnalytics"/>
-  <testcase name="AnalyticsService getClientAnalytics should handle unsuccessful response" time="0.001" classname="AnalyticsService getClientAnalytics">
-    <failure type="">Expected 'Failed to load analytics' to contain 'analytics failed'.
-    at &lt;Jasmine&gt;
-    at Object.error (src/app/services/analytics.service.spec.ts:78:31)
-    at ConsumerObserver.error (node_modules/rxjs/dist/esm/internal/Subscriber.js:102:33)
-    at SafeSubscriber._error (node_modules/rxjs/dist/esm/internal/Subscriber.js:64:30)
-    at SafeSubscriber.error (node_modules/rxjs/dist/esm/internal/Subscriber.js:40:18)
-</failure>
-  </testcase>
-  <testcase name="AnalyticsService getClientAnalytics should fetch and transform client analytics" time="0" classname="AnalyticsService getClientAnalytics"/>
-  <testcase name="AuthService isClient should return true for CLIENT role" time="0.001" classname="AuthService isClient"/>
-  <testcase name="AuthService isClient should return false for SELLER role" time="0" classname="AuthService isClient"/>
-  <testcase name="AuthService signup should register a new user" time="0.001" classname="AuthService signup"/>
+  <testcase name="ProductListingComponent should create" time="0.001" classname="ProductListingComponent"/>
+  <testcase name="ProductService getProducts should update products subject" time="0.001" classname="ProductService getProducts"/>
+  <testcase name="ProductService getProducts should return empty array when no data" time="0" classname="ProductService getProducts"/>
+  <testcase name="ProductService getProducts should fetch all products" time="0.001" classname="ProductService getProducts"/>
+  <testcase name="ProductService getProductsByCategory should fetch products by category" time="0" classname="ProductService getProductsByCategory"/>
+  <testcase name="ProductService addProduct should add product to subject" time="0" classname="ProductService addProduct"/>
+  <testcase name="ProductService addProduct should create a new product" time="0" classname="ProductService addProduct"/>
+  <testcase name="ProductService getProductById should fetch a single product" time="0" classname="ProductService getProductById"/>
+  <testcase name="ProductService getProductsBySeller should fetch products by seller" time="0.001" classname="ProductService getProductsBySeller"/>
+  <testcase name="ProductService should be created" time="0" classname="ProductService"/>
+  <testcase name="ProductService updateProduct should update an existing product" time="0" classname="ProductService updateProduct"/>
   <testcase name="AuthService login should login and store token and user" time="0" classname="AuthService login"/>
-  <testcase name="AuthService isSeller should return true for SELLER role" time="0.001" classname="AuthService isSeller"/>
+  <testcase name="AuthService signup should register a new user" time="0.001" classname="AuthService signup"/>
+  <testcase name="AuthService isSeller should return true for SELLER role" time="0" classname="AuthService isSeller"/>
   <testcase name="AuthService isSeller should return false for CLIENT role" time="0" classname="AuthService isSeller"/>
-  <testcase name="AuthService isAuthenticated should return false when no token" time="0" classname="AuthService isAuthenticated"/>
-  <testcase name="AuthService isAuthenticated should return true when token exists" time="0.004" classname="AuthService isAuthenticated"/>
-  <testcase name="AuthService logout should clear storage and user subject" time="0" classname="AuthService logout"/>
-  <testcase name="AuthService should be created" time="0" classname="AuthService"/>
+  <testcase name="AuthService isClient should return false for SELLER role" time="0.001" classname="AuthService isClient"/>
+  <testcase name="AuthService isClient should return true for CLIENT role" time="0" classname="AuthService isClient"/>
+  <testcase name="AuthService updateCurrentUserInStorage should update storage and subject" time="0" classname="AuthService updateCurrentUserInStorage"/>
   <testcase name="AuthService currentUser$ should emit user updates" time="0" classname="AuthService currentUser$"/>
-  <testcase name="AuthService updateCurrentUserInStorage should update storage and subject" time="0.001" classname="AuthService updateCurrentUserInStorage"/>
-  <testcase name="AuthService getUserId should return null when not logged in" time="0" classname="AuthService getUserId"/>
   <testcase name="AuthService getUserId should return user id when logged in" time="0" classname="AuthService getUserId"/>
-  <testcase name="CheckoutComponent saved address should generate correct saved address key" time="0.014" classname="CheckoutComponent saved address">
-    <failure type="">TypeError: ctx.cartService.getShippingCost is not a function
-    at CheckoutComponent2_Template (ng:///CheckoutComponent2.js:408:50)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CheckoutComponent form validation should validate phone pattern" time="0.004" classname="CheckoutComponent form validation">
-    <failure type="">TypeError: ctx.cartService.getShippingCost is not a function
-    at CheckoutComponent2_Template (ng:///CheckoutComponent2.js:408:50)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CheckoutComponent form validation should require fullName" time="0.004" classname="CheckoutComponent form validation">
-    <failure type="">TypeError: ctx.cartService.getShippingCost is not a function
-    at CheckoutComponent2_Template (ng:///CheckoutComponent2.js:408:50)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CheckoutComponent form validation should validate zipCode pattern" time="0.003" classname="CheckoutComponent form validation">
-    <failure type="">TypeError: ctx.cartService.getShippingCost is not a function
-    at CheckoutComponent2_Template (ng:///CheckoutComponent2.js:408:50)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CheckoutComponent cart subscription should update cart items on change" time="0.003" classname="CheckoutComponent cart subscription">
-    <failure type="">TypeError: ctx.cartService.getShippingCost is not a function
-    at CheckoutComponent2_Template (ng:///CheckoutComponent2.js:408:50)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CheckoutComponent cart subscription should handle empty cart" time="0.003" classname="CheckoutComponent cart subscription">
-    <failure type="">TypeError: ctx.cartService.getShippingCost is not a function
-    at CheckoutComponent2_Template (ng:///CheckoutComponent2.js:408:50)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CheckoutComponent form initialization should create checkout form with required fields" time="0.003" classname="CheckoutComponent form initialization">
-    <failure type="">TypeError: ctx.cartService.getShippingCost is not a function
-    at CheckoutComponent2_Template (ng:///CheckoutComponent2.js:408:50)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CheckoutComponent form initialization should have default payment method" time="0.003" classname="CheckoutComponent form initialization">
-    <failure type="">TypeError: ctx.cartService.getShippingCost is not a function
-    at CheckoutComponent2_Template (ng:///CheckoutComponent2.js:408:50)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CheckoutComponent form initialization should create review form" time="0.004" classname="CheckoutComponent form initialization">
-    <failure type="">TypeError: ctx.cartService.getShippingCost is not a function
-    at CheckoutComponent2_Template (ng:///CheckoutComponent2.js:408:50)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
-  <testcase name="CheckoutComponent should create" time="0.003" classname="CheckoutComponent">
-    <failure type="">TypeError: ctx.cartService.getShippingCost is not a function
-    at CheckoutComponent2_Template (ng:///CheckoutComponent2.js:408:50)
-    at executeTemplate (node_modules/@angular/core/fesm2022/debug_node.mjs:9125:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10161:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewIfAttached (node_modules/@angular/core/fesm2022/debug_node.mjs:10341:5)
-    at detectChangesInComponent (node_modules/@angular/core/fesm2022/debug_node.mjs:10329:5)
-    at detectChangesInChildComponents (node_modules/@angular/core/fesm2022/debug_node.mjs:10407:9)
-    at refreshView (node_modules/@angular/core/fesm2022/debug_node.mjs:10216:13)
-    at detectChangesInView (node_modules/@angular/core/fesm2022/debug_node.mjs:10381:9)
-    at detectChangesInViewWhileDirty (node_modules/@angular/core/fesm2022/debug_node.mjs:10070:9)
-</failure>
-  </testcase>
+  <testcase name="AuthService getUserId should return null when not logged in" time="0" classname="AuthService getUserId"/>
+  <testcase name="AuthService logout should clear storage and user subject" time="0" classname="AuthService logout"/>
+  <testcase name="AuthService isAuthenticated should return false when no token" time="0" classname="AuthService isAuthenticated"/>
+  <testcase name="AuthService isAuthenticated should return true when token exists" time="0" classname="AuthService isAuthenticated"/>
+  <testcase name="AuthService should be created" time="0" classname="AuthService"/>
+  <testcase name="CategoriesComponent getCategoryName should return category name for valid id" time="0.007" classname="CategoriesComponent getCategoryName"/>
+  <testcase name="CategoriesComponent getCategoryName should return empty string for invalid id" time="0.002" classname="CategoriesComponent getCategoryName"/>
+  <testcase name="CategoriesComponent should create" time="0" classname="CategoriesComponent"/>
+  <testcase name="CategoriesComponent route handling should clear selection when no slug in URL" time="0.001" classname="CategoriesComponent route handling"/>
+  <testcase name="CategoriesComponent route handling should redirect on invalid slug" time="0.001" classname="CategoriesComponent route handling"/>
+  <testcase name="CategoriesComponent filteredProducts should return empty array when no category selected" time="0.001" classname="CategoriesComponent filteredProducts"/>
+  <testcase name="CategoriesComponent filteredProducts should filter products by category" time="0.001" classname="CategoriesComponent filteredProducts"/>
+  <testcase name="CategoriesComponent loadSellersForProducts should load sellers for products" time="0" classname="CategoriesComponent loadSellersForProducts"/>
+  <testcase name="CategoriesComponent loadSellersForProducts should not load seller twice for same id" time="0.001" classname="CategoriesComponent loadSellersForProducts"/>
+  <testcase name="CategoriesComponent selectedCategory should return undefined when no category selected" time="0.001" classname="CategoriesComponent selectedCategory"/>
+  <testcase name="CategoriesComponent selectedCategory should return selected category object" time="0.001" classname="CategoriesComponent selectedCategory"/>
+  <testcase name="CategoriesComponent isLoading should be true when loading categories" time="0" classname="CategoriesComponent isLoading"/>
+  <testcase name="CategoriesComponent isLoading should be true when loading products" time="0.001" classname="CategoriesComponent isLoading"/>
+  <testcase name="CategoriesComponent isLoading should be false when not loading" time="0" classname="CategoriesComponent isLoading"/>
+  <testcase name="CategoriesComponent selectCategory should update selected category slug" time="0.001" classname="CategoriesComponent selectCategory"/>
+  <testcase name="CategoriesComponent selectCategory should navigate to category URL" time="0" classname="CategoriesComponent selectCategory"/>
+  <testcase name="CategoriesComponent initialization should load categories on init" time="0.001" classname="CategoriesComponent initialization"/>
+  <testcase name="CategoriesComponent initialization should load products on init" time="0.001" classname="CategoriesComponent initialization"/>
+  <testcase name="CategoriesComponent viewProductDetail should navigate to product detail" time="0" classname="CategoriesComponent viewProductDetail"/>
+  <testcase name="CategoriesComponent getSeller should return seller from map" time="0.001" classname="CategoriesComponent getSeller"/>
+  <testcase name="CategoriesComponent getSeller should return undefined for unknown seller" time="0.004" classname="CategoriesComponent getSeller"/>
+  <testcase name="NavigationComponent should create" time="0.004" classname="NavigationComponent"/>
+  <testcase name="NavigationComponent ngOnInit should set isAuthenticated to true when user exists" time="0.001" classname="NavigationComponent ngOnInit"/>
+  <testcase name="NavigationComponent ngOnInit should set isAuthenticated to false when no user" time="0" classname="NavigationComponent ngOnInit"/>
+  <testcase name="NavigationComponent ngOnInit should update cart item count from cart service" time="0.001" classname="NavigationComponent ngOnInit"/>
+  <testcase name="NavigationComponent ngOnInit should update cart count when items change" time="0.001" classname="NavigationComponent ngOnInit"/>
+  <testcase name="NavigationComponent onLogout should navigate to home after logout" time="0" classname="NavigationComponent onLogout"/>
+  <testcase name="NavigationComponent onLogout should call authService.logout" time="0.001" classname="NavigationComponent onLogout"/>
+  <testcase name="NavigationComponent ngOnDestroy should unsubscribe from cart subscription" time="0.001" classname="NavigationComponent ngOnDestroy"/>
+  <testcase name="CartComponent getCategorySlug should return category slug" time="0.009" classname="CartComponent getCategorySlug"/>
+  <testcase name="CartComponent should create" time="0.001" classname="CartComponent"/>
+  <testcase name="CartComponent cart items updates should update items when cart changes" time="0.001" classname="CartComponent cart items updates"/>
+  <testcase name="CartComponent cart items updates should handle empty cart" time="0.002" classname="CartComponent cart items updates"/>
+  <testcase name="CartComponent clearCart should call cart service clearCart" time="0.001" classname="CartComponent clearCart"/>
+  <testcase name="CartComponent removeItem should call cart service removeItem" time="0.002" classname="CartComponent removeItem"/>
+  <testcase name="CartComponent ngOnInit should load categories on init" time="0.002" classname="CartComponent ngOnInit"/>
+  <testcase name="CartComponent ngOnInit should load cart on init" time="0.002" classname="CartComponent ngOnInit"/>
+  <testcase name="CartComponent ngOnInit should subscribe to cart items" time="0.001" classname="CartComponent ngOnInit"/>
+  <testcase name="CartComponent decreaseQuantity should decrease quantity by 1" time="0.002" classname="CartComponent decreaseQuantity"/>
+  <testcase name="CartComponent decreaseQuantity should do nothing for non-existent product" time="0.001" classname="CartComponent decreaseQuantity"/>
+  <testcase name="CartComponent ngOnDestroy should unsubscribe on destroy" time="0.002" classname="CartComponent ngOnDestroy"/>
+  <testcase name="CartComponent increaseQuantity should increase quantity by 1" time="0.002" classname="CartComponent increaseQuantity"/>
+  <testcase name="CartComponent increaseQuantity should do nothing for non-existent product" time="0.001" classname="CartComponent increaseQuantity"/>
+  <testcase name="CartComponent updateQuantity should call cart service updateQuantity" time="0.001" classname="CartComponent updateQuantity"/>
+  <testcase name="AppComponent should create the app" time="0.005" classname="AppComponent"/>
+  <testcase name="CategoryService getCategoryById should fetch a single category" time="0" classname="CategoryService getCategoryById"/>
+  <testcase name="CategoryService getCategorySlug should return slug from map" time="0" classname="CategoryService getCategorySlug"/>
+  <testcase name="CategoryService getCategorySlug should fallback to subject value" time="0" classname="CategoryService getCategorySlug"/>
+  <testcase name="CategoryService getCategorySlug should fallback to id when not found" time="0" classname="CategoryService getCategorySlug"/>
+  <testcase name="CategoryService getCategories should populate categoryMap" time="0.001" classname="CategoryService getCategories"/>
+  <testcase name="CategoryService getCategories should update categories subject" time="0" classname="CategoryService getCategories"/>
+  <testcase name="CategoryService getCategories should fetch all categories" time="0" classname="CategoryService getCategories"/>
+  <testcase name="CategoryService should be created" time="0" classname="CategoryService"/>
+  <testcase name="CategoryService loadCategories should load categories when map is empty" time="0.001" classname="CategoryService loadCategories"/>
+  <testcase name="CategoryService loadCategories should not reload when categories already loaded" time="0" classname="CategoryService loadCategories"/>
+  <testcase name="AboutComponent should create" time="0.004" classname="AboutComponent"/>
+  <testcase name="AboutComponent shopNow should navigate to product-listing" time="0" classname="AboutComponent shopNow"/>
+  <testcase name="AboutComponent browseCollections should navigate to categories" time="0" classname="AboutComponent browseCollections"/>
+  <testcase name="AboutComponent onSellWithUsClick should navigate to seller-dashboard for seller users" time="0.001" classname="AboutComponent onSellWithUsClick"/>
+  <testcase name="AboutComponent onSellWithUsClick should logout and redirect to signup for non-seller users" time="0" classname="AboutComponent onSellWithUsClick"/>
+  <testcase name="AboutComponent registerSeller should logout and navigate to signup" time="0" classname="AboutComponent registerSeller"/>
+  <testcase name="HeroComponent ngOnDestroy should clear slide interval" time="0.006" classname="HeroComponent ngOnDestroy"/>
+  <testcase name="HeroComponent initialization should start on first slide" time="0" classname="HeroComponent initialization"/>
+  <testcase name="HeroComponent initialization should have 4 hero slides" time="0" classname="HeroComponent initialization"/>
+  <testcase name="HeroComponent initialization should have hero slides defined" time="0.001" classname="HeroComponent initialization"/>
+  <testcase name="HeroComponent prevSlide should wrap around to last slide from first" time="0" classname="HeroComponent prevSlide"/>
+  <testcase name="HeroComponent prevSlide should go to previous slide" time="0.001" classname="HeroComponent prevSlide"/>
+  <testcase name="HeroComponent setSlide should set slide to specific index" time="0" classname="HeroComponent setSlide"/>
+  <testcase name="HeroComponent setSlide should set slide to 0" time="0.001" classname="HeroComponent setSlide"/>
+  <testcase name="HeroComponent nextSlide should advance to next slide" time="0" classname="HeroComponent nextSlide"/>
+  <testcase name="HeroComponent nextSlide should wrap around to first slide after last" time="0" classname="HeroComponent nextSlide"/>
+  <testcase name="HeroComponent should create" time="0" classname="HeroComponent"/>
+  <testcase name="HeroComponent ngOnInit should start slide interval" time="0" classname="HeroComponent ngOnInit"/>
+  <testcase name="HeroComponent ngOnInit should auto-advance slides every 5 seconds" time="0" classname="HeroComponent ngOnInit"/>
+  <testcase name="HeroComponent shopNow should navigate to product-listing" time="0.001" classname="HeroComponent shopNow"/>
+  <testcase name="HeroComponent browseCollections should navigate to categories" time="0" classname="HeroComponent browseCollections"/>
+  <testcase name="HeroComponent onSellWithUsClick should navigate to seller-dashboard when user is seller" time="0.001" classname="HeroComponent onSellWithUsClick"/>
+  <testcase name="HeroComponent onSellWithUsClick should call registerSeller when user is not seller" time="0" classname="HeroComponent onSellWithUsClick"/>
+  <testcase name="HeroComponent onSellWithUsClick should call registerSeller when no user" time="0" classname="HeroComponent onSellWithUsClick"/>
+  <testcase name="HeroComponent registerSeller should logout and navigate to signup" time="0" classname="HeroComponent registerSeller"/>
+  <testcase name="ProfileAnalyticsComponent should create" time="0.004" classname="ProfileAnalyticsComponent"/>
+  <testcase name="ProfileAnalyticsComponent empty data should handle empty items" time="0.001" classname="ProfileAnalyticsComponent empty data"/>
+  <testcase name="ProfileAnalyticsComponent seller role should set up chart data for seller" time="0.001" classname="ProfileAnalyticsComponent seller role"/>
+  <testcase name="ProfileAnalyticsComponent client role should use client colors" time="0" classname="ProfileAnalyticsComponent client role"/>
+  <testcase name="ProfileAnalyticsComponent client role should set up chart data for client" time="0" classname="ProfileAnalyticsComponent client role"/>
   <testcase name="SellerShopComponent without seller id should show error message when no seller id" time="0.004" classname="SellerShopComponent without seller id"/>
   <testcase name="SellerShopComponent with valid seller id should create" time="0.001" classname="SellerShopComponent with valid seller id"/>
   <testcase name="SellerShopComponent with valid seller id should load seller on init" time="0.001" classname="SellerShopComponent with valid seller id"/>
   <testcase name="SellerShopComponent with valid seller id should handle seller load error" time="0.001" classname="SellerShopComponent with valid seller id"/>
-  <testcase name="OrderService should be created" time="0" classname="OrderService"/>
+  <testcase name="HomeComponent should create" time="0.005" classname="HomeComponent"/>
+  <testcase name="HomeComponent ngOnInit should load products on init" time="0.001" classname="HomeComponent ngOnInit"/>
+  <testcase name="HomeComponent ngOnInit should load sellers on init" time="0.002" classname="HomeComponent ngOnInit"/>
+  <testcase name="HomeComponent ngOnInit should load categories on init" time="0.001" classname="HomeComponent ngOnInit"/>
+  <testcase name="HomeComponent error handling should handle products load error" time="0.001" classname="HomeComponent error handling"/>
+  <testcase name="HomeComponent error handling should handle category load error" time="0.001" classname="HomeComponent error handling"/>
+  <testcase name="HomeComponent error handling should handle sellers load error" time="0.001" classname="HomeComponent error handling"/>
+  <testcase name="HomeComponent seller avatar fallback should use default avatar when seller has none" time="0.001" classname="HomeComponent seller avatar fallback"/>
+  <testcase name="HomeComponent onCategoryClick should navigate to category page" time="0.001" classname="HomeComponent onCategoryClick"/>
+  <testcase name="SellerGuard canActivate should allow access for seller" time="0.001" classname="SellerGuard canActivate"/>
+  <testcase name="SellerGuard canActivate should redirect client to home" time="0" classname="SellerGuard canActivate"/>
+  <testcase name="SellerGuard canActivate should deny access and redirect for non-seller" time="0" classname="SellerGuard canActivate"/>
+  <testcase name="SellerGuard should be created" time="0" classname="SellerGuard"/>
+  <testcase name="OrderService should be created" time="0.001" classname="OrderService"/>
+  <testcase name="OrderService cancelOrder should cancel an order" time="0" classname="OrderService cancelOrder"/>
   <testcase name="OrderService createOrder should handle create order error" time="0.001" classname="OrderService createOrder"/>
   <testcase name="OrderService createOrder should create a new order" time="0" classname="OrderService createOrder"/>
-  <testcase name="OrderService getOrder should return null on error" time="0" classname="OrderService getOrder"/>
-  <testcase name="OrderService getOrder should fetch order by number" time="0.001" classname="OrderService getOrder"/>
-  <testcase name="OrderService redoOrder should redo a cancelled order" time="0" classname="OrderService redoOrder"/>
-  <testcase name="OrderService getMyOrders should return empty array on error" time="0" classname="OrderService getMyOrders"/>
-  <testcase name="OrderService getMyOrders should return empty array when no data" time="0.001" classname="OrderService getMyOrders"/>
-  <testcase name="OrderService getMyOrders should fetch seller orders with pagination" time="0" classname="OrderService getMyOrders"/>
   <testcase name="OrderService getMyOrders should fetch buyer orders" time="0" classname="OrderService getMyOrders"/>
-  <testcase name="OrderService cancelOrder should cancel an order" time="0" classname="OrderService cancelOrder"/>
-  <testcase name="MediaService isAlreadySelected should handle null files in list" time="0.001" classname="MediaService isAlreadySelected"/>
-  <testcase name="MediaService isAlreadySelected should return false if file not in list" time="0" classname="MediaService isAlreadySelected"/>
-  <testcase name="MediaService isAlreadySelected should return true if file already in list" time="0.001" classname="MediaService isAlreadySelected"/>
-  <testcase name="MediaService constants should have correct allowed avatar types" time="0" classname="MediaService constants"/>
-  <testcase name="MediaService constants should have correct allowed product image types" time="0" classname="MediaService constants"/>
-  <testcase name="MediaService constants should have correct max image size" time="0" classname="MediaService constants"/>
-  <testcase name="MediaService uploadAvatar should reject invalid file type" time="0" classname="MediaService uploadAvatar"/>
-  <testcase name="MediaService uploadAvatar should reject when user not logged in" time="0.001" classname="MediaService uploadAvatar"/>
-  <testcase name="MediaService uploadAvatar should reject file too large" time="0.02" classname="MediaService uploadAvatar"/>
-  <testcase name="MediaService uploadAvatar should upload avatar successfully" time="0" classname="MediaService uploadAvatar"/>
-  <testcase name="MediaService should be created" time="0" classname="MediaService"/>
-  <testcase name="ClientOnlyGuard canActivate should allow access for client" time="0" classname="ClientOnlyGuard canActivate"/>
-  <testcase name="ClientOnlyGuard canActivate should deny access and redirect for non-client" time="0.001" classname="ClientOnlyGuard canActivate"/>
-  <testcase name="ClientOnlyGuard canActivate should redirect seller to home" time="0" classname="ClientOnlyGuard canActivate"/>
-  <testcase name="ClientOnlyGuard should be created" time="0" classname="ClientOnlyGuard"/>
-  <testcase name="ProductService getProductsBySeller should fetch products by seller" time="0" classname="ProductService getProductsBySeller"/>
-  <testcase name="ProductService getProductsByCategory should fetch products by category" time="0.001" classname="ProductService getProductsByCategory"/>
-  <testcase name="ProductService addProduct should create a new product" time="0" classname="ProductService addProduct"/>
-  <testcase name="ProductService addProduct should add product to subject" time="0" classname="ProductService addProduct"/>
-  <testcase name="ProductService getProducts should return empty array when no data" time="0.001" classname="ProductService getProducts"/>
-  <testcase name="ProductService getProducts should update products subject" time="0" classname="ProductService getProducts"/>
-  <testcase name="ProductService getProducts should fetch all products" time="0" classname="ProductService getProducts"/>
-  <testcase name="ProductService getProductById should fetch a single product" time="0" classname="ProductService getProductById"/>
-  <testcase name="ProductService should be created" time="0.001" classname="ProductService"/>
-  <testcase name="ProductService updateProduct should update an existing product" time="0" classname="ProductService updateProduct"/>
-  <testcase name="AuthGuard should be created" time="0" classname="AuthGuard"/>
-  <testcase name="AuthGuard canActivate should pass return URL for redirect" time="0.001" classname="AuthGuard canActivate"/>
-  <testcase name="AuthGuard canActivate should allow access when authenticated" time="0" classname="AuthGuard canActivate"/>
-  <testcase name="AuthGuard canActivate should deny access and redirect when not authenticated" time="0" classname="AuthGuard canActivate"/>
-  <testcase name="AppComponent should create the app" time="0.008" classname="AppComponent"/>
-  <testcase name="SellerGuard canActivate should redirect client to home" time="0.001" classname="SellerGuard canActivate"/>
-  <testcase name="SellerGuard canActivate should allow access for seller" time="0" classname="SellerGuard canActivate"/>
-  <testcase name="SellerGuard canActivate should deny access and redirect for non-seller" time="0" classname="SellerGuard canActivate"/>
-  <testcase name="SellerGuard should be created" time="0.001" classname="SellerGuard"/>
-  <testcase name="CartService localStorage persistence should load cart from localStorage on init" time="0.013" classname="CartService localStorage persistence">
-    <failure type="">Error: NG0203: The `_HttpClient` token injection failed. `inject()` function must be called from an injection context such as a constructor, a factory function, a field initializer, or a function used with `runInInjectionContext`. Find more at https://v20.angular.dev/errors/NG0203
-error properties: Object({ code: -203 })
-    at injectInjectorOnly (node_modules/@angular/core/fesm2022/root_effect_scheduler.mjs:1039:15)
-    at ɵɵinject (node_modules/@angular/core/fesm2022/root_effect_scheduler.mjs:1061:42)
-    at inject2 (node_modules/@angular/core/fesm2022/root_effect_scheduler.mjs:1149:12)
-    at CartService2.&lt;instance_members_initializer&gt; (src/app/services/cart.service.ts:31:27)
-    at new CartService2 (src/app/services/cart.service.ts:42:3)
-    at UserContext.&lt;anonymous&gt; (src/app/services/cart.service.spec.ts:228:26)
-    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
-    at _ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
-    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
-    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
-</failure>
-  </testcase>
-  <testcase name="CartService localStorage persistence should save cart to localStorage on changes" time="0.001" classname="CartService localStorage persistence"/>
-  <testcase name="CartService getSubtotal should return 0 for empty cart" time="0.001" classname="CartService getSubtotal"/>
-  <testcase name="CartService getSubtotal should calculate subtotal correctly" time="0" classname="CartService getSubtotal">
-    <failure type="">Expected 32.25806451612903 to be 40.
-    at &lt;Jasmine&gt;
-    at UserContext.&lt;anonymous&gt; (src/app/services/cart.service.spec.ts:191:37)
-    at UserContext.fakeAsyncFn (node_modules/zone.js/fesm2015/zone-testing.js:1715:26)
-    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
-    at _ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
-</failure>
-  </testcase>
-  <testcase name="CartService clearCart should clear cart via API" time="0.001" classname="CartService clearCart">
-    <failure type="">TypeError: Cannot read properties of undefined (reading 'onAction')
-    at CartService2.clearCart (src/app/services/cart.service.ts:273:17)
-    at UserContext.&lt;anonymous&gt; (src/app/services/cart.service.spec.ts:202:15)
-    at UserContext.fakeAsyncFn (node_modules/zone.js/fesm2015/zone-testing.js:1715:26)
-    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
-    at _ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
-    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:397:34)
-    at ZoneImpl.run (node_modules/zone.js/fesm2015/zone.js:113:43)
-    at runInTestZone (node_modules/zone.js/fesm2015/zone-testing.js:216:38)
-    at UserContext.&lt;anonymous&gt; (node_modules/zone.js/fesm2015/zone-testing.js:234:32)
-    at &lt;Jasmine&gt;
-</failure>
-  </testcase>
-  <testcase name="CartService getItemCount should return total quantity of items" time="0.001" classname="CartService getItemCount">
-    <failure type="">Expected 2 to be 5.
-    at &lt;Jasmine&gt;
-    at UserContext.&lt;anonymous&gt; (src/app/services/cart.service.spec.ts:173:38)
-    at UserContext.fakeAsyncFn (node_modules/zone.js/fesm2015/zone-testing.js:1715:26)
-    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
-    at _ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
-</failure>
-  </testcase>
-  <testcase name="CartService getItemCount should return 0 for empty cart" time="0" classname="CartService getItemCount"/>
-  <testcase name="CartService should be created" time="0" classname="CartService"/>
-  <testcase name="CartService loadCart should handle empty cart response" time="0.001" classname="CartService loadCart"/>
-  <testcase name="CartService loadCart should set empty cart when not authenticated" time="0" classname="CartService loadCart"/>
-  <testcase name="CartService loadCart should load cart when authenticated" time="0.001" classname="CartService loadCart"/>
-  <testcase name="CartService loadCart should handle API error gracefully" time="0" classname="CartService loadCart"/>
-  <testcase name="OrderListComponent order loading should handle load error gracefully" time="0.014" classname="OrderListComponent order loading"/>
-  <testcase name="OrderListComponent order loading should show loading state" time="0.006" classname="OrderListComponent order loading">
-    <failure type="">Expected false to be true.
-    at &lt;Jasmine&gt;
-    at UserContext.&lt;anonymous&gt; (src/app/components/order-list/order-list.component.spec.ts:135:33)
-    at UserContext.fakeAsyncFn (node_modules/zone.js/fesm2015/zone-testing.js:1715:26)
-    at _ZoneDelegate.invoke (node_modules/zone.js/fesm2015/zone.js:398:28)
-    at _ProxyZoneSpec.onInvoke (node_modules/zone.js/fesm2015/zone-testing.js:2132:39)
-</failure>
-  </testcase>
-  <testcase name="OrderListComponent ngOnInit should handle seller context" time="0.004" classname="OrderListComponent ngOnInit"/>
-  <testcase name="OrderListComponent ngOnInit should load orders on init" time="0.005" classname="OrderListComponent ngOnInit"/>
-  <testcase name="OrderListComponent ngOnInit should set user context" time="0.005" classname="OrderListComponent ngOnInit"/>
-  <testcase name="OrderListComponent order actions should navigate to order detail" time="0.005" classname="OrderListComponent order actions"/>
-  <testcase name="OrderListComponent filtering should search by order number" time="0.005" classname="OrderListComponent filtering"/>
-  <testcase name="OrderListComponent filtering should have status options" time="0.005" classname="OrderListComponent filtering"/>
-  <testcase name="OrderListComponent filtering should filter by status" time="0.006" classname="OrderListComponent filtering"/>
-  <testcase name="OrderListComponent filtering should initialize with ALL status filter" time="0.005" classname="OrderListComponent filtering"/>
-  <testcase name="OrderListComponent should create" time="0.002" classname="OrderListComponent"/>
-  <testcase name="UserService getSellers should fetch only sellers" time="0.001" classname="UserService getSellers"/>
-  <testcase name="UserService getUserById should fetch user by id" time="0" classname="UserService getUserById"/>
-  <testcase name="UserService should be created" time="0" classname="UserService"/>
-  <testcase name="UserService getCurrentUser should fetch current user" time="0" classname="UserService getCurrentUser"/>
-  <testcase name="UserService getAllUsers should fetch all users" time="0" classname="UserService getAllUsers"/>
-  <testcase name="UserService updateCurrentUser should update current user" time="0" classname="UserService updateCurrentUser"/>
-  <testcase name="SignInComponent should create" time="0.006" classname="SignInComponent"/>
+  <testcase name="OrderService getMyOrders should fetch seller orders with pagination" time="0" classname="OrderService getMyOrders"/>
+  <testcase name="OrderService getMyOrders should return empty array on error" time="0.001" classname="OrderService getMyOrders"/>
+  <testcase name="OrderService getMyOrders should return empty array when no data" time="0" classname="OrderService getMyOrders"/>
+  <testcase name="OrderService getOrder should fetch order by number" time="0" classname="OrderService getOrder"/>
+  <testcase name="OrderService getOrder should return null on error" time="0.001" classname="OrderService getOrder"/>
+  <testcase name="OrderService redoOrder should redo a cancelled order" time="0" classname="OrderService redoOrder"/>
+  <testcase name="AnalyticsService getSellerAnalytics should handle unsuccessful response" time="0.149" classname="AnalyticsService getSellerAnalytics"/>
+  <testcase name="AnalyticsService getSellerAnalytics should handle missing bestSellingProducts" time="0.001" classname="AnalyticsService getSellerAnalytics"/>
+  <testcase name="AnalyticsService getSellerAnalytics should fetch and transform seller analytics" time="0" classname="AnalyticsService getSellerAnalytics"/>
+  <testcase name="AnalyticsService getClientAnalytics should handle HTTP error" time="0" classname="AnalyticsService getClientAnalytics"/>
+  <testcase name="AnalyticsService getClientAnalytics should handle unsuccessful response" time="0.001" classname="AnalyticsService getClientAnalytics"/>
+  <testcase name="AnalyticsService getClientAnalytics should fetch and transform client analytics" time="0" classname="AnalyticsService getClientAnalytics"/>
+  <testcase name="AnalyticsService should be created" time="0" classname="AnalyticsService"/>
+  <testcase name="ProfileComponent should load analytics" time="0.038" classname="ProfileComponent"/>
+  <testcase name="ProfileComponent should return null userRole when no user" time="0.007" classname="ProfileComponent"/>
+  <testcase name="ProfileComponent changePassword should validate password match" time="0.007" classname="ProfileComponent changePassword"/>
+  <testcase name="ProfileComponent changePassword should update password when form valid" time="0.007" classname="ProfileComponent changePassword"/>
+  <testcase name="ProfileComponent should create" time="0.005" classname="ProfileComponent"/>
+  <testcase name="ProfileComponent should load current user on init" time="0.005" classname="ProfileComponent"/>
+  <testcase name="ProfileComponent saveProfile should show success message when profile saved" time="0.004" classname="ProfileComponent saveProfile"/>
+  <testcase name="ProfileComponent saveProfile should not save if avatar error exists" time="0.005" classname="ProfileComponent saveProfile"/>
+  <testcase name="ProfileComponent saveProfile should update auth storage on successful save" time="0.005" classname="ProfileComponent saveProfile"/>
+  <testcase name="ProfileComponent avatar handling should show error for invalid avatar type" time="0.005" classname="ProfileComponent avatar handling"/>
+  <testcase name="ProfileComponent avatar handling should remove avatar without media id" time="0.01" classname="ProfileComponent avatar handling"/>
+  <testcase name="ProfileComponent avatar handling should handle no file selected" time="0.004" classname="ProfileComponent avatar handling"/>
+  <testcase name="ProfileComponent avatar handling should show error for oversized avatar" time="0.005" classname="ProfileComponent avatar handling"/>
+  <testcase name="ProfileComponent avatar handling should delete avatar with media id" time="0.005" classname="ProfileComponent avatar handling"/>
+  <testcase name="ProfileComponent should return seller userRole for SELLER" time="0.004" classname="ProfileComponent"/>
+  <testcase name="ProfileComponent should return client userRole for CLIENT" time="0.005" classname="ProfileComponent"/>
+  <testcase name="ProfileComponent transformedAnalyticsItems should return analytics items" time="0.004" classname="ProfileComponent transformedAnalyticsItems"/>
+  <testcase name="ProfileComponent transformedAnalyticsItems should return empty array when no data" time="0.005" classname="ProfileComponent transformedAnalyticsItems"/>
+  <testcase name="EmptyCartGuard canActivate should deny access and redirect when cart is empty" time="0" classname="EmptyCartGuard canActivate"/>
+  <testcase name="EmptyCartGuard canActivate should allow checkout with single item" time="0" classname="EmptyCartGuard canActivate"/>
+  <testcase name="EmptyCartGuard canActivate should redirect to product listing when empty" time="0" classname="EmptyCartGuard canActivate"/>
+  <testcase name="EmptyCartGuard canActivate should allow access when cart has items" time="0" classname="EmptyCartGuard canActivate"/>
+  <testcase name="EmptyCartGuard should be created" time="0.001" classname="EmptyCartGuard"/>
+  <testcase name="SignInComponent should create" time="0.007" classname="SignInComponent"/>
   <testcase name="SignInComponent onSubmit should set loading state during login" time="0.004" classname="SignInComponent onSubmit"/>
-  <testcase name="SignInComponent onSubmit should not submit if form is invalid" time="0.002" classname="SignInComponent onSubmit"/>
-  <testcase name="SignInComponent onSubmit should call login service on valid form" time="0.003" classname="SignInComponent onSubmit"/>
-  <testcase name="SignInComponent onSubmit should store user on successful login" time="0.003" classname="SignInComponent onSubmit"/>
+  <testcase name="SignInComponent onSubmit should not submit if form is invalid" time="0.003" classname="SignInComponent onSubmit"/>
   <testcase name="SignInComponent onSubmit should load cart after login" time="0.003" classname="SignInComponent onSubmit"/>
   <testcase name="SignInComponent onSubmit should store token on successful login" time="0.003" classname="SignInComponent onSubmit"/>
+  <testcase name="SignInComponent onSubmit should call login service on valid form" time="0.004" classname="SignInComponent onSubmit"/>
+  <testcase name="SignInComponent onSubmit should store user on successful login" time="0.003" classname="SignInComponent onSubmit"/>
   <testcase name="SignInComponent onSubmit should handle login error" time="0.003" classname="SignInComponent onSubmit"/>
-  <testcase name="SignInComponent form initialization should initialize with empty values" time="0.002" classname="SignInComponent form initialization"/>
-  <testcase name="SignInComponent form initialization should create form with email and password controls" time="0.002" classname="SignInComponent form initialization"/>
-  <testcase name="SignInComponent form initialization should require password" time="0.003" classname="SignInComponent form initialization"/>
-  <testcase name="SignInComponent form initialization should require minimum password length" time="0.003" classname="SignInComponent form initialization"/>
+  <testcase name="SignInComponent ngOnInit should not redirect if not authenticated" time="0.004" classname="SignInComponent ngOnInit"/>
+  <testcase name="SignInComponent ngOnInit should redirect if already authenticated" time="0.004" classname="SignInComponent ngOnInit"/>
+  <testcase name="SignInComponent form initialization should require email" time="0.003" classname="SignInComponent form initialization"/>
+  <testcase name="SignInComponent form initialization should require password" time="0.002" classname="SignInComponent form initialization"/>
   <testcase name="SignInComponent form initialization should validate email format" time="0.003" classname="SignInComponent form initialization"/>
-  <testcase name="SignInComponent form initialization should require email" time="0.002" classname="SignInComponent form initialization"/>
-  <testcase name="SignInComponent ngOnInit should redirect if already authenticated" time="0.002" classname="SignInComponent ngOnInit"/>
-  <testcase name="SignInComponent ngOnInit should not redirect if not authenticated" time="0.002" classname="SignInComponent ngOnInit"/>
+  <testcase name="SignInComponent form initialization should initialize with empty values" time="0.009" classname="SignInComponent form initialization"/>
+  <testcase name="SignInComponent form initialization should require minimum password length" time="0.004" classname="SignInComponent form initialization"/>
+  <testcase name="SignInComponent form initialization should create form with email and password controls" time="0.003" classname="SignInComponent form initialization"/>
+  <testcase name="MediaService should be created" time="0.001" classname="MediaService"/>
+  <testcase name="MediaService uploadAvatar should reject when user not logged in" time="0" classname="MediaService uploadAvatar"/>
+  <testcase name="MediaService uploadAvatar should reject file too large" time="0.022" classname="MediaService uploadAvatar"/>
+  <testcase name="MediaService uploadAvatar should reject invalid file type" time="0.001" classname="MediaService uploadAvatar"/>
+  <testcase name="MediaService uploadAvatar should upload avatar successfully" time="0.001" classname="MediaService uploadAvatar"/>
+  <testcase name="MediaService isAlreadySelected should return true if file already in list" time="0" classname="MediaService isAlreadySelected"/>
+  <testcase name="MediaService isAlreadySelected should handle null files in list" time="0.001" classname="MediaService isAlreadySelected"/>
+  <testcase name="MediaService isAlreadySelected should return false if file not in list" time="0" classname="MediaService isAlreadySelected"/>
+  <testcase name="MediaService uploadProductImage should reject large product image" time="0.02" classname="MediaService uploadProductImage"/>
+  <testcase name="MediaService uploadProductImage should reject invalid product image type" time="0.001" classname="MediaService uploadProductImage"/>
+  <testcase name="MediaService uploadProductImage should reject when user not logged in" time="0" classname="MediaService uploadProductImage"/>
+  <testcase name="MediaService uploadProductImage should upload product image successfully" time="0.001" classname="MediaService uploadProductImage"/>
+  <testcase name="MediaService constants should have correct allowed avatar types" time="0" classname="MediaService constants"/>
+  <testcase name="MediaService constants should have correct allowed product image types" time="0" classname="MediaService constants"/>
+  <testcase name="MediaService constants should have correct max image size" time="0.001" classname="MediaService constants"/>
+  <testcase name="MediaService deleteImage should reject when user not logged in" time="0" classname="MediaService deleteImage"/>
+  <testcase name="MediaService deleteImage should delete image successfully" time="0" classname="MediaService deleteImage"/>
+  <testcase name="MediaService listProductImages should list product images" time="0.001" classname="MediaService listProductImages"/>
+  <testcase name="AuthGuard should be created" time="0" classname="AuthGuard"/>
+  <testcase name="AuthGuard canActivate should allow access when authenticated" time="0" classname="AuthGuard canActivate"/>
+  <testcase name="AuthGuard canActivate should deny access and redirect when not authenticated" time="0.001" classname="AuthGuard canActivate"/>
+  <testcase name="AuthGuard canActivate should pass return URL for redirect" time="0" classname="AuthGuard canActivate"/>
+  <testcase name="SellerDashboardComponent getCategoryById should return undefined for non-existent category" time="0.011" classname="SellerDashboardComponent getCategoryById"/>
+  <testcase name="SellerDashboardComponent getCategoryById should return category by id" time="0.002" classname="SellerDashboardComponent getCategoryById"/>
+  <testcase name="SellerDashboardComponent drag and drop should set isDragActive on dragOver" time="0.001" classname="SellerDashboardComponent drag and drop"/>
+  <testcase name="SellerDashboardComponent drag and drop should handle drop event" time="0.001" classname="SellerDashboardComponent drag and drop"/>
+  <testcase name="SellerDashboardComponent image handling should move image up" time="0.002" classname="SellerDashboardComponent image handling"/>
+  <testcase name="SellerDashboardComponent image handling should not move first image up" time="0.001" classname="SellerDashboardComponent image handling"/>
+  <testcase name="SellerDashboardComponent image handling should remove image from previews" time="0.002" classname="SellerDashboardComponent image handling"/>
+  <testcase name="SellerDashboardComponent image handling should move image down" time="0.001" classname="SellerDashboardComponent image handling"/>
+  <testcase name="SellerDashboardComponent image handling should not move last image down" time="0.001" classname="SellerDashboardComponent image handling"/>
+  <testcase name="SellerDashboardComponent image handling should delete media when removing image with mediaId" time="0.001" classname="SellerDashboardComponent image handling"/>
+  <testcase name="SellerDashboardComponent viewMyShop should navigate to seller shop" time="0.001" classname="SellerDashboardComponent viewMyShop"/>
+  <testcase name="SellerDashboardComponent should create" time="0" classname="SellerDashboardComponent"/>
+  <testcase name="SellerDashboardComponent submitProduct in edit mode should update product without new images" time="0.002" classname="SellerDashboardComponent submitProduct in edit mode"/>
+  <testcase name="SellerDashboardComponent submitProduct in edit mode should upload new images and update product" time="0.001" classname="SellerDashboardComponent submitProduct in edit mode"/>
+  <testcase name="SellerDashboardComponent closeModal should reset form and close modal" time="0.002" classname="SellerDashboardComponent closeModal"/>
+  <testcase name="SellerDashboardComponent selectedCategoryId getter should return category id from form" time="0.001" classname="SellerDashboardComponent selectedCategoryId getter"/>
+  <testcase name="SellerDashboardComponent editProduct should handle media list error" time="0.001" classname="SellerDashboardComponent editProduct"/>
+  <testcase name="SellerDashboardComponent editProduct should load product into form for editing" time="0.001" classname="SellerDashboardComponent editProduct"/>
+  <testcase name="SellerDashboardComponent editProduct should map image URLs with media IDs" time="0.002" classname="SellerDashboardComponent editProduct"/>
+  <testcase name="SellerDashboardComponent UI display should show empty state when no products" time="0.002" classname="SellerDashboardComponent UI display"/>
+  <testcase name="SellerDashboardComponent UI display should display seller name" time="0.001" classname="SellerDashboardComponent UI display"/>
+  <testcase name="SellerDashboardComponent UI display should display seller products list" time="0.001" classname="SellerDashboardComponent UI display"/>
+  <testcase name="SellerDashboardComponent UI display should show Add New Product button" time="0.001" classname="SellerDashboardComponent UI display"/>
+  <testcase name="SellerDashboardComponent submitProduct in add mode should handle product creation without returned id" time="0.001" classname="SellerDashboardComponent submitProduct in add mode"/>
+  <testcase name="SellerDashboardComponent submitProduct in add mode should create product and upload images" time="0.002" classname="SellerDashboardComponent submitProduct in add mode"/>
+  <testcase name="SellerDashboardComponent submitProduct should show error if too many images" time="0.001" classname="SellerDashboardComponent submitProduct"/>
+  <testcase name="SellerDashboardComponent submitProduct should not submit if form is invalid" time="0.002" classname="SellerDashboardComponent submitProduct"/>
+  <testcase name="SellerDashboardComponent submitProduct should show error if no images" time="0.001" classname="SellerDashboardComponent submitProduct"/>
+  <testcase name="SellerDashboardComponent deleteProduct should not delete if user cancels" time="0.005" classname="SellerDashboardComponent deleteProduct"/>
+  <testcase name="SellerDashboardComponent deleteProduct should delete product on confirmation" time="0.001" classname="SellerDashboardComponent deleteProduct"/>
+  <testcase name="SellerDashboardComponent deleteProduct should handle delete error" time="0.001" classname="SellerDashboardComponent deleteProduct"/>
+  <testcase name="SellerDashboardComponent onDragLeave should set isDragActive to false" time="0.001" classname="SellerDashboardComponent onDragLeave"/>
+  <testcase name="SellerDashboardComponent openAddProductModal should open modal in add mode" time="0.001" classname="SellerDashboardComponent openAddProductModal"/>
+  <testcase name="SellerDashboardComponent openAddProductModal should reset form when opening modal" time="0.001" classname="SellerDashboardComponent openAddProductModal"/>
+  <testcase name="SellerDashboardComponent openAddProductModal should set default category when opening modal" time="0.001" classname="SellerDashboardComponent openAddProductModal"/>
+  <testcase name="SellerDashboardComponent onFilesSelected should reject invalid file types" time="0.002" classname="SellerDashboardComponent onFilesSelected"/>
+  <testcase name="SellerDashboardComponent onFilesSelected should reject duplicate images" time="0.001" classname="SellerDashboardComponent onFilesSelected"/>
+  <testcase name="SellerDashboardComponent onFilesSelected should prevent too many images" time="0.001" classname="SellerDashboardComponent onFilesSelected"/>
+  <testcase name="SellerDashboardComponent onFilesSelected should reject files too large" time="0.002" classname="SellerDashboardComponent onFilesSelected"/>
+  <testcase name="SellerDashboardComponent ngOnInit should handle product load error" time="0.002" classname="SellerDashboardComponent ngOnInit"/>
+  <testcase name="SellerDashboardComponent ngOnInit should load seller products on init" time="0.002" classname="SellerDashboardComponent ngOnInit"/>
+  <testcase name="SellerDashboardComponent ngOnInit should set seller name and avatar" time="0.001" classname="SellerDashboardComponent ngOnInit"/>
+  <testcase name="SellerDashboardComponent ngOnInit should load categories on init" time="0.001" classname="SellerDashboardComponent ngOnInit"/>
+  <testcase name="OrderDetailComponent without order number should show error when no order number" time="0.008" classname="OrderDetailComponent without order number"/>
+  <testcase name="OrderDetailComponent getStatusClass should return correct class for SHIPPED" time="0.001" classname="OrderDetailComponent getStatusClass"/>
+  <testcase name="OrderDetailComponent getStatusClass should return correct class for CONFIRMED" time="0.001" classname="OrderDetailComponent getStatusClass"/>
+  <testcase name="OrderDetailComponent getStatusClass should return correct class for DELIVERED" time="0" classname="OrderDetailComponent getStatusClass"/>
+  <testcase name="OrderDetailComponent getStatusClass should return correct class for CANCELLED" time="0.001" classname="OrderDetailComponent getStatusClass"/>
+  <testcase name="OrderDetailComponent getStatusClass should return correct class for PENDING" time="0" classname="OrderDetailComponent getStatusClass"/>
+  <testcase name="OrderDetailComponent with valid order number should handle order load error" time="0.001" classname="OrderDetailComponent with valid order number"/>
+  <testcase name="OrderDetailComponent with valid order number should load seller names for order items" time="0.003" classname="OrderDetailComponent with valid order number"/>
+  <testcase name="OrderDetailComponent with valid order number should load order on init" time="0.002" classname="OrderDetailComponent with valid order number"/>
+  <testcase name="OrderDetailComponent with valid order number should create" time="0.001" classname="OrderDetailComponent with valid order number"/>
+  <testcase name="ProductGridCardComponent should create" time="0.001" classname="ProductGridCardComponent"/>
+  <testcase name="ProductGridCardComponent addToCart should show stock limit message when exceeding available stock" time="0.001" classname="ProductGridCardComponent addToCart"/>
+  <testcase name="ProductGridCardComponent addToCart should show out of stock message when quantity is 0" time="0.001" classname="ProductGridCardComponent addToCart"/>
+  <testcase name="ProductGridCardComponent input properties should accept categoryName input" time="0.001" classname="ProductGridCardComponent input properties"/>
+  <testcase name="ProductGridCardComponent input properties should accept product input" time="0" classname="ProductGridCardComponent input properties"/>
+  <testcase name="ProductGridCardComponent input properties should accept seller input" time="0.001" classname="ProductGridCardComponent input properties"/>
+  <testcase name="ProductGridCardComponent input properties should have default showCategory as true" time="0" classname="ProductGridCardComponent input properties"/>
+  <testcase name="ProductGridCardComponent input properties should have default showSeller as true" time="0.001" classname="ProductGridCardComponent input properties"/>
+  <testcase name="ProductGridCardComponent onView should emit view event with product id" time="0.001" classname="ProductGridCardComponent onView"/>
+  <testcase name="CartService getTotalInclVat should calculate total including VAT" time="0.001" classname="CartService getTotalInclVat"/>
+  <testcase name="CartService getVatAmount should calculate VAT amount" time="0.001" classname="CartService getVatAmount"/>
+  <testcase name="CartService addToCart should show out of stock message when stock is 0" time="0" classname="CartService addToCart"/>
+  <testcase name="CartService addToCart should add item to cart via API" time="0.001" classname="CartService addToCart"/>
+  <testcase name="CartService removeItem should remove item from cart via API" time="0" classname="CartService removeItem"/>
+  <testcase name="CartService updateQuantity should remove item when quantity is less than 1" time="0.001" classname="CartService updateQuantity"/>
+  <testcase name="CartService localStorage persistence should load cart from localStorage on init" time="0" classname="CartService localStorage persistence"/>
+  <testcase name="CartService localStorage persistence should save cart to localStorage on changes" time="0.001" classname="CartService localStorage persistence"/>
+  <testcase name="CartService isInCart should return true if product is in cart" time="0" classname="CartService isInCart"/>
+  <testcase name="CartService isInCart should return false if product is not in cart" time="0" classname="CartService isInCart"/>
+  <testcase name="CartService clearCart should clear cart via API" time="0.001" classname="CartService clearCart"/>
+  <testcase name="CartService getProductQuantity should return quantity for product in cart" time="0" classname="CartService getProductQuantity"/>
+  <testcase name="CartService getProductQuantity should return 0 for product not in cart" time="0.001" classname="CartService getProductQuantity"/>
+  <testcase name="CartService getSubtotal should calculate subtotal correctly" time="0" classname="CartService getSubtotal"/>
+  <testcase name="CartService getSubtotal should return 0 for empty cart" time="0.001" classname="CartService getSubtotal"/>
+  <testcase name="CartService getShippingCost should return 0 for orders over 50" time="0" classname="CartService getShippingCost"/>
+  <testcase name="CartService getShippingCost should return 4.9 for orders under 50" time="0" classname="CartService getShippingCost"/>
+  <testcase name="CartService getItemCount should return total quantity of items" time="0.001" classname="CartService getItemCount"/>
+  <testcase name="CartService getItemCount should return 0 for empty cart" time="0" classname="CartService getItemCount"/>
+  <testcase name="CartService getTotal should calculate total including shipping" time="0.001" classname="CartService getTotal"/>
+  <testcase name="CartService loadCart should set empty cart when not authenticated" time="0" classname="CartService loadCart"/>
+  <testcase name="CartService loadCart should load cart when authenticated" time="0.001" classname="CartService loadCart"/>
+  <testcase name="CartService loadCart should handle empty cart response" time="0" classname="CartService loadCart"/>
+  <testcase name="CartService loadCart should handle API error gracefully" time="0.001" classname="CartService loadCart"/>
+  <testcase name="CartService isEmpty should return true for empty cart" time="0" classname="CartService isEmpty"/>
+  <testcase name="CartService isEmpty should return false for non-empty cart" time="0" classname="CartService isEmpty"/>
+  <testcase name="CartService clearCartAfterOrder should clear cart" time="0.001" classname="CartService clearCartAfterOrder"/>
+  <testcase name="CartService addProductToCart should add product with correct mapping" time="0" classname="CartService addProductToCart"/>
+  <testcase name="CartService should be created" time="0.001" classname="CartService"/>
+  <testcase name="CartService getCachedSellerName should return cached seller name" time="0.004" classname="CartService getCachedSellerName"/>
+  <testcase name="CartService getCachedSellerName should return default for unknown seller" time="0.001" classname="CartService getCachedSellerName"/>
+  <testcase name="ClientOnlyGuard canActivate should deny access and redirect for non-client" time="0.001" classname="ClientOnlyGuard canActivate"/>
+  <testcase name="ClientOnlyGuard canActivate should allow access for client" time="0" classname="ClientOnlyGuard canActivate"/>
+  <testcase name="ClientOnlyGuard canActivate should redirect seller to home" time="0" classname="ClientOnlyGuard canActivate"/>
+  <testcase name="ClientOnlyGuard should be created" time="0" classname="ClientOnlyGuard"/>
+  <testcase name="UserService getSellers should fetch only sellers" time="0.001" classname="UserService getSellers"/>
+  <testcase name="UserService getAllUsers should fetch all users" time="0" classname="UserService getAllUsers"/>
+  <testcase name="UserService getUserById should fetch user by id" time="0" classname="UserService getUserById"/>
+  <testcase name="UserService getCurrentUser should fetch current user" time="0.001" classname="UserService getCurrentUser"/>
+  <testcase name="UserService updateCurrentUser should update current user" time="0" classname="UserService updateCurrentUser"/>
+  <testcase name="UserService should be created" time="0" classname="UserService"/>
+  <testcase name="ProductCardComponent isInCart should return false when product is not in cart" time="0.004" classname="ProductCardComponent isInCart"/>
+  <testcase name="ProductCardComponent isInCart should return true when product is in cart" time="0.001" classname="ProductCardComponent isInCart"/>
+  <testcase name="ProductCardComponent should create" time="0" classname="ProductCardComponent"/>
+  <testcase name="ProductCardComponent UI display should display product name" time="0.001" classname="ProductCardComponent UI display"/>
+  <testcase name="ProductCardComponent UI display should display product description" time="0.002" classname="ProductCardComponent UI display"/>
+  <testcase name="ProductCardComponent UI display should display product price" time="0.001" classname="ProductCardComponent UI display"/>
+  <testcase name="ProductCardComponent isSeller should return true when user is seller" time="0.001" classname="ProductCardComponent isSeller"/>
+  <testcase name="ProductCardComponent isSeller should return false when user is not seller" time="0.001" classname="ProductCardComponent isSeller"/>
+  <testcase name="ProductCardComponent ngOnInit should load seller after product loads" time="0.001" classname="ProductCardComponent ngOnInit"/>
+  <testcase name="ProductCardComponent ngOnInit should handle product load error" time="0.001" classname="ProductCardComponent ngOnInit"/>
+  <testcase name="ProductCardComponent ngOnInit should load category after product loads" time="0.001" classname="ProductCardComponent ngOnInit"/>
+  <testcase name="ProductCardComponent ngOnInit should load product on init" time="0.001" classname="ProductCardComponent ngOnInit"/>
+  <testcase name="ProductCardComponent addToCart should add product to cart when stock available" time="0.001" classname="ProductCardComponent addToCart"/>
+  <testcase name="ProductCardComponent addToCart should show stock limit message when exceeding available" time="0.001" classname="ProductCardComponent addToCart"/>
+  <testcase name="ProductCardComponent addToCart should include seller info in cart product" time="0.001" classname="ProductCardComponent addToCart"/>
+  <testcase name="ProductCardComponent addToCart should show out of stock message when quantity is 0" time="0.001" classname="ProductCardComponent addToCart"/>
+  <testcase name="InfiniteSliderComponent browseCollections should navigate to categories" time="0.001" classname="InfiniteSliderComponent browseCollections"/>
+  <testcase name="InfiniteSliderComponent should create" time="0.001" classname="InfiniteSliderComponent"/>
+  <testcase name="InfiniteSliderComponent viewSellerShop should navigate to seller shop with seller id" time="0.001" classname="InfiniteSliderComponent viewSellerShop"/>
+  <testcase name="InfiniteSliderComponent extendedSellers should return empty array when no sellers" time="0" classname="InfiniteSliderComponent extendedSellers"/>
+  <testcase name="InfiniteSliderComponent extendedSellers should contain same seller objects repeated" time="0" classname="InfiniteSliderComponent extendedSellers"/>
+  <testcase name="InfiniteSliderComponent extendedSellers should return sellers repeated 4 times" time="0.001" classname="InfiniteSliderComponent extendedSellers"/>
+  <testcase name="InfiniteSliderComponent inputs should accept products input" time="0" classname="InfiniteSliderComponent inputs"/>
+  <testcase name="InfiniteSliderComponent inputs should have empty sellers by default" time="0" classname="InfiniteSliderComponent inputs"/>
+  <testcase name="InfiniteSliderComponent inputs should accept sellers input" time="0.001" classname="InfiniteSliderComponent inputs"/>
+  <testcase name="InfiniteSliderComponent inputs should have empty products by default" time="0" classname="InfiniteSliderComponent inputs"/>
+  <testcase name="InfiniteSliderComponent shopNow should navigate to product-listing" time="0.001" classname="InfiniteSliderComponent shopNow"/>
+  <testcase name="InfiniteSliderComponent viewProductDetail should navigate to product detail with product id" time="0" classname="InfiniteSliderComponent viewProductDetail"/>
+  <testcase name="InfiniteSliderComponent extendedProducts should return empty array when no products" time="0" classname="InfiniteSliderComponent extendedProducts"/>
+  <testcase name="InfiniteSliderComponent extendedProducts should return products repeated 4 times" time="0" classname="InfiniteSliderComponent extendedProducts"/>
+  <testcase name="OrderListComponent should create" time="0.012" classname="OrderListComponent"/>
+  <testcase name="OrderListComponent getSellerRevenue should return 0 for non-seller" time="0.008" classname="OrderListComponent getSellerRevenue"/>
+  <testcase name="OrderListComponent getSellerRevenue should calculate seller revenue" time="0.007" classname="OrderListComponent getSellerRevenue"/>
+  <testcase name="OrderListComponent trackByOrderNumber should return order number" time="0.006" classname="OrderListComponent trackByOrderNumber"/>
+  <testcase name="OrderListComponent permission checks canCancel should return true for CONFIRMED orders" time="0.006" classname="OrderListComponent permission checks"/>
+  <testcase name="OrderListComponent permission checks canConfirm should return true for PENDING order with seller items" time="0.006" classname="OrderListComponent permission checks"/>
+  <testcase name="OrderListComponent permission checks canCancel should return true for PENDING orders" time="0.005" classname="OrderListComponent permission checks"/>
+  <testcase name="OrderListComponent permission checks canRedo should return true for CANCELLED orders (non-seller)" time="0.005" classname="OrderListComponent permission checks"/>
+  <testcase name="OrderListComponent permission checks canRemove should return false for PENDING orders" time="0.005" classname="OrderListComponent permission checks"/>
+  <testcase name="OrderListComponent permission checks canCancel should return false for SHIPPED orders" time="0.005" classname="OrderListComponent permission checks"/>
+  <testcase name="OrderListComponent permission checks canRedo should return false for seller" time="0.004" classname="OrderListComponent permission checks"/>
+  <testcase name="OrderListComponent permission checks canRemove should return true for CANCELLED orders" time="0.006" classname="OrderListComponent permission checks"/>
+  <testcase name="OrderListComponent clearFilters should reset all filters" time="0.006" classname="OrderListComponent clearFilters"/>
+  <testcase name="OrderListComponent viewOrderDetail should navigate to order detail page" time="0.006" classname="OrderListComponent viewOrderDetail"/>
+  <testcase name="OrderListComponent getStatusClass should return correct class for PENDING" time="0.002" classname="OrderListComponent getStatusClass"/>
+  <testcase name="OrderListComponent getStatusClass should return correct class for CONFIRMED" time="0.002" classname="OrderListComponent getStatusClass"/>
+  <testcase name="OrderListComponent redoOrder should stop event propagation" time="0.004" classname="OrderListComponent redoOrder"/>
+  <testcase name="OrderListComponent redoOrder should show error for non-cancelled orders" time="0.005" classname="OrderListComponent redoOrder"/>
+  <testcase name="OrderListComponent seller filtering should filter orders by seller items when seller" time="0.005" classname="OrderListComponent seller filtering"/>
+  <testcase name="OrderListComponent cancelOrder should stop event propagation" time="0.005" classname="OrderListComponent cancelOrder"/>
+  <testcase name="OrderListComponent cancelOrder should show error for non-cancellable orders" time="0.005" classname="OrderListComponent cancelOrder"/>
+  <testcase name="OrderListComponent order loading should show loading state" time="0.006" classname="OrderListComponent order loading"/>
+  <testcase name="OrderListComponent order loading should handle load error gracefully" time="0.004" classname="OrderListComponent order loading"/>
+  <testcase name="OrderListComponent filtering should handle null date strings" time="0.004" classname="OrderListComponent filtering"/>
+  <testcase name="OrderListComponent filtering should filter by date range" time="0.009" classname="OrderListComponent filtering"/>
+  <testcase name="OrderListComponent filtering should search by product name" time="0.005" classname="OrderListComponent filtering"/>
+  <testcase name="OrderListComponent filtering should filter by status" time="0.006" classname="OrderListComponent filtering"/>
+  <testcase name="OrderListComponent filtering should search by order number" time="0.005" classname="OrderListComponent filtering"/>
+  <testcase name="OrderListComponent filtering should initialize with ALL status filter" time="0.005" classname="OrderListComponent filtering"/>
+  <testcase name="OrderListComponent filtering should have status options" time="0.005" classname="OrderListComponent filtering"/>
+  <testcase name="OrderListComponent filtering should show all orders when status is ALL" time="0.005" classname="OrderListComponent filtering"/>
+  <testcase name="OrderListComponent onDateChange should apply filters on date change" time="0.005" classname="OrderListComponent onDateChange"/>
+  <testcase name="OrderListComponent getSellerItems should return all items for non-seller" time="0.005" classname="OrderListComponent getSellerItems"/>
+  <testcase name="OrderListComponent getSellerItems should filter to seller items only" time="0.005" classname="OrderListComponent getSellerItems"/>
+  <testcase name="OrderListComponent ngOnInit should load orders on init" time="0.005" classname="OrderListComponent ngOnInit"/>
+  <testcase name="OrderListComponent ngOnInit should set user context" time="0.005" classname="OrderListComponent ngOnInit"/>
+  <testcase name="OrderListComponent ngOnInit should handle seller context" time="0.005" classname="OrderListComponent ngOnInit"/>
+  <testcase name="CheckoutComponent form validation should be valid when review confirmed" time="0.018" classname="CheckoutComponent form validation"/>
+  <testcase name="CheckoutComponent form validation should require country" time="0.005" classname="CheckoutComponent form validation"/>
+  <testcase name="CheckoutComponent form validation should be invalid when review not confirmed" time="0.005" classname="CheckoutComponent form validation"/>
+  <testcase name="CheckoutComponent form validation should validate phone pattern" time="0.005" classname="CheckoutComponent form validation"/>
+  <testcase name="CheckoutComponent form validation should require fullName" time="0.005" classname="CheckoutComponent form validation"/>
+  <testcase name="CheckoutComponent form validation should require city" time="0.006" classname="CheckoutComponent form validation"/>
+  <testcase name="CheckoutComponent form validation should validate zipCode pattern" time="0.005" classname="CheckoutComponent form validation"/>
+  <testcase name="CheckoutComponent form validation should require street" time="0.005" classname="CheckoutComponent form validation"/>
+  <testcase name="CheckoutComponent should create" time="0.006" classname="CheckoutComponent"/>
+  <testcase name="CheckoutComponent cart subscription should update cart items on change" time="0.005" classname="CheckoutComponent cart subscription"/>
+  <testcase name="CheckoutComponent cart subscription should handle empty cart" time="0.005" classname="CheckoutComponent cart subscription"/>
+  <testcase name="CheckoutComponent placeOrder should not place order if review not confirmed" time="0.005" classname="CheckoutComponent placeOrder"/>
+  <testcase name="CheckoutComponent placeOrder should handle order error" time="0.005" classname="CheckoutComponent placeOrder"/>
+  <testcase name="CheckoutComponent placeOrder should call createOrder with address" time="0.005" classname="CheckoutComponent placeOrder"/>
+  <testcase name="CheckoutComponent placeOrder should not place order if form invalid" time="0.006" classname="CheckoutComponent placeOrder"/>
+  <testcase name="CheckoutComponent saved address should auto-save address changes" time="0.005" classname="CheckoutComponent saved address"/>
+  <testcase name="CheckoutComponent saved address should load saved address from localStorage" time="0.005" classname="CheckoutComponent saved address"/>
+  <testcase name="CheckoutComponent saved address should generate correct saved address key" time="0.005" classname="CheckoutComponent saved address"/>
+  <testcase name="CheckoutComponent confirmReview should advance stepper" time="0.005" classname="CheckoutComponent confirmReview"/>
+  <testcase name="CheckoutComponent confirmReview should set confirmed to true" time="0.005" classname="CheckoutComponent confirmReview"/>
+  <testcase name="CheckoutComponent form initialization should create checkout form with required fields" time="0.01" classname="CheckoutComponent form initialization"/>
+  <testcase name="CheckoutComponent form initialization should create review form" time="0.006" classname="CheckoutComponent form initialization"/>
+  <testcase name="CheckoutComponent form initialization should have default payment method" time="0.005" classname="CheckoutComponent form initialization"/>
   <system-out>
-    <![CDATA[Chrome Headless 144.0.0.0 (Mac OS 10.15.7) WARN: 'Spec 'CategoryService loadCategories should not reload when categories already loaded' has no expectations.'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10}]
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10}]
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', []
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10}]
+    <![CDATA[Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Sign-up successful', Object{id: '1', name: 'John', email: 'john@example.com', role: 'CLIENT'}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: 'Sign-up error', HttpErrorResponse{headers: _HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Unknown Error', url: null, ok: false, type: undefined, redirected: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 500 undefined', error: Object{message: 'Server error'}}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Sign-up successful', Object{id: '1', name: 'John', email: 'john@example.com', role: 'CLIENT'}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Sign-up successful', Object{id: '1', name: 'John', email: 'john@example.com', role: 'CLIENT'}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: 'Sign-up error', HttpErrorResponse{headers: _HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 409, statusText: 'Unknown Error', url: null, ok: false, type: undefined, redirected: undefined, name: 'HttpErrorResponse', message: 'Http failure response for (unknown url): 409 undefined', error: Object{message: 'Email already exists'}}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Sign-up successful', Object{id: '1', name: 'John', email: 'john@example.com', role: 'CLIENT'}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Sign-up successful', Object{id: '1', name: 'John', email: 'john@example.com', role: 'SELLER'}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 CartComponent init - loading from API'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 Cart items updated:', [Object{id: 'item-1', productId: 'prod-1', productName: 'Test Product', sellerId: 'seller-1', sellerName: 'Test Seller', price: 99.99, quantity: 2, categoryId: 'cat-1', imageUrl: 'image.jpg'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 CartComponent init - loading from API'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 Cart items updated:', [Object{id: 'item-1', productId: 'prod-1', productName: 'Test Product', sellerId: 'seller-1', sellerName: 'Test Seller', price: 99.99, quantity: 2, categoryId: 'cat-1', imageUrl: 'image.jpg'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 Cart items updated:', [Object{id: 'item-1', productId: 'prod-1', productName: 'Test Product', sellerId: 'seller-1', sellerName: 'Test Seller', price: 99.99, quantity: 2, categoryId: 'cat-1', imageUrl: 'image.jpg'}, Object{id: 'item-2', productId: 'prod-2', productName: 'New Product', sellerId: 'seller-1', sellerName: 'Test Seller', price: 99.99, quantity: 2, categoryId: 'cat-1', imageUrl: 'image.jpg'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 CartComponent init - loading from API'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 Cart items updated:', [Object{id: 'item-1', productId: 'prod-1', productName: 'Test Product', sellerId: 'seller-1', sellerName: 'Test Seller', price: 99.99, quantity: 2, categoryId: 'cat-1', imageUrl: 'image.jpg'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 Cart items updated:', []
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 CartComponent init - loading from API'
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 Cart items updated:', [Object{id: 'item-1', productId: 'prod-1', productName: 'Test Product', sellerId: 'seller-1', sellerName: 'Test Seller', price: 99.99, quantity: 2, categoryId: 'cat-1', imageUrl: 'image.jpg'}]
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 CartComponent init - loading from API'
@@ -823,98 +475,281 @@ error properties: Object({ code: -203 })
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 Cart items updated:', [Object{id: 'item-1', productId: 'prod-1', productName: 'Test Product', sellerId: 'seller-1', sellerName: 'Test Seller', price: 99.99, quantity: 2, categoryId: 'cat-1', imageUrl: 'image.jpg'}]
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 CartComponent init - loading from API'
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 Cart items updated:', [Object{id: 'item-1', productId: 'prod-1', productName: 'Test Product', sellerId: 'seller-1', sellerName: 'Test Seller', price: 99.99, quantity: 2, categoryId: 'cat-1', imageUrl: 'image.jpg'}]
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 CartComponent init - loading from API'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 Cart items updated:', [Object{id: 'item-1', productId: 'prod-1', productName: 'Test Product', sellerId: 'seller-1', sellerName: 'Test Seller', price: 99.99, quantity: 2, categoryId: 'cat-1', imageUrl: 'image.jpg'}]
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 CartComponent init - loading from API'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 Cart items updated:', [Object{id: 'item-1', productId: 'prod-1', productName: 'Test Product', sellerId: 'seller-1', sellerName: 'Test Seller', price: 99.99, quantity: 2, categoryId: 'cat-1', imageUrl: 'image.jpg'}]
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 CartComponent init - loading from API'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 Cart items updated:', [Object{id: 'item-1', productId: 'prod-1', productName: 'Test Product', sellerId: 'seller-1', sellerName: 'Test Seller', price: 99.99, quantity: 2, categoryId: 'cat-1', imageUrl: 'image.jpg'}]
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📥 Raw response:', Object{success: true, message: 'OK', data: Object{totalRevenue: 1000, bestSellingProducts: [...], topCategories: [...]}}
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📥 Raw response:', Object{success: true, data: Object{totalRevenue: 0, bestSellingProducts: undefined, topCategories: []}}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'App root loaded'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) WARN: 'Spec 'CategoryService loadCategories should not reload when categories already loaded' has no expectations.'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) WARN: 'Spec 'HeroComponent ngOnDestroy should clear slide interval' has no expectations.'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: '❌ Error fetching orders:', HttpErrorResponse{headers: _HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'https://localhost:8080/api/orders/buyer', ok: false, type: undefined, redirected: undefined, name: 'HttpErrorResponse', message: 'Http failure response for https://localhost:8080/api/orders/buyer: 500 Server Error', error: Object{message: 'Error'}}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🌐 Fetching order from API:', 'ORD-001'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🌐 Fetching order from API:', 'BAD-ORDER'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: '❌ Error fetching order:', HttpErrorResponse{headers: _HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 404, statusText: 'Not Found', url: 'https://localhost:8080/api/orders/BAD-ORDER', ok: false, type: undefined, redirected: undefined, name: 'HttpErrorResponse', message: 'Http failure response for https://localhost:8080/api/orders/BAD-ORDER: 404 Not Found', error: Object{message: 'Not Found'}}
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📥 Raw response:', Object{success: false, message: 'Seller analytics failed'}
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: 'Analytics API error:', Error: Seller analytics failed
 Error: Seller analytics failed
-    at http://localhost:9876/base/src/app/services/analytics.service.ts:48:17
-    at http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/operators/map.js:7:37
-    at OperatorSubscriber._next (http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:13:21)
-    at OperatorSubscriber.next (http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/Subscriber.js:31:18)
-    at http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/operators/map.js:7:24
-    at OperatorSubscriber._next (http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:13:21)
-    at OperatorSubscriber.next (http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/Subscriber.js:31:18)
-    at http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/operators/filter.js:6:128
-    at OperatorSubscriber._next (http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:13:21)
-    at OperatorSubscriber.next (http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/Subscriber.js:31:18)
+    at http://localhost:9877/base/src/app/services/analytics.service.ts:48:17
+    at http://localhost:9877/base/node_modules/rxjs/src/internal/operators/map.ts:57:33
+    at OperatorSubscriber._next (http://localhost:9877/base/node_modules/rxjs/src/internal/operators/OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.next (http://localhost:9877/base/node_modules/rxjs/src/internal/Subscriber.ts:71:12)
+    at http://localhost:9877/base/node_modules/rxjs/src/internal/operators/map.ts:57:20
+    at OperatorSubscriber._next (http://localhost:9877/base/node_modules/rxjs/src/internal/operators/OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.next (http://localhost:9877/base/node_modules/rxjs/src/internal/Subscriber.ts:71:12)
+    at http://localhost:9877/base/node_modules/rxjs/src/internal/operators/filter.ts:72:109
+    at OperatorSubscriber._next (http://localhost:9877/base/node_modules/rxjs/src/internal/operators/OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.next (http://localhost:9877/base/node_modules/rxjs/src/internal/Subscriber.ts:71:12)
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📥 Raw response:', Object{success: true, data: Object{totalRevenue: 0, bestSellingProducts: undefined, topCategories: []}}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📥 Raw response:', Object{success: true, message: 'OK', data: Object{totalRevenue: 1000, bestSellingProducts: [...], topCategories: [...]}}
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: 'Analytics API error:', HttpErrorResponse{headers: _HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'https://localhost:8080/api/analytics/client/user-1', ok: false, type: undefined, redirected: undefined, name: 'HttpErrorResponse', message: 'Http failure response for https://localhost:8080/api/analytics/client/user-1: 500 Server Error', error: Object{message: 'Server Error'}}
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📥 Raw response:', Object{success: false, message: 'Client analytics failed'}
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: 'Analytics API error:', Error: Client analytics failed
 Error: Client analytics failed
-    at http://localhost:9876/base/src/app/services/analytics.service.ts:21:17
-    at http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/operators/map.js:7:37
-    at OperatorSubscriber._next (http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:13:21)
-    at OperatorSubscriber.next (http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/Subscriber.js:31:18)
-    at http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/operators/map.js:7:24
-    at OperatorSubscriber._next (http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:13:21)
-    at OperatorSubscriber.next (http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/Subscriber.js:31:18)
-    at http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/operators/filter.js:6:128
-    at OperatorSubscriber._next (http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/operators/OperatorSubscriber.js:13:21)
-    at OperatorSubscriber.next (http://localhost:9876/base/node_modules/rxjs/dist/esm/internal/Subscriber.js:31:18)
+    at http://localhost:9877/base/src/app/services/analytics.service.ts:21:17
+    at http://localhost:9877/base/node_modules/rxjs/src/internal/operators/map.ts:57:33
+    at OperatorSubscriber._next (http://localhost:9877/base/node_modules/rxjs/src/internal/operators/OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.next (http://localhost:9877/base/node_modules/rxjs/src/internal/Subscriber.ts:71:12)
+    at http://localhost:9877/base/node_modules/rxjs/src/internal/operators/map.ts:57:20
+    at OperatorSubscriber._next (http://localhost:9877/base/node_modules/rxjs/src/internal/operators/OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.next (http://localhost:9877/base/node_modules/rxjs/src/internal/Subscriber.ts:71:12)
+    at http://localhost:9877/base/node_modules/rxjs/src/internal/operators/filter.ts:72:109
+    at OperatorSubscriber._next (http://localhost:9877/base/node_modules/rxjs/src/internal/operators/OperatorSubscriber.ts:70:13)
+    at OperatorSubscriber.next (http://localhost:9877/base/node_modules/rxjs/src/internal/Subscriber.ts:71:12)
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📥 Raw response:', Object{success: true, message: 'OK', data: Object{totalSpent: 500, mostBoughtProducts: [..., ...], topCategories: [..., ...]}}
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🌐 Fetching order from API:', 'BAD-ORDER'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: '❌ Error fetching order:', HttpErrorResponse{headers: _HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 404, statusText: 'Not Found', url: 'https://localhost:8080/api/orders/BAD-ORDER', ok: false, type: undefined, redirected: undefined, name: 'HttpErrorResponse', message: 'Http failure response for https://localhost:8080/api/orders/BAD-ORDER: 404 Not Found', error: Object{message: 'Not Found'}}
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🌐 Fetching order from API:', 'ORD-001'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: '❌ Error fetching orders:', HttpErrorResponse{headers: _HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'https://localhost:8080/api/orders/buyer', ok: false, type: undefined, redirected: undefined, name: 'HttpErrorResponse', message: 'Http failure response for https://localhost:8080/api/orders/buyer: 500 Server Error', error: Object{message: 'Error'}}
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Avatar file size:', 4, 'max allowed:', 2097152
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Avatar file size:', 6, 'max allowed:', 2097152
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Avatar file size:', 3145728, 'max allowed:', 2097152
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '⚠️ Blocking avatar upload: file too large'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Avatar file size:', 6, 'max allowed:', 2097152
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) WARN: '⛔ AuthGuard block:', '/checkout'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ AuthGuard allow:', '/protected-page'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) WARN: '⛔ AuthGuard block:', '/protected-page'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'App root loaded'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🔄 Loading cart from:', 'https://localhost:8080/api/cart'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🔄 Loading cart from:', 'https://localhost:8080/api/cart'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '👤 Not logged in - empty cart'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🔄 Loading cart from:', 'https://localhost:8080/api/cart'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🔄 Loading cart from:', 'https://localhost:8080/api/cart'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: 'Cart API error:', HttpErrorResponse{headers: _HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 400, statusText: 'Bad Request', url: 'https://localhost:8080/api/cart', ok: false, type: undefined, redirected: undefined, name: 'HttpErrorResponse', message: 'Http failure response for https://localhost:8080/api/cart: 400 Bad Request', error: Object{message: 'Error'}}
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 0
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', true
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) WARN: 'Spec 'OrderListComponent order actions should navigate to order detail' has no expectations.'
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
-,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Password updated successfully'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Profile updated successfully'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) WARN: 'Cannot save profile because avatar upload failed.'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Profile updated successfully'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Avatar deleted from R2 + MongoDB'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ User loaded:', 'user1', 'CLIENT'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 loadAnalytics:', 'user1', 'client'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '📊 Analytics loaded:', Object{items: [Object{name: ..., count: ..., categories: ...}], totalAmount: 500}
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Login successful', Object{message: 'Login successful', token: 'test-token', user: Object{id: 'user-1', email: 'test@example.com', name: 'Test User', role: 'CLIENT', avatar: 'avatar.png'}}
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Login successful', Object{message: 'Login successful', token: 'test-token', user: Object{id: 'user-1', email: 'test@example.com', name: 'Test User', role: 'CLIENT', avatar: 'avatar.png'}}
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Login successful', Object{message: 'Login successful', token: 'test-token', user: Object{id: 'user-1', email: 'test@example.com', name: 'Test User', role: 'CLIENT', avatar: 'avatar.png'}}
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Login successful', Object{message: 'Login successful', token: 'test-token', user: Object{id: 'user-1', email: 'test@example.com', name: 'Test User', role: 'CLIENT', avatar: 'avatar.png'}}
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Login successful', Object{message: 'Login successful', token: 'test-token', user: Object{id: 'user-1', email: 'test@example.com', name: 'Test User', role: 'CLIENT', avatar: 'avatar.png'}}
 ,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: 'Login error', Object{error: Object{message: 'Invalid credentials'}}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Avatar file size:', 6, 'max allowed:', 2097152
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Avatar file size:', 3145728, 'max allowed:', 2097152
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '⚠️ Blocking avatar upload: file too large'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Avatar file size:', 4, 'max allowed:', 2097152
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Avatar file size:', 6, 'max allowed:', 2097152
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ AuthGuard allow:', '/protected-page'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) WARN: '⛔ AuthGuard block:', '/protected-page'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) WARN: '⛔ AuthGuard block:', '/checkout'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'removeImage called', 0
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'removeImage called', 0
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Media deleted', 'media-1'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'closeModal called'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'All new images uploaded', [Object{success: true, message: 'OK', data: Object{url: ...}}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'closeModal called'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'closeModal called'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: 'Failed to load media list for product', '1', Error: Error
+Error: Error
+    at http://localhost:9877/base/src/app/components/seller-dashboard/seller-dashboard.component.spec.ts:355:74
+    at _Observable.init [as _subscribe] (http://localhost:9877/base/node_modules/rxjs/src/internal/observable/throwError.ts:123:68)
+    at _Observable._trySubscribe (http://localhost:9877/base/node_modules/rxjs/src/internal/Observable.ts:235:19)
+    at http://localhost:9877/base/node_modules/rxjs/src/internal/Observable.ts:225:18
+    at errorContext (http://localhost:9877/base/node_modules/rxjs/src/internal/util/errorContext.ts:29:5)
+    at _Observable.subscribe (http://localhost:9877/base/node_modules/rxjs/src/internal/Observable.ts:211:5)
+    at SellerDashboardComponent2.editProduct (http://localhost:9877/base/src/app/components/seller-dashboard/seller-dashboard.component.ts:454:53)
+    at UserContext.<anonymous> (http://localhost:9877/base/src/app/components/seller-dashboard/seller-dashboard.component.spec.ts:356:17)
+    at UserContext.fakeAsyncFn (http://localhost:9877/base/node_modules/zone.js/fesm2015/zone-testing.js:1715:26)
+    at _ZoneDelegate.invoke (http://localhost:9877/base/node_modules/zone.js/fesm2015/zone.js:398:28)
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', []
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'No createdProduct.id, skipping uploadImagesToMediaService'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'closeModal called'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Calling uploadImagesToMediaService with id', 'new-product-id'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'uploadImagesToMediaService called, productId:', 'new-product-id'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'imagePreviews inside uploadImagesToMediaService:', [Object{file: File{}, dataUrl: 'data:image/jpeg;base64,...', mediaId: null}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'Uploading file', 'product.jpg'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'All images uploaded, results:', [Object{success: true, message: 'OK', data: Object{url: ...}}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'closeModal called'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'form invalid, controls:', Object{name: Object{required: true}, description: Object{required: true}, price: Object{required: true}, quantity: Object{required: true}, categoryId: Object{required: true}, image: null}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: 'Delete failed', Error: Error
+Error: Error
+    at http://localhost:9877/base/src/app/components/seller-dashboard/seller-dashboard.component.spec.ts:402:72
+    at _Observable.init [as _subscribe] (http://localhost:9877/base/node_modules/rxjs/src/internal/observable/throwError.ts:123:68)
+    at _Observable._trySubscribe (http://localhost:9877/base/node_modules/rxjs/src/internal/Observable.ts:235:19)
+    at http://localhost:9877/base/node_modules/rxjs/src/internal/Observable.ts:225:18
+    at errorContext (http://localhost:9877/base/node_modules/rxjs/src/internal/util/errorContext.ts:29:5)
+    at _Observable.subscribe (http://localhost:9877/base/node_modules/rxjs/src/internal/Observable.ts:211:5)
+    at SellerDashboardComponent2.deleteProduct (http://localhost:9877/base/src/app/components/seller-dashboard/seller-dashboard.component.ts:499:77)
+    at UserContext.<anonymous> (http://localhost:9877/base/src/app/components/seller-dashboard/seller-dashboard.component.spec.ts:404:17)
+    at UserContext.fakeAsyncFn (http://localhost:9877/base/node_modules/zone.js/fesm2015/zone-testing.js:1715:26)
+    at _ZoneDelegate.invoke (http://localhost:9877/base/node_modules/zone.js/fesm2015/zone.js:398:28)
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: 'Error loading seller products:'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'products from backend', [Object{id: '1', name: 'T-Shirt', description: 'Nice shirt', price: 19.99, images: [...], categoryId: 'cat1', quantity: 10, userId: 'seller1'}]
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🔄 Loading cart from:', 'https://localhost:8080/api/cart'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🔄 Loading cart from:', 'https://localhost:8080/api/cart'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🔄 Loading cart from:', 'https://localhost:8080/api/cart'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '👤 Not logged in - empty cart'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🔄 Loading cart from:', 'https://localhost:8080/api/cart'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🔄 Loading cart from:', 'https://localhost:8080/api/cart'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🔄 Loading cart from:', 'https://localhost:8080/api/cart'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) ERROR: 'Cart API error:', HttpErrorResponse{headers: _HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 400, statusText: 'Bad Request', url: 'https://localhost:8080/api/cart', ok: false, type: undefined, redirected: undefined, name: 'HttpErrorResponse', message: 'Http failure response for https://localhost:8080/api/cart: 400 Bad Request', error: Object{message: 'Error'}}
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🛒 Cart cleared after order!'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Adding to cart:', 'Test Seller', 'Stock:', 50
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Adding to cart:', 'Test Seller', 'Stock:', 50
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'seller-1', 'Seller?', true
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 0
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', false
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: 'User:', 'user-1', 'Seller?', true
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '✅ Orders loaded:', 2
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 Calling REAL API createOrder'
+,Chrome Headless 144.0.0.0 (Mac OS 10.15.7) LOG: '🚀 Calling REAL API createOrder'
 
 ]]>
   </system-out>

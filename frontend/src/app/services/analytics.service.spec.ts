@@ -75,7 +75,7 @@ describe('AnalyticsService', () => {
     it('should handle unsuccessful response', () => {
       service.getClientAnalytics('user-1').subscribe({
         error: (err) => {
-          expect(err.message).toContain('analytics failed');
+          expect(err.message).toContain('Failed to load analytics');
         },
       });
 
@@ -113,7 +113,7 @@ describe('AnalyticsService', () => {
     it('should handle unsuccessful response', () => {
       service.getSellerAnalytics('seller-1').subscribe({
         error: (err) => {
-          expect(err.message).toContain('analytics failed');
+          expect(err.message).toContain('Failed to load analytics');
         },
       });
 

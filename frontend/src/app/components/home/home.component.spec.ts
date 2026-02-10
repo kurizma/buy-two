@@ -24,8 +24,8 @@ describe('HomeComponent', () => {
   ];
 
   const mockProducts: ProductResponse[] = [
-    { id: 'prod-1', name: 'Product 1', description: 'Desc 1', price: 99, quantity: 10, images: [], categoryId: 'cat-1', userId: 'seller-1' },
-    { id: 'prod-2', name: 'Product 2', description: 'Desc 2', price: 199, quantity: 5, images: [], categoryId: 'cat-2', userId: 'seller-2' },
+    { id: 'prod-1', name: 'Product 1', description: 'Desc 1', price: 99, quantity: 10, images: ['img1.jpg'], categoryId: 'cat-1', userId: 'seller-1' },
+    { id: 'prod-2', name: 'Product 2', description: 'Desc 2', price: 199, quantity: 5, images: ['img2.jpg'], categoryId: 'cat-2', userId: 'seller-2' },
   ];
 
   const mockSellers: UserResponse[] = [
