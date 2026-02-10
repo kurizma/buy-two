@@ -374,9 +374,11 @@ export class CartService {
   }
 
   // Generate unique cart item ID
-  private generateCartItemId(): string {
-    return `cart-item-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
-  }
+private generateCartItemId(item: any): string {
+  // Use backend-provided productId + sellerId (trusted) + short random for uniqueness
+  const shortRandom = Math.random().toString(36).substring(2, 8);
+  return `cart-${item.productId}-${item.sellerId}-${shortRandom}`;
+}
 
   /** API Error handler */
   private handleApiError(error: any) {
