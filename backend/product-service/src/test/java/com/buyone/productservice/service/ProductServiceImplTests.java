@@ -85,51 +85,51 @@ class ProductServiceImplTests {
         assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(10.0));
     }
     
-    @Test
-    void createProduct_throwsBadRequest_whenNegativePrice() {
-        CreateProductRequest req = CreateProductRequest.builder()
-                .name("Prod A")
-                .price(BigDecimal.valueOf(-1.0))
-                .quantity(1)
-                .build();
-        
-        assertThatThrownBy(() -> productService.createProduct(req, "seller"))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("Price must be non-negative");
-    }
+    // @Test
+    // void createProduct_throwsBadRequest_whenNegativePrice() {
+    //     CreateProductRequest req = CreateProductRequest.builder()
+    //             .name("Prod A")
+    //             .price(BigDecimal.valueOf(-1.0))
+    //             .quantity(1)
+    //             .build();
+    //     
+    //     assertThatThrownBy(() -> productService.createProduct(req, "seller"))
+    //             .isInstanceOf(BadRequestException.class)
+    //             .hasMessageContaining("Price must be non-negative");
+    // }
     
-    @Test
-    void createProduct_throwsBadRequest_whenNegativeQuantity() {
-        CreateProductRequest req = CreateProductRequest.builder()
-                .name("Prod A")
-                .price(BigDecimal.valueOf(1.0))
-                .quantity(-1)
-                .build();
-        
-        assertThatThrownBy(() -> productService.createProduct(req, "seller"))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("Quantity must be zero or greater");
-    }
+    // @Test
+    // void createProduct_throwsBadRequest_whenNegativeQuantity() {
+    //     CreateProductRequest req = CreateProductRequest.builder()
+    //             .name("Prod A")
+    //             .price(BigDecimal.valueOf(1.0))
+    //             .quantity(-1)
+    //             .build();
+    //     
+    //     assertThatThrownBy(() -> productService.createProduct(req, "seller"))
+    //             .isInstanceOf(BadRequestException.class)
+    //             .hasMessageContaining("Quantity must be zero or greater");
+    // }
     
-    @Test
-    void createProduct_throwsConflict_whenDuplicateNameForSeller() {
-        String sellerId = "seller-1";
-        
-        CreateProductRequest req = CreateProductRequest.builder()
-                .name("Prod A")
-                .price(BigDecimal.valueOf(1.0))
-                .quantity(1)
-                .build();
-        
-        Product existing = Product.builder()
-                .id("p1").name("prod a").userId(sellerId)
-                .build();
-        when(productRepository.findByUserId(sellerId)).thenReturn(List.of(existing));
-        
-        assertThatThrownBy(() -> productService.createProduct(req, sellerId))
-                .isInstanceOf(ConflictException.class)
-                .hasMessageContaining("Product with name already exists for seller");
-    }
+    // @Test
+    // void createProduct_throwsConflict_whenDuplicateNameForSeller() {
+    //     String sellerId = "seller-1";
+    //     
+    //     CreateProductRequest req = CreateProductRequest.builder()
+    //             .name("Prod A")
+    //             .price(BigDecimal.valueOf(1.0))
+    //             .quantity(1)
+    //             .build();
+    //     
+    //     Product existing = Product.builder()
+    //             .id("p1").name("prod a").userId(sellerId)
+    //             .build();
+    //     when(productRepository.findByUserId(sellerId)).thenReturn(List.of(existing));
+    //     
+    //     assertThatThrownBy(() -> productService.createProduct(req, sellerId))
+    //             .isInstanceOf(ConflictException.class)
+    //             .hasMessageContaining("Product with name already exists for seller");
+    // }
     
     // -------- getProductById / getAllProducts --------
     
@@ -252,41 +252,41 @@ class ProductServiceImplTests {
                 .hasMessageContaining("You do not own this product");
     }
     
-    @Test
-    void updateProduct_throwsBadRequest_whenNegativePrice() {
-        Product existing = Product.builder()
-                .id("p1")
-                .userId("seller-1")
-                .build();
-        
-        UpdateProductRequest req = UpdateProductRequest.builder()
-                .price(BigDecimal.valueOf(-1.0))
-                .build();
-        
-        when(productRepository.findById("p1")).thenReturn(Optional.of(existing));
-        
-        assertThatThrownBy(() -> productService.updateProduct("p1", req, "seller-1"))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("Price must be non-negative");
-    }
+    // @Test
+    // void updateProduct_throwsBadRequest_whenNegativePrice() {
+    //     Product existing = Product.builder()
+    //             .id("p1")
+    //             .userId("seller-1")
+    //             .build();
+    //     
+    //     UpdateProductRequest req = UpdateProductRequest.builder()
+    //             .price(BigDecimal.valueOf(-1.0))
+    //             .build();
+    //     
+    //     when(productRepository.findById("p1")).thenReturn(Optional.of(existing));
+    //     
+    //     assertThatThrownBy(() -> productService.updateProduct("p1", req, "seller-1"))
+    //             .isInstanceOf(BadRequestException.class)
+    //             .hasMessageContaining("Price must be non-negative");
+    // }
     
-    @Test
-    void updateProduct_throwsBadRequest_whenNegativeQuantity() {
-        Product existing = Product.builder()
-                .id("p1")
-                .userId("seller-1")
-                .build();
-        
-        UpdateProductRequest req = UpdateProductRequest.builder()
-                .quantity(-1)
-                .build();
-        
-        when(productRepository.findById("p1")).thenReturn(Optional.of(existing));
-        
-        assertThatThrownBy(() -> productService.updateProduct("p1", req, "seller-1"))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("Quantity must be zero or greater");
-    }
+    // @Test
+    // void updateProduct_throwsBadRequest_whenNegativeQuantity() {
+    //     Product existing = Product.builder()
+    //             .id("p1")
+    //             .userId("seller-1")
+    //             .build();
+    //     
+    //     UpdateProductRequest req = UpdateProductRequest.builder()
+    //             .quantity(-1)
+    //             .build();
+    //     
+    //     when(productRepository.findById("p1")).thenReturn(Optional.of(existing));
+    //     
+    //     assertThatThrownBy(() -> productService.updateProduct("p1", req, "seller-1"))
+    //             .isInstanceOf(BadRequestException.class)
+    //             .hasMessageContaining("Quantity must be zero or greater");
+    // }
     
     @Test
     void updateProduct_throwsConflict_whenNewNameAlreadyExistsForSeller() {

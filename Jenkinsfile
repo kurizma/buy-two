@@ -97,14 +97,9 @@ pipeline {
 			}
 		}
 
-		stage('Backend Build - order-service') {
-			steps {
-				dir('backend/order-service') {
-					sh "JAVA_TOOL_OPTIONS='-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400' mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} clean package -DskipTests"
-				}
-			}
-		}
-
+		/***********************
+		 * Backend unit tests  *
+		 ***********************/
 		stage('Backend Tests - discovery-service') {
 			steps {
 				dir('backend/discovery-service') {
@@ -145,14 +140,9 @@ pipeline {
 			}
 		}
 
-		stage('Backend Tests - order-service') {
-			steps {
-				dir('backend/order-service') {
-					sh "JAVA_TOOL_OPTIONS='-Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=86400' mvn -Dmaven.repo.local=${MAVEN_REPO_LOCAL} test"
-				}
-			}
-		}
-
+		/************
+		 * Frontend *
+		 ************/
 		stage('Frontend - Tests Included') {
 			steps {
 				dir('frontend') {
@@ -189,56 +179,114 @@ pipeline {
 			}
 		}
 
-		// SonarCloud Code Analysis
-		stage('SonarCloud Analysis - Backend') {
+		/****************************
+		* SonarQube Code Analysis *
+		****************************/
+		stage('SonarQube Analysis - Backend') {
 			steps {
 				script {
 					def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
 					env.PATH = "${scannerHome}/bin:${env.PATH}"
 
-					withSonarQubeEnv('SonarCloud') {
-						dir('backend/discovery-service') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_discovery-service -Dsonar.projectName='Discovery Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-						}
-						dir('backend/gateway-service') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_gateway-service -Dsonar.projectName='Gateway Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-						}
-						dir('backend/order-service') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_order-service -Dsonar.projectName='Order Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-						}
-						dir('backend/order-service') {
-							sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_order-service -Dsonar.projectName='Order Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-						}
-						dir('backend/user-service') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_user-service -Dsonar.projectName='User Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-						}
-						dir('backend/product-service') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_product-service -Dsonar.projectName='Product Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-						}
-						dir('backend/media-service') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_media-service -Dsonar.projectName='Media Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
+					withSonarQubeEnv('SonarQube Dev') {
+						withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN'),
+							string(credentialsId: 'sonarqube-host-url', variable: 'SONAR_HOST')]) {
+							dir('backend/discovery-service') {
+								sh '''
+                                    sonar-scanner \
+                                        -Dsonar.projectKey=safe-zone-discovery-service \
+                                        -Dsonar.projectName="Safe Zone - Discovery Service" \
+                                        -Dsonar.sources=src \
+                                        -Dsonar.java.binaries=target/classes \
+                                        -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
+                                        -Dsonar.host.url=${SONAR_HOST} \
+                                        -Dsonar.token=${SONAR_TOKEN}
+                                '''
+							}
+							dir('backend/gateway-service') {
+								sh '''
+                                    sonar-scanner \
+                                        -Dsonar.projectKey=safe-zone-gateway-service \
+                                        -Dsonar.projectName="Safe Zone - Gateway Service" \
+                                        -Dsonar.sources=src \
+                                        -Dsonar.java.binaries=target/classes \
+                                        -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
+                                        -Dsonar.host.url=${SONAR_HOST} \
+                                        -Dsonar.token=${SONAR_TOKEN}
+                                '''
+							}
+							dir('backend/user-service') {
+								sh '''
+                                    sonar-scanner \
+                                        -Dsonar.projectKey=safe-zone-user-service \
+                                        -Dsonar.projectName="Safe Zone - User Service" \
+                                        -Dsonar.sources=src \
+                                        -Dsonar.java.binaries=target/classes \
+                                        -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
+                                        -Dsonar.host.url=${SONAR_HOST} \
+                                        -Dsonar.token=${SONAR_TOKEN}
+                                '''
+							}
+							dir('backend/product-service') {
+								sh '''
+                                    sonar-scanner \
+                                        -Dsonar.projectKey=safe-zone-product-service \
+                                        -Dsonar.projectName="Safe Zone - Product Service" \
+                                        -Dsonar.sources=src \
+                                        -Dsonar.java.binaries=target/classes \
+                                        -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
+                                        -Dsonar.host.url=${SONAR_HOST} \
+                                        -Dsonar.token=${SONAR_TOKEN}
+                                '''
+							}
+							dir('backend/media-service') {
+								sh '''
+                                    sonar-scanner \
+                                        -Dsonar.projectKey=safe-zone-media-service \
+                                        -Dsonar.projectName="Safe Zone - Media Service" \
+                                        -Dsonar.sources=src \
+                                        -Dsonar.java.binaries=target/classes \
+                                        -Dsonar.exclusions="**/.env,**/.env*,**/*.log" \
+                                        -Dsonar.host.url=${SONAR_HOST} \
+                                        -Dsonar.token=${SONAR_TOKEN}
+                                '''
+							}
 						}
 					}
 				}
 			}
 		}
 
-		stage('SonarCloud Analysis - Frontend') {
+		stage('SonarQube Analysis - Frontend') {
 			steps {
 				dir('frontend') {
 					script {
 						def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
 						env.PATH = "${scannerHome}/bin:${env.PATH}"
 
-						withSonarQubeEnv('SonarCloud') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_frontend -Dsonar.projectName='Frontend' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src/app -Dsonar.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,**/*.d.ts,node_modules/**,dist/**,coverage/**,**/.env,**/.env*,src/environments/**,src/assets/**' -Dsonar.cpd.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,node_modules/**'"
+						withSonarQubeEnv('SonarQube Dev') {
+							withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_TOKEN'),
+								string(credentialsId: 'sonarqube-host-url', variable: 'SONAR_HOST')]) {
+								sh '''
+                                    sonar-scanner \
+                                        -Dsonar.projectKey=safe-zone-frontend \
+                                        -Dsonar.projectName="Safe Zone - Frontend" \
+                                        -Dsonar.sources=src/app \
+                                        -Dsonar.exclusions=**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,**/*.d.ts,node_modules/**,dist/**,coverage/**,**/.env,**/.env*,src/environments/**,src/assets/** \
+                                        -Dsonar.cpd.exclusions=**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,node_modules/** \
+                                        -Dsonar.host.url=${SONAR_HOST} \
+                                        -Dsonar.token=${SONAR_TOKEN}
+                                '''
+							}
 						}
 					}
 				}
 			}
 		}
 
-		// Quality Gate Check → Skip deploy → Post FAILURE Slack
+		/****************************
+		 * Quality Gate Check → Skip deploy → Post FAILURE Slack *
+		 ****************************/
 		stage('Quality Gate Check') {
 			steps {
 				script {
@@ -250,6 +298,9 @@ pipeline {
 			}
 		}
 
+		/************************
+		 * Build Docker images  *
+		 ************************/
 		stage('Build Images') {
 			steps {
 				script {
@@ -314,14 +365,13 @@ EOF
 									sh 'docker compose build frontend || exit 1'
 									sh 'docker compose build --pull --parallel --progress=plain'
 									sh '''
-                                        docker tag frontend:${VERSION} frontend:${STABLE_TAG} frontend:build-${BUILD_NUMBER} || true
-                                        docker tag discovery-service:${VERSION} discovery-service:${STABLE_TAG} discovery-service:build-${BUILD_NUMBER} || true
-                                        docker tag gateway-service:${VERSION} gateway-service:${STABLE_TAG} gateway-service:build-${BUILD_NUMBER} || true
-                                        docker tag user-service:${VERSION} user-service:${STABLE_TAG} user-service:build-${BUILD_NUMBER} || true
-                                        docker tag product-service:${VERSION} product-service:${STABLE_TAG} product-service:build-${BUILD_NUMBER} || true
-                                        docker tag order-service:${VERSION} order-service:${STABLE_TAG} order-service:build-${BUILD_NUMBER} || true
-                                        docker tag media-service:${VERSION} media-service:${STABLE_TAG} media-service:build-${BUILD_NUMBER} || true
-                                    '''
+                                    docker tag frontend:${VERSION} frontend:${STABLE_TAG} frontend:build-${BUILD_NUMBER} || true
+                                    docker tag discovery-service:${VERSION} discovery-service:${STABLE_TAG} discovery-service:build-${BUILD_NUMBER} || true
+                                    docker tag gateway-service:${VERSION} gateway-service:${STABLE_TAG} gateway-service:build-${BUILD_NUMBER} || true
+                                    docker tag user-service:${VERSION} user-service:${STABLE_TAG} user-service:build-${BUILD_NUMBER} || true
+                                    docker tag product-service:${VERSION} product-service:${STABLE_TAG} product-service:build-${BUILD_NUMBER} || true
+                                    docker tag media-service:${VERSION} media-service:${STABLE_TAG} media-service:build-${BUILD_NUMBER} || true
+                                '''
 
 									// Deploy new version for verification
 									sh 'docker compose up -d'
@@ -406,10 +456,10 @@ EOF
 								  -d '{"state":"${ghState}", "context":"buy-two", "description":"Jenkins ${buildState}", "target_url":"${BUILD_URL}"}' \\
 								  https://api.github.com/repos/kurizma/buy-two/statuses/${GIT_COMMIT} || true
 
-								curl -s -H "Authorization: token ${GITHUB_TOKEN}" \\
-								  -X POST -H "Accept: application/vnd.github.v3+json" \\
-								  -d '{"state":"${ghState}", "context":"buy-two-quality-gate", "description":"Quality gate ${buildState}", "target_url":"https://sonarcloud.io/organizations/kurizma/projects?search=buy-two"}' \\
-								  https://api.github.com/repos/kurizma/buy-two/statuses/${GIT_COMMIT} || true
+							curl -s -H "Authorization: token ${GITHUB_TOKEN}" \\
+							  -X POST -H "Accept: application/vnd.github.v3+json" \\
+							  -d '{"state":"${ghState}", "context":"safe-quality-gate", "description":"Quality gate ${buildState}"}' \\
+							  https://api.github.com/repos/kurizma/safe-zone/statuses/${GIT_COMMIT} || true
 
 								exit 0
 							"""

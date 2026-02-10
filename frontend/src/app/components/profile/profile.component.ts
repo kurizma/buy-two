@@ -1,34 +1,22 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { UserResponse } from '../../models/users/user-response.model';
 import { UserUpdateRequest } from '../../models/users/userUpdateRequest.model';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { MediaService } from '../../services/media.service';
 import { AuthService } from '../../services/auth.service';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-  AbstractControl,
-} from '@angular/forms';
-import { ProfileAnalyticsComponent } from '../profile-analytics/profile-analytics.component';
-import { AnalyticsItem } from '../../models/profile/analytics-item';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, ProfileAnalyticsComponent],
+  imports: [ReactiveFormsModule, CommonModule],
 })
 export class ProfileComponent implements OnInit {
   currentUser: UserResponse | null = null;
-  get userRole(): 'client' | 'seller' | null {
-    if (!this.currentUser?.role) return null;
-    return this.currentUser.role === 'CLIENT' ? 'client' : 'seller';
-  }
-
   profileForm: FormGroup;
   passwordForm: FormGroup;
   avatar: string | null = null; // always URL or null
@@ -46,42 +34,6 @@ export class ProfileComponent implements OnInit {
 
   fb = inject(FormBuilder);
 
-  // ************* Mock analytics data *****************
-  getAnalyticsItems(role: 'client' | 'seller'): AnalyticsItem[] {
-    if (!this.currentUser?.email) return [];
-
-    const key = `${role}-${this.currentUser.email}`;
-
-    switch (key) {
-      case 'client-dada@dee.com':
-        return [
-          { name: 'Code Wizard Tee', categories: 'CAT-001', count: 2, amount: 58 },
-          { name: 'Keep Coding Tee', categories: 'CAT-001', count: 1, amount: 28 },
-          { name: 'Action Noir Tee', categories: 'CAT-006', count: 1, amount: 45 },
-        ];
-
-      case 'client-john@doe.com':
-      case 'seller-angu@readme.md':
-        return [];
-
-      case 'seller-joon@kim.kr':
-        return [
-          { name: 'Code Wizard Tee', categories: 'CAT-001', count: 4, amount: 110 },
-          { name: 'Pop Code Queen Tee', categories: 'CAT-003', count: 2, amount: 150 },
-          { name: 'Classic Portrait Tee', categories: 'CAT-006', count: 10, amount: 450 },
-          { name: 'Why Dark Mode Tee', categories: 'CAT-005', count: 1, amount: 35 },
-        ];
-
-      default:
-        return [];
-    }
-  }
-
-  getTotalAmount(role: 'client' | 'seller'): number {
-    const items = this.getAnalyticsItems(role);
-    return items.reduce((sum, item) => sum + item.amount, 0);
-  }
-
   constructor() {
     this.profileForm = this.fb.group({
       name: ['', Validators.required],
@@ -95,7 +47,7 @@ export class ProfileComponent implements OnInit {
           [
             Validators.required,
             Validators.minLength(8),
-            Validators.pattern(String.raw`^(?=.*[a-z])(?=.*\d).{8,}$`),
+            Validators.pattern('^(?=.*[a-z])(?=.*\\d).{8,}$'),
           ],
         ],
         confirmPassword: ['', Validators.required],
@@ -192,7 +144,7 @@ export class ProfileComponent implements OnInit {
 
   private extractMediaId(url?: string): string | null {
     if (!url) return null;
-    const match = /media\/([a-f0-9-]+)\./.exec(url);
+    const match = url.match(/media\/([a-f0-9-]+)\./);
     return match?.[1] || null;
   }
 
