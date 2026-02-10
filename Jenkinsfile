@@ -192,36 +192,114 @@ pipeline {
 		// SonarCloud Code Analysis
 		stage('SonarCloud Analysis - Backend') {
 			steps {
+				parallel(
+					'discovery-service': {
+						script {
+							def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+							env.PATH = "${scannerHome}/bin:${env.PATH}"
+							
+							dir('backend/discovery-service') {
+								withSonarQubeEnv('SonarCloud') {
+									sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_discovery-service -Dsonar.projectName='Discovery Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
+								}
+								timeout(time: 5, unit: 'MINUTES') {
+									waitForQualityGate abortPipeline: true
+								}
+							}
+						}
+					},
+					'gateway-service': {
+						script {
+							def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+							env.PATH = "${scannerHome}/bin:${env.PATH}"
+							
+							dir('backend/gateway-service') {
+								withSonarQubeEnv('SonarCloud') {
+									sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_gateway-service -Dsonar.projectName='Gateway Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
+								}
+								timeout(time: 5, unit: 'MINUTES') {
+									waitForQualityGate abortPipeline: true
+								}
+							}
+						}
+					},
+					'order-service': {
+						script {
+							def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+							env.PATH = "${scannerHome}/bin:${env.PATH}"
+							
+							dir('backend/order-service') {
+								withSonarQubeEnv('SonarCloud') {
+									sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_order-service -Dsonar.projectName='Order Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
+								}
+								timeout(time: 5, unit: 'MINUTES') {
+									waitForQualityGate abortPipeline: true
+								}
+							}
+						}
+					},
+					'user-service': {
+						script {
+							def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+							env.PATH = "${scannerHome}/bin:${env.PATH}"
+							
+							dir('backend/user-service') {
+								withSonarQubeEnv('SonarCloud') {
+									sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_user-service -Dsonar.projectName='User Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
+								}
+								timeout(time: 5, unit: 'MINUTES') {
+									waitForQualityGate abortPipeline: true
+								}
+							}
+						}
+					},
+					'product-service': {
+						script {
+							def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+							env.PATH = "${scannerHome}/bin:${env.PATH}"
+							
+							dir('backend/product-service') {
+								withSonarQubeEnv('SonarCloud') {
+									sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_product-service -Dsonar.projectName='Product Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
+								}
+								timeout(time: 5, unit: 'MINUTES') {
+									waitForQualityGate abortPipeline: true
+								}
+							}
+						}
+					},
+					'media-service': {
+						script {
+							def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+							env.PATH = "${scannerHome}/bin:${env.PATH}"
+							
+							dir('backend/media-service') {
+								withSonarQubeEnv('SonarCloud') {
+									sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_media-service -Dsonar.projectName='Media Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
+								}
+								timeout(time: 5, unit: 'MINUTES') {
+									waitForQualityGate abortPipeline: true
+								}
+							}
+						}
+					}
+				)
+			}
+		}
+
+		stage('SonarCloud Analysis - Frontend') {
+			steps {
 				script {
 					def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
 					env.PATH = "${scannerHome}/bin:${env.PATH}"
-				
-				withSonarQubeEnv('SonarCloud') {
-					dir('backend/discovery-service') {
-						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_discovery-service -Dsonar.projectName='Discovery Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-					}
-					dir('backend/gateway-service') {
-						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_gateway-service -Dsonar.projectName='Gateway Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-					}
-					dir('backend/order-service') {
-						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_order-service -Dsonar.projectName='Order Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-					}
-					dir('backend/user-service') {
-						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_user-service -Dsonar.projectName='User Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-					}
-					dir('backend/product-service') {
-						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_product-service -Dsonar.projectName='Product Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-					}
-					dir('backend/media-service') {
-						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_media-service -Dsonar.projectName='Media Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-					}
-
+					
 					dir('frontend') {
-						sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_frontend -Dsonar.projectName='Frontend' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src/app -Dsonar.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,**/*.d.ts,node_modules/**,dist/**,coverage/**,**/.env,**/.env*,src/environments/**,src/assets/**' -Dsonar.cpd.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,node_modules/**'"
-					}
-					// 🔒 MUST BE HERE
-					timeout(time: 10, unit: 'MINUTES') {
-						waitForQualityGate abortPipeline: true
+						withSonarQubeEnv('SonarCloud') {
+							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_frontend -Dsonar.projectName='Frontend' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src/app -Dsonar.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,**/*.d.ts,node_modules/**,dist/**,coverage/**,**/.env,**/.env*,src/environments/**,src/assets/**' -Dsonar.cpd.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,node_modules/**'"
+						}
+						timeout(time: 5, unit: 'MINUTES') {
+							waitForQualityGate abortPipeline: true
+						}
 					}
 				}
 			}
