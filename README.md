@@ -1,5 +1,4 @@
-# Safe Zone - Microservices CI/CD Pipeline
-
+# buy-two E-Commerce
 Complete automated CI/CD pipeline with Jenkins and SonarQube code quality analysis.
 
 # Project Overview
