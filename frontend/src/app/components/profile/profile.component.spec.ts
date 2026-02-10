@@ -3,8 +3,8 @@ import { ProfileComponent } from './profile.component';
 import { UserService } from '../../services/user.service';
 import { MediaService } from '../../services/media.service';
 import { AuthService } from '../../services/auth.service';
-import { HttpClient } from '@angular/common/http';
-import { Router, ActivatedRoute } from '@angular/router';
+import { provideRouter } from '@angular/router';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { of } from 'rxjs';
 
 const mockUser = {
@@ -22,6 +22,8 @@ describe('ProfileComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ProfileComponent],
+      providers: [provideRouter([])],
+      schemas: [NO_ERRORS_SCHEMA]
     })
       .overrideProvider(UserService, {
         useValue: {
@@ -43,24 +45,6 @@ describe('ProfileComponent', () => {
         useValue: {
           updateCurrentUserInStorage: jasmine.createSpy('updateCurrentUserInStorage'),
         },
-      })
-      .overrideProvider(HttpClient, {
-        useValue: jasmine.createSpyObj('HttpClient', ['get', 'post']),
-      })
-      .overrideProvider(Router, {
-        useValue: {
-          createUrlTree: jasmine
-            .createSpy('createUrlTree')
-            .and.returnValue({ toString: () => '/profile' }),
-          serializeUrl: jasmine.createSpy('serializeUrl').and.returnValue('/profile'),
-          navigate: jasmine.createSpy('navigate'),
-        },
-      })
-      .overrideProvider(ActivatedRoute, {
-        useValue: { snapshot: { paramMap: { get: () => null } } },
-      })
-      .overrideProvider(HttpClient, {
-        useValue: jasmine.createSpyObj('HttpClient', ['get', 'post']),
       })
       .compileComponents();
   });
