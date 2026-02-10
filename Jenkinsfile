@@ -304,7 +304,6 @@ pipeline {
 				}
 			}
 		}
-	}
 
 
 		// stage('SonarCloud Analysis - Frontend') {
