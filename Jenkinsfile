@@ -215,41 +215,44 @@ pipeline {
 					dir('backend/media-service') {
 						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_media-service -Dsonar.projectName='Media Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
 					}
-					sleep(time: 2, unit: 'MINUTES')  // Buffer for background queues
+
+					dir('frontend') {
+						sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_frontend -Dsonar.projectName='Frontend' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src/app -Dsonar.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,**/*.d.ts,node_modules/**,dist/**,coverage/**,**/.env,**/.env*,src/environments/**,src/assets/**' -Dsonar.cpd.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,node_modules/**'"
+					}
+					// 🔒 MUST BE HERE
 					timeout(time: 10, unit: 'MINUTES') {
-						waitForQualityGate abortPipeline: false  // Warn-only for backends
-					}
-				}
-			}
-		}
-
-
-		stage('SonarCloud Analysis - Frontend') {
-			steps {
-				dir('frontend') {
-					script {
-						def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-						env.PATH = "${scannerHome}/bin:${env.PATH}"
-
-						withSonarQubeEnv('SonarCloud') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_frontend -Dsonar.projectName='Frontend' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src/app -Dsonar.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,**/*.d.ts,node_modules/**,dist/**,coverage/**,**/.env,**/.env*,src/environments/**,src/assets/**' -Dsonar.cpd.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,node_modules/**'"
-						}
-					}
-				}
-			}
-		}
-
-		// Quality Gate Check → Skip deploy → Post FAILURE Slack
-		stage('Quality Gate Check') {
-			steps {
-				script {
-					echo 'Checking SonarQube Quality Gate...'
-					timeout(time: 5, unit: 'MINUTES') {
 						waitForQualityGate abortPipeline: true
 					}
 				}
 			}
 		}
+
+
+		// stage('SonarCloud Analysis - Frontend') {
+		// 	steps {
+		// 		dir('frontend') {
+		// 			script {
+		// 				def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+		// 				env.PATH = "${scannerHome}/bin:${env.PATH}"
+
+		// 				withSonarQubeEnv('SonarCloud') {
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
+
+		// Quality Gate Check → Skip deploy → Post FAILURE Slack
+		// stage('Quality Gate Check') {
+		// 	steps {
+		// 		script {
+		// 			echo 'Checking SonarQube Quality Gate...'
+		// 			timeout(time: 5, unit: 'MINUTES') {
+		// 				waitForQualityGate abortPipeline: true
+		// 			}
+		// 		}
+		// 	}
+		// }
 
 		stage('Build Images') {
 			steps {
