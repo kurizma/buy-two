@@ -197,10 +197,7 @@ pipeline {
 				}
 				withSonarQubeEnv('SonarCloud') {
 					dir('backend/discovery-service') {
-						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_discovery-service -Dsonar.projectName='Discovery Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-					}
-					timeout(time: 15, unit: 'MINUTES') {
-						waitForQualityGate abortPipeline: true
+							sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_discovery-service -Dsonar.projectName='Discovery Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log' -Dsonar.qualitygate.wait=true"
 					}
 				}
 			}
@@ -214,10 +211,7 @@ pipeline {
 				}
 				withSonarQubeEnv('SonarCloud') {
 					dir('backend/gateway-service') {
-						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_gateway-service -Dsonar.projectName='Gateway Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-					}
-					timeout(time: 15, unit: 'MINUTES') {
-						waitForQualityGate abortPipeline: true
+							sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_gateway-service -Dsonar.projectName='Gateway Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log' -Dsonar.qualitygate.wait=true"
 					}
 				}
 			}
@@ -231,10 +225,7 @@ pipeline {
 				}
 				withSonarQubeEnv('SonarCloud') {
 					dir('backend/user-service') {
-						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_user-service -Dsonar.projectName='User Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-					}
-					timeout(time: 15, unit: 'MINUTES') {
-						waitForQualityGate abortPipeline: true
+						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_user-service -Dsonar.projectName='User Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log' -Dsonar.qualitygate.wait=true"
 					}
 				}
 			}
@@ -248,10 +239,7 @@ pipeline {
 				}
 				withSonarQubeEnv('SonarCloud') {
 					dir('backend/product-service') {
-						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_product-service -Dsonar.projectName='Product Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-					}
-					timeout(time: 15, unit: 'MINUTES') {
-						waitForQualityGate abortPipeline: true
+							sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_product-service -Dsonar.projectName='Product Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log' -Dsonar.qualitygate.wait=true"
 					}
 				}
 			}
@@ -265,10 +253,7 @@ pipeline {
 				}
 				withSonarQubeEnv('SonarCloud') {
 					dir('backend/media-service') {
-						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_media-service -Dsonar.projectName='Media Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-					}
-					timeout(time: 15, unit: 'MINUTES') {
-						waitForQualityGate abortPipeline: true
+						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_media-service -Dsonar.projectName='Media Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log' -Dsonar.qualitygate.wait=true"
 					}
 				}
 			}
@@ -282,10 +267,7 @@ pipeline {
 				}
 				withSonarQubeEnv('SonarCloud') {
 					dir('backend/order-service') {
-						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_order-service -Dsonar.projectName='Order Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-					}
-					timeout(time: 15, unit: 'MINUTES') {
-						waitForQualityGate abortPipeline: true
+						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_order-service -Dsonar.projectName='Order Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log' -Dsonar.qualitygate.wait=true"
 					}
 				}
 			}
@@ -299,10 +281,7 @@ pipeline {
 				}
 				withSonarQubeEnv('SonarCloud') {
 					dir('frontend') {
-						sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_frontend -Dsonar.projectName='Frontend' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src/app -Dsonar.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,**/*.d.ts,node_modules/**,dist/**,coverage/**,**/.env,**/.env*,src/environments/**,src/assets/**' -Dsonar.cpd.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,node_modules/**'"
-					}
-					timeout(time: 15, unit: 'MINUTES') {
-						waitForQualityGate abortPipeline: true
+						sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_frontend -Dsonar.projectName='Frontend' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src/app -Dsonar.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,**/*.d.ts,node_modules/**,dist/**,coverage/**,**/.env,**/.env*,src/environments/**,src/assets/**' -Dsonar.cpd.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,node_modules/**' -Dsonar.qualitygate.wait=true"
 					}
 				}
 			}
@@ -330,37 +309,6 @@ pipeline {
 				branch 'main'
 			}
 			steps {
-				timeout(time: 15, unit: 'MINUTES') {
-					script {
-						dir("${env.WORKSPACE}") {
-							def cleanBranch = "${BRANCH ?: GIT_BRANCH ?: 'main'}".replaceAll(/^origin\//, '')
-
-							// Create .env from Jenkins credentials
-							withCredentials([
-								string(credentialsId: 'atlas-uri', variable: 'ATLAS_URI'),
-								string(credentialsId: 'jwt-secret', variable: 'JWT_SECRET'),
-								string(credentialsId: 'keystore-password', variable: 'KEYSTORE_PASSWORD'),
-								string(credentialsId: 'r2-endpoint', variable: 'R2_ENDPOINT'),
-								string(credentialsId: 'r2-access-key', variable: 'R2_ACCESS_KEY'),
-								string(credentialsId: 'r2-secret-key', variable: 'R2_SECRET_KEY')
-							]) {
-								sh '''
-									cat > .env << EOF
-ATLAS_URI=${ATLAS_URI}
-SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_SECRET=${JWT_SECRET}
-KEY_STORE_PASSWORD=${KEYSTORE_PASSWORD}
-R2_ENDPOINT=${R2_ENDPOINT}
-R2_ACCESS_KEY=${R2_ACCESS_KEY}
-R2_SECRET_KEY=${R2_SECRET_KEY}
-USER_DB=buy-one
-PRODUCT_DB=buy-one
-MEDIA_DB=buy-one
-ORDER_DB=buy-one
-SPRING_SECURITY_USER_NAME=user
-SPRING_SECURITY_USER_PASSWORD=password
-EOF
-								'''
-							}
 
 							// Cleanup old containers
 							sh 'docker compose down || true'
