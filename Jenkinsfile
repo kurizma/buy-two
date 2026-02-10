@@ -3,9 +3,6 @@ pipeline {
 	triggers {
 		githubPush()
 	}
-	triggers {
-		githubPush()
-	}
 	options {
 		timestamps()
 		timeout(time: 20, unit: 'MINUTES')
@@ -14,18 +11,8 @@ pipeline {
 			throttleEnabled: true,
 			throttleOption: 'category'
 		)
-		timeout(time: 20, unit: 'MINUTES')
-		throttleJobProperty(
-			categories: ['buy-two-serial'],
-			throttleEnabled: true,
-			throttleOption: 'category'
-		)
-	}
 
 	// Global configuration
-
-	// Global configuration
-
 	parameters {
 		string(name: 'BRANCH', defaultValue: 'main', description: 'Branch to build')
 	}
@@ -52,25 +39,6 @@ pipeline {
 	stages {
 		stage('Checkout') {
 			steps {
-				// Checkout is handled automatically by Jenkins Pipeline from SCM
-				// This stage is here for clarity in the UI
-				echo "Code already checked out by Jenkins"
-				sh 'git rev-parse HEAD'
-			}
-		}
-
-		stage('Clean Maven Cache') {
-			steps {
-				script {
-					// Remove any stale Maven lock files that might cause hangs
-					sh """
-						find ${MAVEN_REPO_LOCAL} -name '*.lock' -type f -delete 2>/dev/null || true
-						find ${MAVEN_REPO_LOCAL} -name '_remote.repositories' -mtime +7 -type f -delete 2>/dev/null || true
-					"""
-				}
-			}
-		}
-
 				// Checkout is handled automatically by Jenkins Pipeline from SCM
 				// This stage is here for clarity in the UI
 				echo "Code already checked out by Jenkins"
@@ -316,11 +284,7 @@ pipeline {
 			when {
 				branch 'main'
 			}
-			when {
-				branch 'main'
-			}
 			steps {
-				timeout(time: 15, unit: 'MINUTES') {
 				timeout(time: 15, unit: 'MINUTES') {
 					script {
 						dir("${env.WORKSPACE}") {
