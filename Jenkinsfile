@@ -372,8 +372,8 @@ pipeline {
 					}
 				}
 			}
-		}
-	}
+
+
 	// end of stages
 
 	post {
@@ -429,4 +429,4 @@ pipeline {
 			}
 		}
 	}
-}
+
