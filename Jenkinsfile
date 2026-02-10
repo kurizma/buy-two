@@ -229,19 +229,19 @@ pipeline {
 	}
 
 
-		stage('SonarCloud Analysis - Frontend') {
-			steps {
-				dir('frontend') {
-					script {
-						def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-						env.PATH = "${scannerHome}/bin:${env.PATH}"
+		// stage('SonarCloud Analysis - Frontend') {
+		// 	steps {
+		// 		dir('frontend') {
+		// 			script {
+		// 				def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+		// 				env.PATH = "${scannerHome}/bin:${env.PATH}"
 
-						withSonarQubeEnv('SonarCloud') {
-						}
-					}
-				}
-			}
-		}
+		// 				withSonarQubeEnv('SonarCloud') {
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
 
 		// Quality Gate Check → Skip deploy → Post FAILURE Slack
 		// stage('Quality Gate Check') {
