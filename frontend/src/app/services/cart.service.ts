@@ -36,7 +36,7 @@ export class CartService {
   private readonly authService = inject(AuthService);
   private sellerCache: { [sellerId: string]: { name: string; avatar: string } } = {};
 
-  private cartItemsSubject = new BehaviorSubject<CartItem[]>(this.loadCartFromStorage());
+  private readonly cartItemsSubject = new BehaviorSubject<CartItem[]>(this.loadCartFromStorage());
   cartItems$ = this.cartItemsSubject.asObservable();
 
   constructor() {
