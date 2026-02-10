@@ -38,9 +38,10 @@ class AddressTests {
 
     @Test
     void testAddressAllArgsConstructor() {
-        Address address = new Address("123 Main St", "New York", "NY", 
+        Address address = new Address("John Doe", "123 Main St", "New York", "NY", 
                 "10001", "USA", "+12025551234");
 
+        assertEquals("John Doe", address.getFullName());
         assertEquals("123 Main St", address.getStreet());
         assertEquals("New York", address.getCity());
         assertEquals("NY", address.getState());

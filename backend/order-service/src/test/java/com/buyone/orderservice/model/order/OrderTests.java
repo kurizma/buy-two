@@ -93,7 +93,7 @@ class OrderTests {
         Order order = new Order("order-1", "user-1", "ORD-123", items,
                 OrderStatus.CONFIRMED, PaymentMethod.PAYPAL, address,
                 new BigDecimal("50.00"), new BigDecimal("5.00"),
-                new BigDecimal("55.00"), now, now);
+                new BigDecimal("5.00"), new BigDecimal("60.00"), now, now);
 
         assertEquals("order-1", order.getId());
         assertEquals(OrderStatus.CONFIRMED, order.getStatus());

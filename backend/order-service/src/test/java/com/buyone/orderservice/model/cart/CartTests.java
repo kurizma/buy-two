@@ -50,7 +50,7 @@ class CartTests {
         
         Cart cart = new Cart("cart-1", "user-1", items, 
                 new BigDecimal("100.00"), new BigDecimal("10.00"), 
-                new BigDecimal("110.00"), now);
+                new BigDecimal("5.00"), new BigDecimal("115.00"), now);
 
         assertEquals("cart-1", cart.getId());
         assertEquals("user-1", cart.getUserId());

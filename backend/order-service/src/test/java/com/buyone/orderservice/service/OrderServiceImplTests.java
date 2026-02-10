@@ -321,16 +321,15 @@ class OrderServiceImplTests {
         assertThat(result).isEmpty();
     }
     
-    // -------- searchBuyerOrders (faceted) --------
+    // -------- searchBuyerOrders --------
     
     @Test
-    void searchBuyerOrders_withKeywordOnly_usesDefaultDatesAndNullStatus() {
+    void searchBuyerOrders_withKeywordOnly_callsRepository() {
         Order order = Order.builder().orderNumber("ORD-001").userId("user-1").build();
         Page<Order> page = new PageImpl<>(List.of(order));
         
-        when(orderRepository.findFacetedOrders(
+        when(orderRepository.findBuyerOrdersSearch(
                 eq("user-1"), eq("laptop"),
-                any(LocalDateTime.class), any(LocalDateTime.class),
                 eq(null), any(Pageable.class)))
                 .thenReturn(page);
         
@@ -341,9 +340,8 @@ class OrderServiceImplTests {
         Page<Order> result = orderService.searchBuyerOrders("user-1", req);
         
         assertThat(result.getContent()).hasSize(1);
-        verify(orderRepository).findFacetedOrders(
+        verify(orderRepository).findBuyerOrdersSearch(
                 eq("user-1"), eq("laptop"),
-                any(LocalDateTime.class), any(LocalDateTime.class),
                 eq(null), any(Pageable.class));
     }
     
@@ -351,9 +349,8 @@ class OrderServiceImplTests {
     void searchBuyerOrders_withStatus_passesEnumToRepository() {
         Page<Order> page = new PageImpl<>(List.of());
         
-        when(orderRepository.findFacetedOrders(
-                eq("user-1"), eq(""),
-                any(LocalDateTime.class), any(LocalDateTime.class),
+        when(orderRepository.findBuyerOrdersSearch(
+                eq("user-1"), isNull(),
                 eq(OrderStatus.PENDING), any(Pageable.class)))
                 .thenReturn(page);
         
@@ -364,38 +361,32 @@ class OrderServiceImplTests {
         Page<Order> result = orderService.searchBuyerOrders("user-1", req);
         
         assertThat(result.getContent()).isEmpty();
-        verify(orderRepository).findFacetedOrders(
-                eq("user-1"), eq(""),
-                any(LocalDateTime.class), any(LocalDateTime.class),
+        verify(orderRepository).findBuyerOrdersSearch(
+                eq("user-1"), isNull(),
                 eq(OrderStatus.PENDING), any(Pageable.class));
     }
     
     @Test
-    void searchBuyerOrders_withDateRange_parsesIsoDatesAndReturnsEmpty() {
+    void searchBuyerOrders_withKeywordAndStatus_callsRepositoryWithBoth() {
         Page<Order> page = new PageImpl<>(List.of());
         
-        LocalDateTime expectedStart = LocalDateTime.parse("2025-01-01T00:00:00");
-        LocalDateTime expectedEnd = LocalDateTime.parse("2025-01-02T23:59:59");
-        
-        when(orderRepository.findFacetedOrders(
-                eq("user-1"), eq(""),
-                eq(expectedStart), eq(expectedEnd),
-                eq(null), any(Pageable.class)))
+        when(orderRepository.findBuyerOrdersSearch(
+                eq("user-1"), eq("laptop"),
+                eq(OrderStatus.DELIVERED), any(Pageable.class)))
                 .thenReturn(page);
         
         OrderSearchRequest req = OrderSearchRequest.builder()
-                .startDate("2025-01-01T00:00:00")
-                .endDate("2025-01-02T23:59:59")
+                .keyword("laptop")
+                .status("DELIVERED")
                 .page(0).size(10)
                 .build();
         
         Page<Order> result = orderService.searchBuyerOrders("user-1", req);
         
         assertThat(result.getContent()).isEmpty();
-        verify(orderRepository).findFacetedOrders(
-                eq("user-1"), eq(""),
-                eq(expectedStart), eq(expectedEnd),
-                eq(null), any(Pageable.class));
+        verify(orderRepository).findBuyerOrdersSearch(
+                eq("user-1"), eq("laptop"),
+                eq(OrderStatus.DELIVERED), any(Pageable.class));
     }
     
     // -------- getSellerOrders --------

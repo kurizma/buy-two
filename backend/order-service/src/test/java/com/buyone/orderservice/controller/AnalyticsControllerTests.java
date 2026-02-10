@@ -48,8 +48,9 @@ class AnalyticsControllerTests {
     void getSellerAnalytics_returns200_withData() throws Exception {
         SellerAnalyticsResponse analytics = new SellerAnalyticsResponse(
                 BigDecimal.valueOf(1000),
-                List.of(new SellerBestProduct("p1", "Widget", BigDecimal.valueOf(500), 50)),
-                100
+                List.of(new SellerBestProduct("p1", "Widget", BigDecimal.valueOf(500), 50, "Electronics")),
+                100,
+                List.of(new SellerTopCategory("Electronics", BigDecimal.valueOf(1000)))
         );
         when(profileAnalyticsService.getSellerAnalytics("seller-1")).thenReturn(analytics);
         

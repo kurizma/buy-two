@@ -65,7 +65,7 @@ class ProfileAnalyticsServiceImplTests {
         when(orderRepository.getSellerTotalRevenue("seller-1"))
                 .thenReturn(List.of(new SellerTotalRevenue(BigDecimal.valueOf(1000))));
         when(orderRepository.getSellerBestProducts("seller-1"))
-                .thenReturn(List.of(new SellerBestProduct("p1", "Widget", BigDecimal.valueOf(500), 50)));
+                .thenReturn(List.of(new SellerBestProduct("p1", "Widget", BigDecimal.valueOf(500), 50, "Electronics")));
         when(orderRepository.getSellerTotalUnits("seller-1"))
                 .thenReturn(List.of(new SellerTotalUnits(100)));
         
