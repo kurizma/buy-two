@@ -102,8 +102,10 @@ class OrderServiceImplTests {
         assertThat(result.getUserId()).isEqualTo(userId);
         assertThat(result.getItems()).hasSize(1);
         assertThat(result.getItems().get(0).getProductName()).isEqualTo("Laptop");
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.PENDING);
-        assertThat(result.getSubtotal()).isEqualByComparingTo(BigDecimal.valueOf(2000));
+        // Auto-confirmed for PAY_ON_DELIVERY
+        assertThat(result.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
+        // Subtotal = 2000 / 1.24 = 1612.90 (reverse VAT calculation)
+        assertThat(result.getSubtotal()).isEqualByComparingTo(BigDecimal.valueOf(1612.90));
         verify(cartService).clearCart(userId);
     }
     
@@ -250,7 +252,7 @@ class OrderServiceImplTests {
     }
     
     @Test
-    void cancelOrder_throwsIllegalState_whenNotPending() {
+    void cancelOrder_throwsIllegalState_whenNotPendingOrConfirmed() {
         Order order = Order.builder()
                 .orderNumber("ORD-001").userId("user-1")
                 .status(OrderStatus.SHIPPED)
@@ -260,7 +262,7 @@ class OrderServiceImplTests {
         
         assertThatThrownBy(() -> orderService.cancelOrder("ORD-001", "user-1"))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Only PENDING orders can be cancelled");
+                .hasMessageContaining("Only PENDING or CONFIRMED orders can be cancelled");
     }
     
     @Test

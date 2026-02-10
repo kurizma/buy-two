@@ -71,12 +71,13 @@ class OrderControllerTests {
     
     @Test
     void checkout_returns201_whenClientWithValidAddress() throws Exception {
-        Order order = buildOrder("ORD-001", OrderStatus.PENDING);
+        Order order = buildOrder("ORD-001", OrderStatus.CONFIRMED);
         when(orderService.createOrderFromCart(eq("user-1"), any(Address.class))).thenReturn(order);
         
         String body = """
             {
                 "shippingAddress": {
+                    "fullName": "John Doe",
                     "street": "123 Main",
                     "city": "NYC",
                     "zipCode": "10001",
@@ -93,7 +94,7 @@ class OrderControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.orderNumber").value("ORD-001"))
-                .andExpect(jsonPath("$.data.status").value("PENDING"));
+                .andExpect(jsonPath("$.data.status").value("CONFIRMED"));
     }
     
     @Test
@@ -230,24 +231,24 @@ class OrderControllerTests {
     // ========== POST /api/orders/{orderNumber}/confirm ==========
     
     @Test
-    void confirmOrder_returns200_whenBuyerConfirms() throws Exception {
+    void confirmOrder_returns200_whenSellerConfirms() throws Exception {
         Order o = buildOrder("ORD-001", OrderStatus.CONFIRMED);
-        when(orderService.confirmOrder("ORD-001", "user-1")).thenReturn(Optional.of(o));
+        when(orderService.confirmOrder("ORD-001", "seller-1")).thenReturn(Optional.of(o));
         
         mockMvc.perform(post("/api/orders/ORD-001/confirm")
-                        .header("X-USER-ID", "user-1")
-                        .header("X-USER-ROLE", "CLIENT"))
+                        .header("X-USER-ID", "seller-1")
+                        .header("X-USER-ROLE", "SELLER"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Order confirmed successfully!"));
     }
     
     @Test
     void confirmOrder_returns400_whenNotFound() throws Exception {
-        when(orderService.confirmOrder("ORD-BAD", "user-1")).thenReturn(Optional.empty());
+        when(orderService.confirmOrder("ORD-BAD", "seller-1")).thenReturn(Optional.empty());
         
         mockMvc.perform(post("/api/orders/ORD-BAD/confirm")
-                        .header("X-USER-ID", "user-1")
-                        .header("X-USER-ROLE", "CLIENT"))
+                        .header("X-USER-ID", "seller-1")
+                        .header("X-USER-ROLE", "SELLER"))
                 .andExpect(status().isBadRequest());
     }
     

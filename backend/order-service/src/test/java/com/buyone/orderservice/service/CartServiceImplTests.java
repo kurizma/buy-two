@@ -72,7 +72,8 @@ class CartServiceImplTests {
         
         assertThat(result.getItems()).hasSize(1);
         assertThat(result.getItems().get(0).getProductName()).isEqualTo("Laptop");
-        assertThat(result.getSubtotal()).isEqualByComparingTo(BigDecimal.valueOf(1000));
+        // Subtotal is 1000 / 1.24 = 806.45 (reverse VAT calculation)
+        assertThat(result.getSubtotal()).isEqualByComparingTo(BigDecimal.valueOf(806.45));
     }
     
     @Test

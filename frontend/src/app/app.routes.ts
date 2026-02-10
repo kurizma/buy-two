@@ -27,6 +27,6 @@ export const routes: Routes = [
   { path: 'categories/:slug', component: CategoriesComponent },
   { path: 'seller-shop/:id', component: SellerShopComponent },
   { path: 'about', component: AboutComponent },
-  { path: 'shopping-cart', component: ShoppingCartComponent, canActivate: [AuthGuard] },
+  { path: 'shopping-cart', component: CartComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '' },
 ];
