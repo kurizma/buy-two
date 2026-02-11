@@ -21,8 +21,9 @@ public class UpdateUserRequest {
     
     @Size(min = 8, max = 24, message = "Password must be between 8 and 24 characters")
     private String password;
+
+    private String currentPassword;
     
     private Role role;
     private String avatar;
-    // Add more as your model evolves
 }

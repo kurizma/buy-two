@@ -25,17 +25,19 @@ class UpdateUserRequestTests {
         assertNull(request.getName());
         assertNull(request.getEmail());
         assertNull(request.getPassword());
+        assertNull(request.getCurrentPassword());
         assertNull(request.getRole());
         assertNull(request.getAvatar());
     }
 
     @Test
     void testAllArgsConstructor() {
-        UpdateUserRequest request = new UpdateUserRequest("John Doe", "john@example.com", "password123", Role.CLIENT, "avatar.png");
+        UpdateUserRequest request = new UpdateUserRequest("John Doe", "john@example.com", "password123", null, Role.CLIENT, "avatar.png");
         
         assertEquals("John Doe", request.getName());
         assertEquals("john@example.com", request.getEmail());
         assertEquals("password123", request.getPassword());
+        assertNull(request.getCurrentPassword());
         assertEquals(Role.CLIENT, request.getRole());
         assertEquals("avatar.png", request.getAvatar());
     }
@@ -190,9 +192,9 @@ class UpdateUserRequestTests {
 
     @Test
     void testEqualsAndHashCode() {
-        UpdateUserRequest request1 = new UpdateUserRequest("John", "john@test.com", "pass1234", Role.CLIENT, "avatar.png");
-        UpdateUserRequest request2 = new UpdateUserRequest("John", "john@test.com", "pass1234", Role.CLIENT, "avatar.png");
-        UpdateUserRequest request3 = new UpdateUserRequest("Jane", "jane@test.com", "pass1234", Role.SELLER, null);
+        UpdateUserRequest request1 = new UpdateUserRequest("John", "john@test.com", "pass1234", null, Role.CLIENT, "avatar.png");
+        UpdateUserRequest request2 = new UpdateUserRequest("John", "john@test.com", "pass1234", null, Role.CLIENT, "avatar.png");
+        UpdateUserRequest request3 = new UpdateUserRequest("Jane", "jane@test.com", "pass1234", null, Role.SELLER, null);
         
         assertEquals(request1, request2);
         assertEquals(request1.hashCode(), request2.hashCode());

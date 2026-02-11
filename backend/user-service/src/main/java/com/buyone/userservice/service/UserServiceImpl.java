@@ -148,6 +148,12 @@ public class UserServiceImpl implements UserService {
             existingUser.setName(request.getName());
         }
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            if (request.getCurrentPassword() == null || request.getCurrentPassword().isBlank()) {
+                throw new BadRequestException("Current password is required to change password");
+            }
+            if (!passwordEncoder.matches(request.getCurrentPassword(), existingUser.getPassword())) {
+                throw new BadRequestException("Current password is incorrect");
+            }
             existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
         }
         existingUser.setAvatar(request.getAvatar()); // may be null -> clears avatar
