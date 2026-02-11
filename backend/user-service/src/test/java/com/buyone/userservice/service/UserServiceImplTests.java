@@ -276,9 +276,11 @@ class UserServiceImplTests {
         UpdateUserRequest req = new UpdateUserRequest();
         req.setName("New");
         req.setPassword("newpwd");
+        req.setCurrentPassword("OLDPWD");
         req.setAvatar("new.png");
         
         when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(existing));
+        when(passwordEncoder.matches("OLDPWD", "OLDPWD")).thenReturn(true);
         when(passwordEncoder.encode("newpwd")).thenReturn("ENC(newpwd)");
         
         User saved = User.builder()
