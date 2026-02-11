@@ -385,7 +385,7 @@ export class CartService {
     if (error.status === 400) {
       return EMPTY; // No snackbar!
     }
-    this.snackBar.open('Cart operation failed. Try again.', 'Close', {
+    this.snackBar.open('Please sign in and try again.', 'Close', {
       duration: 4000,
       horizontalPosition: 'center',
       verticalPosition: 'top',
