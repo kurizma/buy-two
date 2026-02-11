@@ -1,325 +1,223 @@
-# buy-two E-Commerce
-Complete automated CI/CD pipeline with Jenkins and SonarQube code quality analysis.
+# grit:Tee E-Commerce Marketplace (buy-two)
 
-# Project Overview
+## Table of Contents
+- [Overview](#overview)
+- [Architecture & Tech Stack](#architecture--tech-stack)
+- [Core Features](#core-features)
+- [API Documentation](#api-documentation)
+- [Error Handling](#error-handling)
+- [CI/CD & Code Quality](#cicd--code-quality)
+- [Installation & Setup](#installation--setup)
+- [Creators](#creators)
 
-**Backend Services** (Spring Boot + Maven):
-- Discovery Service (service registry)
-- Gateway Service (API gateway)
-- User Service (user management)
-- Product Service (product catalog)
-- Media Service (media handling)
+***
 
-**Frontend** (Angular + npm):
-- Web UI for the Safe Zone application
+## Overview
+**grit:Tee** is a full e-commerce marketplace designed for T-shirt creators and fans.  
+This project (**buy-two phase**) finalizes the platform by integrating a microservice architecture with core features such as a shopping cart, order management, user/seller analytics, and faceted product search.  
 
-**CI/CD Pipeline**:
-- Automated builds and tests
-- Code quality analysis with SonarQube
-- Docker image building
-- Automated deployment
-- Slack notifications
+The system emphasizes **security**, **performance**, and **user experience**, supported by a robust CI/CD pipeline.
 
-# Prerequisites
+[Back to top](#table-of-contents)
 
-- Docker (version 20.10+)
-- Docker Compose (version 1.29+)
-- Ports 9090 (Jenkins) and 9000 (SonarQube) available
-- 4GB RAM minimum
+***
 
-# Installation & Startup
+## Architecture & Tech Stack
+- **Architecture**: Microservice-oriented with a central API Gateway & Service Discovery  
+- **Frontend**: 
+  - Angular 17+ (Angular Material, Ng2-charts)  
+- **Backend**: Spring Boot 3.x Microservices  
+  - **Discovery Service**: Eureka-based service registry  
+  - **Gateway Service**: Spring Cloud Gateway (JWT validation, CORS, header injection)  
+  - **User Service**: Authentication & profile management  
+  - **Product Service**: Catalog management & faceted search  
+  - **Order Service**: Shopping cart, order lifecycle, analytics pipelines  
+  - **Media Service**: Image storage using Cloudflare R2/S3  
+- **Infrastructure**:
+    - Host Platform: Hetzner Virtual Machine (Serves as the Single Source of Truth for Jenkins automation)
+    - Database: MongoDB Atlas (Cloud)
+    - Object Storage: Cloudflare R2 Object Storage
+    - Quality Assurance: SonarCloud.io integration for centralized code metrics
+    - Messaging: Apache Kafka for async service events
 
-### Step 1: Start SonarQube (First - it takes longer to initialize)
-````
-docker-compose -f sonarqube-compose.yml up -d
-````
 
-- Wait 60 seconds for SonarQube to initialize.
+[Back to top](#table-of-contents)
 
-- URL: http://localhost:9000
+***
 
->Username: admin
-Password: admin
+## Core Features
 
-### Step 2: Start Jenkins (Second - it will auto-connect to SonarQube)
+### 1. Faceted Product Search & Pagination
+- Regex-based keyword search on product names/descriptions  
+- Price and category facets  
+- Paginated results to maintain performance at scale  
 
-````
+### 2. Two-Step Checkout & Reservation Logic
+- **Step 1 (Pending):** Reserve stock at checkout initiation  
+- **Step 2 (Commit):** Confirm order → convert reservation to permanent stock deduction  
+- **Cleanup:** Scheduled task runs every 60s to release expired reservations  
+
+### 3. Advanced Analytics Pipelines
+- **Client View:** Total spend, top categories, and most purchased products  
+- **Seller View:** Total revenue, best-selling products, and units sold  
+
+[Back to top](#table-of-contents)
+
+***
+
+## API Documentation
+
+<details>
+<summary><strong>Click to expand API Endpoints</strong></summary>
+
+### Security
+**Base URL:** `https://localhost:8080`  
+**Auth:** Bearer `<JWT>` in the `Authorization` header  
+**Gateway Headers:** Injected — `X-USER-ID` and `X-USER-ROLE`
+
+***
+
+### 1. Authentication (User Service)
+
+| Method | Endpoint             | Access | Description                          |
+|--------|----------------------|---------|--------------------------------------|
+| POST   | /auth/register       | Public  | Register as CLIENT or SELLER         |
+| POST   | /auth/login          | Public  | Returns JWT and user profile         |
+| GET    | /api/users/me        | Auth    | Retrieve current authenticated user  |
+
+***
+
+### 2. Product Catalog (Product Service)
+
+| Method | Endpoint              | Access | Description                      |
+|--------|------------------------|---------|----------------------------------|
+| GET    | /products/search       | Public  | Faceted search                   |
+| POST   | /products              | Seller  | Create new product listing       |
+| PUT    | /products/{id}         | Seller  | Update owned product             |
+| DELETE | /products/{id}         | Seller  | Delete product & associated media|
+
+***
+
+### 3. Shopping Cart & Orders (Order Service)
+
+| Method | Endpoint                   | Access | Description                             |
+|--------|-----------------------------|---------|-----------------------------------------|
+| POST   | /api/cart/items             | Client  | Add item to cart (valid stock check)    |
+| POST   | /api/orders/checkout        | Client  | Initiate order & reserve stock          |
+| POST   | /api/orders/{num}/confirm   | Client  | Confirm order to commit stock           |
+| POST   | /api/orders/{num}/redo      | Client  | Re-add cancelled order items to cart    |
+| PUT    | /api/orders/{num}/status    | Seller  | Update status (e.g. SHIPPED, DELIVERED) |
+
+***
+
+### 4. Analytics (Order Service)
+
+| Method | Endpoint                    | Access | Description                          |
+|--------|------------------------------|---------|--------------------------------------|
+| GET    | /api/analytics/client/{id}   | Client  | Aggregate spend & category metrics   |
+| GET    | /api/analytics/seller/{id}   | Seller  | Aggregate revenue & unit metrics     |
+
+</details>
+</br>
+
+[Back to top](#table-of-contents)
+
+***
+
+## Error Handling
+All services use a standardized JSON error schema:
+
+```json
+{
+  "code": "400",
+  "message": "Validation failed",
+  "details": {
+    "price": "Must be greater than 0",
+    "quantity": "Required field"
+  }
+}
+```
+
+**Common status codes:**  
+400 (Validation), 401/403 (Auth), 404 (Missing), 409 (Conflict)
+
+[Back to top](#table-of-contents)
+
+***
+
+## CI/CD & Code Quality
+The project utilizes a centralized **Green Pipeline Strategy** hosted on a remote VM. This environment serves as the Single Source of Truth, ensuring that all builds, tests, and quality checks are executed in a consistent, production-like environment—no longer fragmented across developer machines.
+
+- **Jenkins Pipeline**: Orchestrates the full lifecycle from Checkout to Deploy & Verify.
+- **Cloud Quality Gates**: 
+  - Every Pull Request is automatically analyzed by SonarCloud.io. 
+    - The pipeline enforces sonar.qualitygate.wait=true, ensuring that no code with security vulnerabilities or maintainability issues is merged into the main branch.
+- **Automated Staging**: Verified builds are automatically containerized and deployed to a staging environment for final validation.
+- **Build & Test:** Maven builds, JUnit/Mockito tests  
+- **Quality Gate:** SonarQube with `sonar.qualitygate.wait=true`  
+- **Dockerization:** Auto build and push with versioned tags  
+- **Deployment:** Automated deploy + verify with rollback support  
+
+
+
+
+[Back to top](#table-of-contents)
+
+
+***
+
+## Installation & Setup
+
+### Prerequisites
+- Docker & Docker Compose  
+- MongoDB Atlas URI and Kafka environment variables  
+- Cloudflare R2 credentials (for media storage)  
+
+### Startup Steps
+
+<details> <summary><strong>Click to expand Startup Steps</strong></summary>
+
+#### 1. Start Infrastructure Services
+Navigate to each infra directory and start services:
+
+**SonarQube:**
+```bash
+cd root/infra/sonarqube
 docker-compose up -d
-````
-- Wait 60 seconds for Jenkins to start and automatically connect to SonarQube network.
+```
 
-- URL: http://localhost:9090
+**Jenkins:**
+```bash
+cd root/infra/jenkins
+docker-compose up -d
+```
 
->Initial Setup: First login will prompt for initial password (check docker logs jenkins)
+#### 2. Start Marketplace
+```bash
+# From project root
+docker-compose up -d
+```
 
-## Running the Pipeline
-- Open Jenkins: http://localhost:9090
+#### 3. Access Services
+- **Frontend:** `https://localhost:4200`  
+- **Jenkins:** `http://localhost:8080` (default port)  
+- **SonarQube:** `http://localhost:9000` (default port)  
 
-- Select the safe-zone pipeline job
+</details>
+</br>
 
-- Click "Build Now"
+[Back to top](#table-of-contents)
 
-- Monitor the pipeline in Pipeline Overview
+***
 
-Pipeline Stages
-The build will execute these stages automatically:
 
-````
-✓ Checkout                                    (get code from Git)
-  ├─ ✓ Backend Build - discovery-service
-  ├─ ✓ Backend Build - gateway-service
-  ├─ ✓ Backend Build - user-service
-  ├─ ✓ Backend Build - product-service
-  └─ ✓ Backend Build - media-service
-  
-  ├─ ✓ Backend Tests - discovery-service
-  ├─ ✓ Backend Tests - gateway-service
-  ├─ ✓ Backend Tests - user-service
-  ├─ ✓ Backend Tests - product-service
-  └─ ✓ Backend Tests - media-service
-  
-  └─ ✓ Frontend - Tests Included
-  
-  ├─ ✓ SonarQube Analysis - Backend          (analyzes all 5 services)
-  └─ ✓ SonarQube Analysis - Frontend         (analyzes Angular app)
-  
-  ├─ ✓ Build Images                          (Docker image building)
-  ├─ ✓ Deploy & Verify                       (deployment + health checks)
-  └─ ✓ Post Actions                          (Slack notifications)
-  ````
-Build Time: Approximately 2-3 minutes for full pipeline
-
-## Viewing Results
-#### Jenkins Pipeline
-- URL: http://localhost:9090/job/safe-zone/
-
-- View all builds, logs, and stage details
-
-- Click on any build number to see details
-
-#### SonarQube Code Quality
-- URL: http://localhost:9000/projects
-
-- Projects Analyzed:
-
-    - Safe Zone - Discovery Service
-
-    - Safe Zone - Gateway Service
-
-    - Safe Zone - User Service
-
-    - Safe Zone - Product Service
-
-    - Safe Zone - Media Service
-
-    - Safe Zone - Frontend
-
-- Each project shows:
-
-    - ✅ Code quality metrics
-
-    - ✅ Security vulnerabilities
-
-    - ✅ Code coverage
-
-    - ✅ Maintainability ratings
-
-    - ✅ Test coverage
-
-# Architecture
-### Docker Network Setup
-Jenkins and SonarQube are automatically connected via the java-jenk_sonarnet Docker network:
-
-- Jenkins Container: jenkins (http://jenkins:8080 internally)
-
-- SonarQube Container: sonarqube (http://sonarqube:9000 internally)
-
-- Database Container: sonarqube-db (PostgreSQL)
-
-- Network: java-jenk_sonarnet (bridge network)
-
->Key: No manual docker network connect commands needed - fully automated in docker-compose.yml
-
-### How Jenkins Talks to SonarQube
-Inside the pipeline, Jenkins:
-
-1. Compiles Java code with Maven → generates target/classes
-
-2. Runs tests → generates test reports
-
-3. Executes sonar-scanner with compiled classes
-
-4. Sends analysis to SonarQube via: http://sonarqube:9000 (internal Docker DNS)
-
-5. SonarQube stores results in PostgreSQL database
-
-6. Results visible in SonarQube dashboard
-
-### Configuration Files
-- docker-compose.yml (Jenkins)
-````
-services:
-  jenkins:
-    build: .                              # Builds from Dockerfile
-    networks:
-      - java-jenk_sonarnet              # Auto-connects to SonarQube network
-`````
-
-- sonarqube-compose.yml (SonarQube)
-````
-services:
-  sonarqube:
-    image: sonarqube:community
-    networks:
-      - java-jenk_sonarnet
-  sonarqube-db:
-    image: postgres:15-alpine
-    networks:
-      - java-jenk_sonarnet
-
-networks:
-  java-jenk_sonarnet:
-    driver: bridge
-`````
-
-- Jenkinsfile (Pipeline Definition)
-    - Defines all pipeline stages
-
-    - Configures SonarQube Scanner
-
-    - Sets up Maven builds and tests
-
-    - Handles Docker image building
-
-    - Manages deployment and notifications
-
-# Troubleshooting
-### 1. Containers won't start
-````
-# Check logs
-docker logs jenkins
-docker logs sonarqube
-
-# Verify ports are available
-docker ps
-`````
-
-### 2. Jenkins can't reach SonarQube
-This is typically a network issue. Verify:
-
-````
-# Check network exists
-docker network ls | grep java-jenk_sonarnet
-
-# Check containers are on network
-docker network inspect java-jenk_sonarnet
-`````
-
-#### Common causes:
-
-- SonarQube not fully initialized (wait 60+ seconds)
-
-- Containers on different networks (restart both)
-
-- Port 9000 or 9090 already in use
-
-### 3. SonarQube Analysis fails with "java.io.IOException"
-Ensure all 3 containers are running:
-
-````
-docker ps
-`````
-
-Should show:
-
-- jenkins container (port 9090)
-
-- sonarqube container (port 9000)
-
-- sonarqube-db container (internal)
-
-### 4. SonarQube Analysis fails with "compiled classes not found"
-This is already fixed in the Jenkinsfile with:
-
-```groovy
--Dsonar.java.binaries=target/classes
-`````
-
-The -Dsonar.java.binaries parameter tells SonarQube where compiled Java classes are located.
-
-# Cleanup
-## Stop all containers
-````
-docker-compose down
-docker-compose -f sonarqube-compose.yml down
-`````
-
-## Remove all data (databases, volumes)
-````
-docker-compose down -v
-docker-compose -f sonarqube-compose.yml down -v
-`````
-
-## Remove images (optional)
-````
-docker rmi jenkins:latest
-docker rmi sonarqube:community
-docker rmi postgres:15-alpine
-`````
-
-# Technology Stack
-|Component	|Technology	|Version |
-| ---------- | --------- | ------- |
-|CI/CD	| Jenkins	|Latest |
-|Code Quality	|SonarQube Community	|v25.12.0|
-|Backend Framework	|Spring Boot	|3.x|
-|Backend Build	|Maven	|3.9|
-|Frontend Framework	|Angular	|17+|
-|Frontend Build	|npm	|10+|
-|Database (SonarQube)	|PostgreSQL	|15|
-|Containerization	|Docker	|20.10+|
-|Orchestration	|Docker Compose	|1.29+|
-
-
-# Key Features
-✅ Fully Automated: No manual network configuration needed
-
-✅ Parallel Builds: All services build simultaneously (faster CI)
-
-✅ Code Quality: All 6 projects analyzed by SonarQube
-
-✅ Security Scanning: Vulnerabilities detected automatically
-
-✅ Instant Feedback: Developers get analysis results 
-immediately
-
-✅ Reproducible: Same setup works on any machine
-
-✅ Auditor-Friendly: No manual steps, just docker-compose up
-
-# Audit Readiness
-This project is production-ready for audits and evaluations:
-
-✅ All services containerized with Docker
-
-✅ No manual configuration steps required
-
-✅ Fully automated CI/CD pipeline
-
-✅ Code quality metrics tracked
-
-✅ Security vulnerabilities identified
-
-✅ Clear documentation provided
-
-✅ Reproducible setup with docker-compose
-
-To evaluate: Just run docker-compose up and watch the pipeline!
-
-
-# Created By
-
+## Creators
 - **Mayuree Reunsati** - [GitHub](https://github.com/mareerray)
 - **Joon Kim** - [GitHub](https://github.com/kurizma)
+- **Toft Diederichs** - [GitHub](https://github.com/Toft08)
+- **Chan Myint** - [GitHub](https://github.com/cmbigk)
 
-Last Updated: January 6, 2026
+[Back to top](#table-of-contents)
+
+***
+
