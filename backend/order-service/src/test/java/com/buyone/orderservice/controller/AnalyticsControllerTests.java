@@ -32,7 +32,7 @@ class AnalyticsControllerTests {
     void getClientAnalytics_returns200_withData() throws Exception {
         ClientAnalyticsResponse analytics = new ClientAnalyticsResponse(
                 BigDecimal.valueOf(500),
-                List.of(new ClientMostBought("p1", "Widget", 10)),
+                List.of(new ClientMostBought("p1", "Widget", 10, BigDecimal.valueOf(50), "Electronics")),
                 List.of(new ClientTopCategory("Electronics", BigDecimal.valueOf(300)))
         );
         when(profileAnalyticsService.getClientAnalytics("client-1")).thenReturn(analytics);

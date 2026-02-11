@@ -31,7 +31,7 @@ class ProfileAnalyticsServiceImplTests {
         when(orderRepository.getClientTotalSpent("user-1"))
                 .thenReturn(List.of(new ClientTotalSpent("user-1", BigDecimal.valueOf(500))));
         when(orderRepository.getClientMostBought("user-1"))
-                .thenReturn(List.of(new ClientMostBought("p1", "Widget", 10)));
+                .thenReturn(List.of(new ClientMostBought("p1", "Widget", 10, BigDecimal.valueOf(50), "Electronics")));
         when(orderRepository.getClientTopCategories("user-1"))
                 .thenReturn(List.of(new ClientTopCategory("Electronics", BigDecimal.valueOf(300))));
         
