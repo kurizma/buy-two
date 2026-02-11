@@ -85,7 +85,7 @@ export class CartComponent implements OnInit, OnDestroy {
     }
     // Navigate to checkout page
     console.log('Proceeding to checkout...');
-    this.router.navigate(['/order-checkout']);
+    this.router.navigate(['/checkout']);
   }
 
   trackByProductId(index: number, item: CartItem): string {
