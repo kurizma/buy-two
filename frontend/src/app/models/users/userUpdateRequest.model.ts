@@ -3,4 +3,5 @@ export interface UserUpdateRequest {
   name: string;
   avatar?: string | null;
   password?: string;
+  currentPassword?: string;
 }

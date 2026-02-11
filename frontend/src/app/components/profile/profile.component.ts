@@ -42,6 +42,7 @@ export class ProfileComponent implements OnInit {
   avatarMediaId: string | null = null;
   successMessage = '';
   showSuccess = false;
+  passwordError = '';
 
   userService = inject(UserService);
   mediaService = inject(MediaService);
@@ -250,12 +251,14 @@ export class ProfileComponent implements OnInit {
   changePassword() {
     if (this.passwordForm.valid && this.currentUser) {
       this.successMessage = '';
+      this.passwordError = '';
 
       const dto: UserUpdateRequest = {
         id: this.currentUser.id,
         name: this.currentUser.name, // keep unchanged
         avatar: this.avatar,
         password: this.passwordForm.value.newPassword,
+        currentPassword: this.passwordForm.value.currentPassword,
       };
       this.userService.updateCurrentUser(dto).subscribe({
         next: (updatedUser) => {
@@ -263,10 +266,13 @@ export class ProfileComponent implements OnInit {
           this.passwordForm.reset();
           this.successMessage = 'Password changed successfully!';
           this.showSuccess = true;
-          console.log('Password updated successfully');
+          this.passwordError = '';
         },
         error: (err) => {
           console.error('Failed to update password', err);
+          const message = err?.error?.message || 'Failed to change password. Please try again.';
+          this.passwordError = message;
+          this.showSuccess = false;
         },
       });
     }
