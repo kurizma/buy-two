@@ -27,6 +27,35 @@ export const routes: Routes = [
   { path: 'categories/:slug', component: CategoriesComponent },
   { path: 'seller-shop/:id', component: SellerShopComponent },
   { path: 'about', component: AboutComponent },
-  { path: 'shopping-cart', component: CartComponent, canActivate: [AuthGuard] },
+  {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [AuthGuard], //Any logged-in user
+  },
+  {
+    path: 'seller-dashboard',
+    component: SellerDashboardComponent,
+    canActivate: [SellerGuard], //Only sellers
+  },
+  {
+    path: 'cart',
+    component: CartComponent,
+    canActivate: [ClientOnlyGuard], //Client + has items in cart
+  },
+  {
+    path: 'checkout',
+    component: CheckoutComponent,
+    canActivate: [ClientOnlyGuard], //Client + has items in cart
+  },
+  {
+    path: 'order-detail/:orderNumber',
+    component: OrderDetailComponent,
+    canActivate: [ClientOnlyGuard], // Assuming only clients can view order details
+  },
+  {
+    path: 'order-list',
+    component: OrderListComponent,
+    canActivate: [AuthGuard], // Assuming only clients can view order list
+  },
   { path: '**', redirectTo: '' },
 ];
