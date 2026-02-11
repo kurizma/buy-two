@@ -61,10 +61,22 @@ export class AuthService {
     return this.currentUserValue?.role === 'SELLER';
   }
 
+  isClient(): boolean {
+    return this.currentUserValue?.role === 'CLIENT';
+  }
+
+  getUserId(): string | null {
+    return this.currentUserValue?.id || null;
+  }
+
   login(credentials: LoginRequest): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, credentials).pipe(
       tap((response) => {
-        this.saveAuthData(response.token, response.user);
+        localStorage.setItem('token', response.token);
+        if (response.user) {
+          localStorage.setItem('currentUser', JSON.stringify(response.user));
+          this.currentUserSubject.next(response.user);
+        }
       }),
     );
   }
@@ -76,6 +88,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('currentUser');
     localStorage.removeItem('token');
+    localStorage.removeItem('shopping_cart'); // Clear cart on logout
     this.currentUserSubject.next(null);
   }
 }

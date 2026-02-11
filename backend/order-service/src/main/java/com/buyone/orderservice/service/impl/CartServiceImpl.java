@@ -5,6 +5,8 @@ import com.buyone.orderservice.exception.BadRequestException;
 import com.buyone.orderservice.model.Product;
 import com.buyone.orderservice.model.cart.Cart;
 import com.buyone.orderservice.model.cart.CartItem;
+import com.buyone.orderservice.dto.response.ProductResponse;
+import com.buyone.orderservice.dto.response.ApiResponse;
 import com.buyone.orderservice.repository.CartRepository;
 import com.buyone.orderservice.service.CartService;
 import lombok.RequiredArgsConstructor;
@@ -31,12 +33,12 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductClient productClient;  //  Fixed: no @Autowired
     
-    @Value("${app.cart.tax-rate:0.1}")  //  Configurable
+    @Value("${app.cart.tax-rate:0.24}")  //  Configurable
     private double taxRate;
     
     @Override
     @Transactional  // Consistency guarantee
-    public Cart addItem(@NotBlank String userId, CartItem item) {
+    public Cart addItem(String userId, CartItem item) {
         validateCartItem(item);
         Cart cart = getOrCreateCart(userId);
         
@@ -49,16 +51,36 @@ public class CartServiceImpl implements CartService {
         if (existing.isPresent()) {
             existing.get().setQuantity(existing.get().getQuantity() + item.getQuantity());
         } else {
-            Product product = productClient.getById(item.getProductId());
-             if (product.getQuantity() < item.getQuantity()) {
-                 throw new BadRequestException("Insufficient stock");
-             }
+            // Production integration - Full ApiResponse handling
+            ApiResponse<ProductResponse> response = productClient.getById(item.getProductId());
             
-            // Populate snapshot
+            if (!response.isSuccess() || response.getData() == null) {
+                log.warn("Product not found: {}", item.getProductId());
+                throw new BadRequestException("Product not found: " + item.getProductId());
+            }
+            
+            ProductResponse product = response.getData();
+            
+            // Debug logs (keep for now)
+            log.info("Product: {} quantity={}, request qty={}",
+                    product.getId(),
+                    product.getQuantity(),
+                    item.getQuantity());
+            
+            int availableStock = Optional.ofNullable(product.getQuantity()).orElse(0);
+            log.info("Available: {}, requested: {}", availableStock, item.getQuantity());
+            
+            if (availableStock < item.getQuantity()) {
+                throw new BadRequestException("Insufficient stock: " + item.getQuantity() +
+                        " requested, " + availableStock + " available");
+            }
+            
+            // Populate cart item snapshot
             item.setProductName(product.getName());
             item.setPrice(product.getPrice());
             item.setImageUrl(product.getImages() != null && !product.getImages().isEmpty()
                     ? product.getImages().get(0) : null);
+            
             cart.getItems().add(item);
         }
         return recalculateTotals(cart);
@@ -71,8 +93,8 @@ public class CartServiceImpl implements CartService {
     
     @Override
     @Transactional
-    public Cart updateQuantity(@NotBlank String userId, @NotBlank String productId,
-                               @Min(1) int quantity) {  // ✅ Validation
+    public Cart updateQuantity(String userId, String productId,
+                               int quantity) {
         Cart cart = getOrCreateCart(userId);
         boolean updated = cart.getItems().stream()
                 .filter(ci -> ci.getProductId().equals(productId))
@@ -92,7 +114,7 @@ public class CartServiceImpl implements CartService {
     
     @Override
     @Transactional
-    public Cart removeItem(@NotBlank String userId, @NotBlank String productId) {
+    public Cart removeItem(String userId, String productId) {
         Cart cart = getOrCreateCart(userId);
         boolean removed = cart.getItems().removeIf(ci -> ci.getProductId().equals(productId));
         if (!removed) {
@@ -103,13 +125,14 @@ public class CartServiceImpl implements CartService {
     
     @Override
     @Transactional
-    public Cart clearCart(@NotBlank String userId) {
+    public Cart clearCart(String userId) {
         return cartRepository.save(Cart.builder()
                 .id(userId)
                 .userId(userId)
                 .items(new ArrayList<>())
                 .subtotal(BigDecimal.ZERO)
                 .tax(BigDecimal.ZERO)
+                .shippingCost(BigDecimal.ZERO)
                 .total(BigDecimal.ZERO)
                 .updatedAt(LocalDateTime.now())
                 .build());
@@ -121,25 +144,38 @@ public class CartServiceImpl implements CartService {
                         .id(userId)
                         .userId(userId)
                         .items(new ArrayList<>())
+                        .shippingCost(BigDecimal.ZERO)
                         .build());
     }
     
     private Cart recalculateTotals(Cart cart) {
-        BigDecimal subtotal = cart.getItems().stream()
-                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Total price (already incl VAT from product)
+        BigDecimal totalInclVat = cart.getItems().stream()
+            .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
         
-        BigDecimal tax = subtotal.multiply(BigDecimal.valueOf(taxRate))
-                .setScale(2, RoundingMode.HALF_UP);
-        BigDecimal total = subtotal.add(tax);
+        // VAT = 24% of excl VAT price → reverse calculate
+        // totalInclVat = subtotal * 1.24 → subtotal = totalInclVat / 1.24
+        BigDecimal subtotalExclVat = totalInclVat.divide(BigDecimal.valueOf(1.24), 2, RoundingMode.HALF_UP);
         
-        cart.setSubtotal(subtotal);
-        cart.setTax(tax);
-        cart.setTotal(total);
+        // VAT amount = totalInclVat - subtotalExclVat
+        BigDecimal vatAmount = totalInclVat.subtract(subtotalExclVat);
+
+        BigDecimal shippingCost = totalInclVat.compareTo(BigDecimal.valueOf(50)) >= 0 
+            ? BigDecimal.ZERO 
+            : BigDecimal.valueOf(4.9);
+        
+        BigDecimal grandTotal = totalInclVat.add(shippingCost);
+        
+        cart.setSubtotal(subtotalExclVat);    // €17.74
+        cart.setTax(vatAmount);               // €4.26  
+        cart.setShippingCost(shippingCost);  // €4.90 or €0.00
+        cart.setTotal(grandTotal);            // €26.90 or €22.00
         cart.setUpdatedAt(LocalDateTime.now());
         
         return cartRepository.save(cart);
     }
+
     
     private void validateCartItem(CartItem item) {
         if (item.getQuantity() <= 0) {
@@ -155,7 +191,32 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public void saveCart(Cart cart) {
-        cartRepository.save(cart);
+        // Find existing cart by userId
+        Optional<Cart> existingCartOpt = cartRepository.findById(cart.getUserId());
+        
+        if (existingCartOpt.isPresent()) {
+            // ✅ Update existing cart
+            Cart existingCart = existingCartOpt.get();
+            
+            // Clear old items (MongoDB will delete them)
+            existingCart.getItems().clear();
+            
+            // Add new items to the TRACKED entity
+            if (cart.getItems() != null) {
+                existingCart.getItems().addAll(cart.getItems());
+            }
+            
+            // Update timestamps
+            existingCart.setUpdatedAt(LocalDateTime.now());
+            
+            // Save the managed entity
+            cartRepository.save(existingCart);
+        } else {
+            // ✅ New cart - set id = userId for consistency
+            cart.setId(cart.getUserId());
+            cart.setUpdatedAt(LocalDateTime.now());
+            cartRepository.save(cart);
+        }
     }
-    
+        
 }

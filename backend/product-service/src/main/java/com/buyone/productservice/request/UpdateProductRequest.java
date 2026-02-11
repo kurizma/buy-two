@@ -23,7 +23,7 @@ public class UpdateProductRequest {
     @DecimalMin(value = "0.0", inclusive = true, message = "Price must be non-negative")
     private BigDecimal price;
     
-    @Min(value = 0, message = "Quantity must be zero or greater")
+    @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;
     
     private String categoryId;

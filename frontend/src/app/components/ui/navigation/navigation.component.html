@@ -1,9 +1,5 @@
 <nav class="navbar"> 
-<!-- <a class="logo-link d-flex align-items-center gap-2" routerLink="/">
-  <img src="./assets/logo/grit-tee-logo.png" alt="grit:Tee logo" class="navbar-logo" />
-  <span>grit:Tee</span>
-</a> -->
-
+  <!-- Logo (Public) -->
   <a class="logo-link d-flex align-items-center gap-2" routerLink="/">
     <span class="logo-mark rounded-circle d-inline-flex align-items-center justify-content-center">
       <i class="fas fa-shirt"></i>
@@ -11,17 +7,43 @@
     <span>grit:Tee</span>
   </a> 
 
-  <!-- <a routerLink="/" class="logo-link">grit:Tee</a> -->
+  <!-- Navigation Links (Public) -->
   <div class="nav-links">
-    <a routerLink="/product-listing">Shop All</a>
-    <a routerLink="/categories">Browse Collections</a>
-    <a routerLink="/about">About Us</a>
-    <!-- <a routerLink="/about">About Us</a> -->
-    <a *ngIf="authService.isSeller()" routerLink="/seller-dashboard">Seller Dashboard</a>
+    <a class="shop-all-link" routerLink="/product-listing">Shop All</a>
+    <a class="categories-link" routerLink="/categories">Browse Collections</a>
+    <a class="about-link" routerLink="/about">About Us</a>
 
   </div>
+
+  <!-- User Actions -->
   <div class="nav-actions">
-    <ng-container *ngIf="isAuthenticated; else guestLinks">
+    @if (isAuthenticated) {
+
+      <!-- Seller Dashboard or Shopping Cart -->
+      @if (authService.isSeller()) {
+        <a routerLink="/seller-dashboard" 
+          class="dashboard-link position-relative me-2" 
+          title="Seller Dashboard">
+          <i class="fas fa-store"></i>
+        </a>
+      } @else {
+        <a routerLink="/cart" 
+          class="cart-link position-relative me-2">
+          <i class="fas fa-shopping-cart"></i>
+          @if (cartItemCount > 0) {
+            <span class="cart-badge">{{ cartItemCount }}</span>
+          }
+        </a>
+      }
+
+      <!-- Orders (for both users and sellers) -->
+      <a routerLink="/order-list" 
+        class="orders-link position-relative me-2" 
+        [title]="authService.isSeller() ? 'Sales Orders' : 'My Orders'">
+        <i class="fas fa-receipt"></i>
+      </a>
+
+      <!-- Profile -->
       <a routerLink="/profile">
         <span class="navbar-user">
           <img
@@ -32,13 +54,15 @@
           {{ currentUserName }}
         </span>
       </a>
+
+      <!-- Logout -->
       <a (click)="onLogout()" style="cursor: pointer">
-        <i class="fas fa-sign-out-alt me-2" aria-label="Logout"></i> Logout
+        <i class="fas fa-sign-out-alt me-2" aria-label="Logout"></i>
       </a>
-    </ng-container>
-    <ng-template #guestLinks>
+    } @else {
+      <!-- Guest Links (Public) -->
       <a routerLink="/signin">Sign In</a>
       <a routerLink="/signup">Sign Up</a>
-    </ng-template>
+    }
   </div>
 </nav>

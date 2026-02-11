@@ -1,0 +1,68 @@
+<div class="card h-100 shadow-sm rounded product-card ">
+
+  <!-- Product Image with navigation control using Bootstrap Carousel -->
+  <app-product-image-carousel
+    [images]="product.images"
+    [carouselId]="'carousel-' + product.id"
+    [altText]="product.name"
+  >
+  </app-product-image-carousel>
+
+  <ng-template #noImg>
+    <div
+      class="d-flex align-items-center justify-content-center bg-light text-white card-img-top"
+      style="height: 300px; border-radius: 0.75rem 0.75rem 0 0"
+    >
+      No image
+    </div>
+  </ng-template>
+
+  <div class="card-body d-flex flex-column">
+    <!-- Product Name -->
+    <h5 class="card-title mb-1 fw-bold">{{ product.name }}</h5>
+    <!-- Category Badge -->
+    <span *ngIf="showCategory" class="badge bg-secondary mb-2">{{ categoryName }}</span>
+    <!-- Seller Info -->
+    <ng-container *ngIf="showSeller && seller">
+      <div class="mb-3 d-flex align-items-center">
+        <img
+          [src]="seller.avatar || 'assets/avatars/user-default.png'"
+          [alt]="seller.name"
+          class="rounded-circle me-2"
+          style="width: 20px; height: 20px; object-fit: cover"
+        />
+        <a [routerLink]="['/seller-shop', seller.id]" class="fw seller-name">
+          {{ seller.name }}
+        </a>
+      </div>
+    </ng-container>
+    <!-- Description -->
+    <p class="card-text mb-2 flex-grow-1 product-description">{{ product.description }}</p>
+    <!-- Price -->
+    <p class="vat-text mb-1"><span class="text-primary mb-2 fw-bold text-end price-text">€{{ product.price }}</span> (incl. VAT)</p>
+    
+    <!-- Buttons -->
+    <div class="mt-auto d-flex gap-2">
+      <button
+        class="btn btn-outline-primary w-50 hover-lift"
+        (click)="onView(); $event.stopPropagation()"
+      >
+        <i class="fas fa-eye me-2"></i>View Detail
+      </button>
+      <button 
+        class="btn btn-outline-secondary w-50 hover-lift"
+        [class.btn-secondary]="isInCart(product.id)"
+        (click)="addToCart(product); 
+        $event.stopPropagation()"
+        [disabled]="isSeller()"
+        >
+        <i class="fas me-2"
+          [class.fa-shopping-cart] ="!isInCart(product.id)"
+          [class.fa-check] ="isInCart(product.id)">
+        </i>
+        {{isInCart(product.id) ? 'In Cart' : 'Add to Cart'}}
+      </button>
+    </div>
+  </div>
+</div>
+

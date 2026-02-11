@@ -316,4 +316,45 @@ class UserServiceImplTests {
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessageContaining("Cannot delete — user not found");
     }
+    
+    // -------- getUserEntityByEmail / getUserEntityById --------
+    
+    @Test
+    void getUserEntityByEmail_returnsOptionalUser_whenFound() {
+        User user = User.builder().id("u1").email("alice@example.com").build();
+        when(userRepository.findByEmail("alice@example.com")).thenReturn(Optional.of(user));
+        
+        Optional<User> result = userService.getUserEntityByEmail("alice@example.com");
+        
+        assertThat(result).isPresent();
+        assertThat(result.get().getId()).isEqualTo("u1");
+    }
+    
+    @Test
+    void getUserEntityByEmail_returnsEmpty_whenNotFound() {
+        when(userRepository.findByEmail("missing@example.com")).thenReturn(Optional.empty());
+        
+        Optional<User> result = userService.getUserEntityByEmail("missing@example.com");
+        
+        assertThat(result).isEmpty();
+    }
+    
+    @Test
+    void getUserEntityById_returnsUser_whenFound() {
+        User user = User.builder().id("u1").name("Alice").build();
+        when(userRepository.findById("u1")).thenReturn(Optional.of(user));
+        
+        User result = userService.getUserEntityById("u1");
+        
+        assertThat(result.getId()).isEqualTo("u1");
+        assertThat(result.getName()).isEqualTo("Alice");
+    }
+    
+    @Test
+    void getUserEntityById_throwsNotFound_whenMissing() {
+        when(userRepository.findById("u1")).thenReturn(Optional.empty());
+        
+        assertThatThrownBy(() -> userService.getUserEntityById("u1"))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
 }

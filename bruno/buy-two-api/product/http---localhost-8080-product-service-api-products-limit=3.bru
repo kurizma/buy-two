@@ -1,0 +1,26 @@
+meta {
+  name: http://localhost:8080/product-service/api/products?limit=3
+  type: http
+  seq: 1
+}
+
+get {
+  url: product-service/api/products?limit=3
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 3
+}
+
+headers {
+  Authorization: Bearer {{clientToken}}
+  X-USER-ID: 697b7c7c46572d7003f412a1
+  X-USER-ROLE: CLIENT
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

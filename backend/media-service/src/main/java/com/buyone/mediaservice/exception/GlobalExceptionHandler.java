@@ -3,95 +3,98 @@ package com.buyone.mediaservice.exception;
 import com.buyone.mediaservice.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
-import jakarta.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
+
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.time.Instant;
 
-
-@RestControllerAdvice
+@ControllerAdvice
 public class GlobalExceptionHandler {
-    
-    // Helper for building structured error responses
-    private ResponseEntity<ErrorResponse> buildError(HttpStatus status, String message, String path) {
+
+    private ResponseEntity<ErrorResponse> buildError(HttpStatus status, String message, Object details) {
         ErrorResponse error = new ErrorResponse(
-                Instant.now(),
-                status.value(),
-                status.getReasonPhrase(),
-                message,
-                path
+            String.valueOf(status.value()), 
+            message, 
+            details
         );
         return new ResponseEntity<>(error, status);
     }
-    
-    // 400: Bean validation errors
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
-        String message = ex.getBindingResult().getFieldErrors().stream()
-                .map(err -> err.getField() + ": " + err.getDefaultMessage())
-                .collect(Collectors.joining(", "));
-        return buildError(HttpStatus.BAD_REQUEST, message, request.getRequestURI());
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+        Map<String, String> details = ex.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage, (m1, m2) -> m1 + "; " + m2));
+        return buildError(HttpStatus.BAD_REQUEST, "Validation failed", details);
     }
-    
-    // 400: Custom bad request
+
+    @ExceptionHandler(org.springframework.web.bind.MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingParams(org.springframework.web.bind.MissingServletRequestParameterException ex) {
+        return buildError(HttpStatus.BAD_REQUEST, "Missing required parameter: " + ex.getParameterName(), null);
+    }
+
+    @ExceptionHandler(jakarta.validation.ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(jakarta.validation.ConstraintViolationException ex) {
+        Map<String, String> details = ex.getConstraintViolations()
+            .stream()
+            .collect(Collectors.toMap(
+                cv -> cv.getPropertyPath().toString(),
+                jakarta.validation.ConstraintViolation::getMessage,
+                (m1, m2) -> m1 + "; " + m2
+            ));
+        return buildError(HttpStatus.BAD_REQUEST, "Validation failed", details);
+    }
+
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex, HttpServletRequest request) {
-        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
+    public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
     }
-    
-    // 400: Custom for invalid file (media-specific)
+
     @ExceptionHandler(InvalidFileException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidFile(InvalidFileException ex, HttpServletRequest request) {
-        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
+    public ResponseEntity<ErrorResponse> handleInvalidFile(InvalidFileException ex) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
     }
-    
-    // 413: File too large (Spring built-in)
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<ErrorResponse> handleMaxUploadSize(MaxUploadSizeExceededException ex, HttpServletRequest request) {
-        return buildError(HttpStatus.PAYLOAD_TOO_LARGE, "File exceeds 2MB size limit.", request.getRequestURI());
+    public ResponseEntity<ErrorResponse> handleMaxUploadSize(MaxUploadSizeExceededException ex) {
+        return buildError(HttpStatus.PAYLOAD_TOO_LARGE, "File exceeds 2MB size limit", null);
     }
-    
-    // 403: Forbidden (custom app-level or Spring Security)
+
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException ex, HttpServletRequest request) {
-        return buildError(HttpStatus.FORBIDDEN, ex.getMessage(), request.getRequestURI());
+    public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException ex) {
+        return buildError(HttpStatus.FORBIDDEN, ex.getMessage(), null);
     }
+
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
-        return buildError(HttpStatus.FORBIDDEN, "Access Denied: " + ex.getMessage(), request.getRequestURI());
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
+        return buildError(HttpStatus.FORBIDDEN, "Access denied", null);
     }
-    
-    // 404: Media not found
+
     @ExceptionHandler(MediaNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleMediaNotFound(MediaNotFoundException ex, HttpServletRequest request) {
-        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
+    public ResponseEntity<ErrorResponse> handleMediaNotFound(MediaNotFoundException ex) {
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), null);
     }
-    
-    // 405: HTTP Method not allowed
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<ErrorResponse> handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
-        return buildError(HttpStatus.METHOD_NOT_ALLOWED, "Method Not Allowed: " + ex.getMessage(), request.getRequestURI());
+    public ResponseEntity<ErrorResponse> handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex) {
+        return buildError(HttpStatus.METHOD_NOT_ALLOWED, "Method not allowed", null);
     }
-    
-    // 409: Conflict
+
     @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<ErrorResponse> handleConflict(ConflictException ex, HttpServletRequest request) {
-        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
+    public ResponseEntity<ErrorResponse> handleConflict(ConflictException ex) {
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), null);
     }
-    
-    // 500: Fallback for unhandled exceptions
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
-        ex.printStackTrace();
-        String cause = ex.getCause() != null ? ex.getCause().toString() : "No root cause";
-        String fullMessage = (ex.getMessage() != null ? ex.getMessage() : "Unexpected server error")
-                + " [" + cause + "]";
-        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, fullMessage, request.getRequestURI());
+    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
+        // In production, avoid exposing stack traces
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), null);
     }
 }

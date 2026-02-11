@@ -1,0 +1,239 @@
+<div class="container py-4 d-flex flex-column flex-md-row justify-content-between">
+
+  <!-- ************ LEFT: Vertical Steps (60% width) ************* -->
+  <div class="steps-column">
+    <h1 class="checkout-title">Order Checkout
+      <i class="fas fa-check-circle ms-2"></i>
+    </h1>
+
+    <mat-vertical-stepper class="vertical-stepper" [linear]="true" #stepper>
+      <!-- ************ Step 1: Address ************* -->
+      <mat-step [stepControl]="checkoutForm">
+        <ng-template matStepLabel>Shipping Address</ng-template>
+
+        <form class="checkout-form" [formGroup]="checkoutForm">
+
+          <mat-form-field class="form-field-half">
+            <input matInput formControlName="fullName" placeholder="Recipient's Full Name">
+            <mat-error *ngIf="(checkoutForm.get('fullName')?.touched) && checkoutForm.get('fullName')?.hasError('required')">
+              Full Name is required.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field >
+            <input matInput formControlName="street" placeholder="Address">
+            <mat-error *ngIf="(checkoutForm.get('street')?.touched) && checkoutForm.get('street')?.hasError('required')">
+              Address is required.
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field>
+            <input matInput formControlName="city" placeholder="City">
+            <mat-error *ngIf="(checkoutForm.get('city')?.touched)
+                              && checkoutForm.get('city')?.hasError('required')">
+              City is required.
+            </mat-error>
+          </mat-form-field>
+
+          <div class="form-row">
+            <mat-form-field class="form-field-half">
+              <input matInput formControlName="zipCode" placeholder="ZIP Code">
+              <mat-error *ngIf="(checkoutForm.get('zipCode')?.touched)
+                                && checkoutForm.get('zipCode')?.hasError('required')">
+                ZIP Code is required.
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="form-field-half">
+              <input matInput formControlName="country" placeholder="Country">
+              <mat-error *ngIf="(checkoutForm.get('country')?.touched)
+                                && checkoutForm.get('country')?.hasError('required')">
+                Country is required.
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <mat-form-field>
+            <input matInput formControlName="phone" placeholder="Phone Number">
+            <mat-error *ngIf="(checkoutForm.get('phone')?.touched)
+                              && checkoutForm.get('phone')?.hasError('required')">
+              Phone Number is required.
+            </mat-error>
+            <mat-error *ngIf="(checkoutForm.get('phone')?.touched)
+                              && checkoutForm.get('phone')?.hasError('pattern')">
+              Phone Number must contain only digits.
+            </mat-error>
+          </mat-form-field>
+
+          <div>
+            <button 
+              class="cont-button" 
+              mat-button 
+              matStepperNext
+              type="button">
+              Continue
+            </button>
+          </div>
+        </form>
+      </mat-step>
+
+      <!-- ************ Step 2: Review ************* -->
+      <mat-step [stepControl]="reviewForm">
+        <ng-template matStepLabel>Review Order</ng-template>
+        
+        <!-- Cart Items Table (Compact) -->
+        <div *ngFor="let item of cartItems" class="review-item mb-3 p-3 border rounded">
+          <div class="d-flex align-items-center">
+            <img [src]="item.imageUrl" alt="{{item.productName}}" class="rounded me-3" style="width:60px;height:60px;object-fit:cover">
+            <div class="flex-grow-1">
+              <h6 class="mb-1">{{item.productName}}</h6>
+              <small class="text">Seller: {{item.sellerName}} | Qty: {{item.quantity}}</small>
+            </div>
+            <div class="text-end ms-3">
+              <div class="fw-bold">{{item.price | currency:'EUR'}} x {{item.quantity}}</div>
+              <div class="text-primary">{{(item.price * item.quantity) | currency:'EUR'}}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Totals -->
+        <div class="border-top pt-3 mt-3">
+            <div class="d-flex justify-content-between mb-2 fw-bold">
+              <span>Shipping:</span> 
+              <span class="fw-bold">
+                <span *ngIf="cartService.getShippingCost() === 0; else shippingCost">FREE</span>
+                <ng-template #shippingCost>   
+                  {{cartService.getShippingCost() | currency:'EUR'}}
+                </ng-template>
+              </span>
+            </div>
+          <div class="d-flex fw-bold justify-content-between mb-2">
+            <span>Total:</span> <strong>{{cartService.getTotal() | currency:'EUR'}}</strong>
+          </div>
+
+          <div class="text-success mt-2" *ngIf="cartService.getShippingCost() === 0">
+            <small><i class="fas fa-shipping-fast me-1"></i>Free shipping - eligible on this order!</small>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 mt-4">
+          <a routerLink="/cart" class="btn btn-outline-primary">
+            <i class="fas fa-edit me-1"></i>Edit Cart
+          </a>
+          <button 
+            mat-button 
+            (click)="confirmReview(stepper)"
+            class="btn cont-button ms-auto">
+            Continue to Payment
+          </button>
+        </div>
+        <!-- Hidden form for stepper validation -->
+      <form [formGroup]="reviewForm" style="display:none"></form>
+      </mat-step>
+
+      <!-- ************ Step 3: Confirm ************* -->
+      <mat-step>
+        <ng-template matStepLabel>Payment</ng-template>
+        
+        <div class="payment-section">
+          <h5>Select Payment Method</h5>
+          
+          <!-- Pay on Delivery (Only Option) -->
+          <mat-radio-group [(ngModel)]="selectedPayment" class="payment-option">
+            <mat-radio-button value="PAY_ON_DELIVERY" checked>
+              <div class="payment-card">
+                <i class="fas fa-truck me-2"></i>
+                <strong>Pay on Delivery</strong>
+                <div>
+                  <small class="text-primary"> (Pay cash/card to delivery person)</small>
+                </div>
+              </div>
+            </mat-radio-button>
+          </mat-radio-group>
+          
+          <!-- Order Summary -->
+          <div class="order-preview mt-4 p-3 bg-light rounded">
+            <h6>Final Order</h6>
+            <div class="d-flex justify-content-between">
+              <span>Total Amount:</span>
+              <strong>{{cartService.getTotal() | currency:'EUR'}}</strong>
+            </div>
+            <div class="text-success" *ngIf="cartService.getShippingCost() === 0">
+              <small><i class="fas fa-shipping-fast me-1"></i>Free shipping eligible</small>
+            </div>
+          </div>
+          
+          <!-- Confirm Button -->
+          <div class="mt-4">
+            <button 
+              class="cont-button w-100" 
+              mat-raised-button 
+              color="primary" 
+              (click)="placeOrder()"
+              [disabled]="selectedPayment !== 'PAY_ON_DELIVERY'">
+              Confirm & Place Order
+            </button>
+          </div>
+        </div>
+      </mat-step>
+    </mat-vertical-stepper>
+  </div>
+
+  <!-- ************ RIGHT: Order Summary (40% width) ************* -->
+  <div class="order-summary-card">
+    <h4 class="summary-title">Order Summary</h4>
+    
+    <!-- Cart Items (Compact) -->
+    <div *ngFor="let item of cartItems" class="summary-item">
+      <div class="item-image-title">
+        <img [src]="item.imageUrl" [alt]="item.productName" class="item-thumb">
+        <div>
+          <div class="item-name">{{item.productName}}</div>
+        </div>
+      </div>
+      <div class="item-price-qty">
+        €{{item.price}} x {{item.quantity}}
+      </div>
+      <div class="item-total">€{{(item.price * item.quantity).toFixed(2)}}</div>
+    </div>
+
+    <!-- Totals -->
+    <div class="totals-section">
+      <div class="total-row">
+        <span>Subtotal excl. VAT</span>
+        <span>€{{cartService.getSubtotal().toFixed(2)}}</span>
+      </div>
+      <div class="total-row">
+        <span>VAT (24%)</span>
+        <span>€{{cartService.getVatAmount().toFixed(2)}}</span>
+      </div>
+      <div class="total-row shipping-row">
+        <span>Shipping</span>
+        <span *ngIf="cartService.getShippingCost() === 0" class="free-shipping">FREE</span>
+        <span *ngIf="cartService.getShippingCost() > 0">€{{cartService.getShippingCost().toFixed(2)}}</span>
+      </div>
+      <hr>
+      <div class="grand-total-row">
+        <strong>Total</strong>
+        <strong>€{{cartService.getTotal().toFixed(2)}}</strong>
+      </div>
+    </div>
+
+    <!-- Back to Shopping Cart -->
+    <div class="back-to-cart">
+      <a routerLink="/cart" class="btn btn-outline-primary w-100 mb-3">
+        <i class="fas fa-arrow-left me-2"></i> Back to Shopping Cart
+      </a>
+    </div>
+
+    <!-- Trust Indicators -->
+    <div class="trust-indicators">
+      <div><mat-icon>shield</mat-icon> Secure Checkout</div>
+      <div><mat-icon>local_shipping</mat-icon> Fast Delivery</div>
+      <div><mat-icon>payment</mat-icon> Pay on Delivery</div>
+    </div>
+  </div>
+</div>
+
+
+

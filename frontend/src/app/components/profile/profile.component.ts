@@ -1,22 +1,37 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { UserResponse } from '../../models/users/user-response.model';
 import { UserUpdateRequest } from '../../models/users/userUpdateRequest.model';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { MediaService } from '../../services/media.service';
 import { AuthService } from '../../services/auth.service';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  AbstractControl,
+} from '@angular/forms';
+import { ProfileAnalyticsComponent } from '../profile-analytics/profile-analytics.component';
+import { AnalyticsService } from '../../services/analytics.service';
+import { AnalyticsResponse } from '../../models/analytics/analytics-response.model';
+import { AnalyticsItem } from '../../models/analytics/analytics.model';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, ProfileAnalyticsComponent],
 })
 export class ProfileComponent implements OnInit {
   currentUser: UserResponse | null = null;
+
+  get userRole(): 'client' | 'seller' | null {
+    if (!this.currentUser?.role) return null;
+    return this.currentUser.role.toUpperCase() === 'CLIENT' ? 'client' : 'seller';
+  }
+
   profileForm: FormGroup;
   passwordForm: FormGroup;
   avatar: string | null = null; // always URL or null
@@ -31,8 +46,12 @@ export class ProfileComponent implements OnInit {
   userService = inject(UserService);
   mediaService = inject(MediaService);
   authService = inject(AuthService);
-
+  analyticsService = inject(AnalyticsService);
   fb = inject(FormBuilder);
+
+  analyticsData: AnalyticsResponse | null = null;
+  analyticsLoading = false;
+  analyticsError = '';
 
   constructor() {
     this.profileForm = this.fb.group({
@@ -47,7 +66,7 @@ export class ProfileComponent implements OnInit {
           [
             Validators.required,
             Validators.minLength(8),
-            Validators.pattern('^(?=.*[a-z])(?=.*\\d).{8,}$'),
+            Validators.pattern(String.raw`^(?=.*[a-z])(?=.*\d).{8,}$`),
           ],
         ],
         confirmPassword: ['', Validators.required],
@@ -55,20 +74,64 @@ export class ProfileComponent implements OnInit {
       { validator: this.passwordsMatch },
     );
   }
-
   ngOnInit() {
-    this.userService.getCurrentUser().subscribe((user) => {
-      if (user) {
-        this.currentUser = user;
-        this.profileForm.patchValue({ name: user.name, email: user.email });
-        this.profileForm.get('email')?.disable(); // Disable email field
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        console.log('✅ User loaded:', user.id, user.role);
 
-        this.avatar = user.avatar || null;
-        this.avatarPreview = this.avatar;
-        this.avatarMediaId = this.extractMediaId(user.avatar);
-      }
-      this.loaded = true; // render avatar only after this
+        if (user) {
+          this.currentUser = user;
+          this.profileForm.patchValue({ name: user.name, email: user.email });
+          this.profileForm.get('email')?.disable();
+          this.avatar = user.avatar || null;
+          this.avatarPreview = this.avatar;
+          this.avatarMediaId = this.extractMediaId(user.avatar);
+
+          // ✅ Calculate role directly
+          const role = user.role.toUpperCase() === 'CLIENT' ? 'client' : 'seller';
+          if (role && user.id) {
+            this.loadAnalytics(user.id, role); // Pass explicitly
+          } else {
+            console.error('⚠️ Skipping analytics: missing user id or role', {
+              role,
+              userId: user.id,
+            });
+          }
+        }
+        this.loaded = true;
+      },
+      error: (err) => {
+        console.error('❌ Failed to load current user:', err);
+        this.analyticsError = 'Failed to load user profile.';
+        this.loaded = true;
+      },
     });
+  }
+
+  private loadAnalytics(userId: string, role: 'client' | 'seller') {
+    console.log('🚀 loadAnalytics:', userId, role);
+    this.analyticsLoading = true;
+    const analytics$ =
+      role === 'client'
+        ? this.analyticsService.getClientAnalytics(userId)
+        : this.analyticsService.getSellerAnalytics(userId);
+
+    analytics$.subscribe({
+      next: (data) => {
+        console.log('📊 Analytics loaded:', data);
+        this.analyticsData = data;
+        this.analyticsLoading = false;
+      },
+      error: (err) => {
+        console.error('❌ Analytics error:', err);
+        this.analyticsError = err.message;
+        this.analyticsLoading = false;
+      },
+    });
+  }
+
+  get transformedAnalyticsItems(): AnalyticsItem[] {
+    return this.analyticsData?.items || [];
   }
 
   onAvatarSelect(event: any): void {
@@ -144,7 +207,7 @@ export class ProfileComponent implements OnInit {
 
   private extractMediaId(url?: string): string | null {
     if (!url) return null;
-    const match = url.match(/media\/([a-f0-9-]+)\./);
+    const match = /media\/([a-f0-9-]+)\./.exec(url);
     return match?.[1] || null;
   }
 

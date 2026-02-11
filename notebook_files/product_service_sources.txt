@@ -1,0 +1,1234 @@
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/repository/ProductRepository.java ---
+package com.buyone.productservice.repository;
+
+import com.buyone.productservice.model.Product;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import java.util.List;
+
+public interface ProductRepository extends MongoRepository<Product, String> {
+    List<Product> findByUserId(String userId);
+    void deleteByUserId(String userId);
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/repository/ProductRepository.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/repository/CategoryRepository.java ---
+package com.buyone.productservice.repository;
+
+import com.buyone.productservice.model.Category;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+import java.util.List;
+
+public interface CategoryRepository extends MongoRepository<Category, String> {
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/repository/CategoryRepository.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/response/CategoryResponse.java ---
+package com.buyone.productservice.response;
+
+public record CategoryResponse(
+        String id,
+        String slug,
+        String name,
+        String icon,
+        String description
+) {}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/response/CategoryResponse.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/response/ApiResponse.java ---
+package com.buyone.productservice.response;
+
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ApiResponse<T> {
+    private boolean success;
+    private String message;
+    private T data;
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/response/ApiResponse.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/response/ProductResponse.java ---
+package com.buyone.productservice.response;
+
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Builder;
+
+import java.math.BigDecimal;
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ProductResponse {
+    private String id;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private Integer quantity;
+    private String userId;
+    private String categoryId;
+    private java.util.List<String> images;
+    
+    // private String mediaId;
+    // Optional:
+    // private Instant createdAt;
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/response/ProductResponse.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/response/ErrorResponse.java ---
+package com.buyone.productservice.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Builder;
+
+import java.time.LocalDateTime;
+
+@Data
+@AllArgsConstructor
+@Builder
+public class ErrorResponse {
+    private int status;
+    private String error;
+    private String message;
+    private String path;
+    private LocalDateTime timestamp;
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/response/ErrorResponse.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/config/SecurityConfig.java ---
+package com.buyone.productservice.config;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SecurityConfig {
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        logger.info("!!! SecurityConfig loaded, CSRF disabled !!!");
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+        return http.build();
+    }
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/config/SecurityConfig.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/config/KafkaConfig.java ---
+// src/main/java/com/buyone/productservice/config/KafkaConfig.java
+package com.buyone.productservice.config;
+
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Configuration
+public class KafkaConfig {
+    
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootstrapServers;
+    
+    @Bean
+    public ProducerFactory<String, Object> producerFactory() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers); // Change for prod!
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
+    
+    @Bean
+    public KafkaTemplate<String, Object> kafkaTemplate() {
+        return new KafkaTemplate<>(producerFactory());
+    }
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/config/KafkaConfig.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/controller/ProductController.java ---
+package com.buyone.productservice.controller;
+
+import com.buyone.productservice.request.CreateProductRequest;
+import com.buyone.productservice.request.UpdateProductRequest;
+import com.buyone.productservice.request.ReserveStockRequest;
+import com.buyone.productservice.request.ReleaseStockRequest;
+import com.buyone.productservice.response.ProductResponse;
+import com.buyone.productservice.response.ApiResponse;
+import com.buyone.productservice.exception.ForbiddenException;
+import com.buyone.productservice.service.ProductService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
+
+
+
+import jakarta.validation.Valid;
+import java.util.List;
+
+@RestController
+@RequestMapping("/products")
+@Validated
+@RequiredArgsConstructor
+public class ProductController {
+    
+    private final ProductService productService;
+    
+    // GET /products (public) or GET /products?sellerId=... (public)
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getProducts(
+            @RequestParam(required = false) String sellerId) {
+
+        List<ProductResponse> products;
+
+        if (sellerId != null) {
+            products = productService.getProductsBySeller(sellerId);
+        } else {
+            products = productService.getAllProducts();
+        }
+
+        return ResponseEntity.ok(okResponse("Products fetched successfully", products));
+    }
+
+    
+    // GET /products/{id} (public)
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductResponse>> getProductById(@PathVariable String id) {
+        ProductResponse product = productService.getProductById(id);
+        return ResponseEntity.ok(okResponse("Product fetched successfully", product));
+    }
+    
+    // POST /products (seller only)
+    @PostMapping
+    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
+            @Valid @RequestBody CreateProductRequest request,
+            @RequestHeader("X-USER-ID") String sellerId,
+            @RequestHeader("X-USER-ROLE") String role
+    ) {
+        if (!"SELLER".equals(role)) {
+            throw new ForbiddenException("Only sellers can create products.");
+        }
+        
+        ProductResponse product = productService.createProduct(request, sellerId);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(okResponse("Product created successfully", product));
+    }
+    
+    // PUT /products/{id} (seller only & must own)
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
+            @PathVariable String id,
+            @Valid @RequestBody UpdateProductRequest request,
+            @RequestHeader("X-USER-ID") String sellerId,
+            @RequestHeader("X-USER-ROLE") String role
+    ) {
+        if (!"SELLER".equals(role)) {
+            throw new ForbiddenException("Only sellers can update products.");
+        }
+        
+        ProductResponse product = productService.updateProduct(id, request, sellerId);
+        return ResponseEntity.ok(okResponse("Product updated successfully", product));
+    }
+    
+    // DELETE /products/{id} (seller only & must own)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteProduct(
+            @PathVariable String id,
+            @RequestHeader("X-USER-ID") String sellerId,
+            @RequestHeader("X-USER-ROLE") String role
+    ) {
+        if (!"SELLER".equals(role)) {
+            throw new ForbiddenException("Only sellers can delete products.");
+        }
+        
+        productService.deleteProduct(id, sellerId);
+        return ResponseEntity.ok(okResponse("Product deleted successfully", null));
+    }
+    
+    @PostMapping("/stock/reserve")
+    @Operation(summary = "Reserve stock for order", description = "INTERNAL: Order service only via gateway")
+    public ResponseEntity<ApiResponse<Void>> reserveStock(
+            @Valid @RequestBody ReserveStockRequest request) {
+        
+        productService.reserveStock(
+                request.getProductId(),
+                request.getQuantity(),
+                request.getOrderNumber()
+        );
+        
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .success(true)
+                .message("Stock reserved successfully")
+                .build());
+    }
+    
+    @PostMapping("/stock/release")
+    @Operation(summary = "Release reserved stock", description = "INTERNAL: Order service only via gateway")
+    public ResponseEntity<ApiResponse<Void>> releaseStock(
+            @Valid @RequestBody ReleaseStockRequest request) {
+        
+        productService.releaseStock(
+                request.getProductId(),
+                request.getQuantity()
+        );
+        
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .success(true)
+                .message("Stock released successfully")
+                .build());
+    }
+    
+    
+    // Helper to build ApiResponse consistently
+    private <T> ApiResponse<T> okResponse(String message, T data) {
+        return ApiResponse.<T>builder()
+                .success(true)
+                .message(message)
+                .data(data)
+                .build();
+    }
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/controller/ProductController.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/controller/CategoryController.java ---
+package com.buyone.productservice.controller;
+
+import com.buyone.productservice.response.CategoryResponse;
+import com.buyone.productservice.request.UpdateCategoryRequest;
+import com.buyone.productservice.service.CategoryService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/categories")
+@RequiredArgsConstructor
+public class CategoryController {
+    
+    private final CategoryService categoryService;
+    
+    @GetMapping
+    public ResponseEntity<List<CategoryResponse>> getAll() {
+        return ResponseEntity.ok(categoryService.getAllCategories());
+    }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoryResponse> getOne(@PathVariable String id) {
+        return ResponseEntity.ok(categoryService.getCategoryById(id));
+    }
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponse> updateCategory(
+            @PathVariable String id,
+            @Valid @RequestBody UpdateCategoryRequest request
+    ) {
+        CategoryResponse updated = categoryService.updateCategory(id, request);
+        return ResponseEntity.ok(updated);
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable String id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/controller/CategoryController.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/model/Product.java ---
+package com.buyone.productservice.model;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.math.BigDecimal;
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
+@Document(collection = "products")
+public class Product {
+    @Id
+    private String id;
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private Integer quantity;
+    private String userId;
+    private String categoryId;
+    private java.util.List<String> images;
+}-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/model/Product.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/model/Category.java ---
+package com.buyone.productservice.model;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+
+@Document("categories")
+public class Category {
+    @Id
+    private String id;
+    private String slug;
+    private String name;
+    private String icon;
+    private String description;
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/model/Category.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/ProductServiceApplication.java ---
+package com.buyone.productservice;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ProductServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(ProductServiceApplication.class, args);
+	}
+
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/ProductServiceApplication.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/request/ReleaseStockRequest.java ---
+package com.buyone.productservice.dto.request;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReleaseStockRequest {
+    @NotBlank(message = "Product ID is required")
+    private String productId;
+    
+    @Min(value = 1, message = "Quantity must be at least 1")
+    private int quantity;
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/request/ReleaseStockRequest.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/request/CreateProductRequest.java ---
+package com.buyone.productservice.request;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import jakarta.validation.constraints.*;
+
+import java.math.BigDecimal;
+
+/**
+ * DTO for product creation, validates all required/optional fields.
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CreateProductRequest {
+    
+    @NotBlank(message = "Product name is required")
+    @Size(min = 2, max = 100, message = "Product name must be between 2 and 100 characters")
+    private String name;
+    
+    @Size(max = 500, message = "Description must be less than 500 characters")
+    private String description;
+    
+    @NotNull(message = "Price is required")
+    @DecimalMin(value = "0.0", inclusive = true, message = "Price must be non-negative")
+    private BigDecimal price;
+    
+    @NotNull(message = "Quantity is required")
+    @Min(value = 0, message = "Quantity must be zero or greater")
+    private Integer quantity;
+    
+    private String categoryId;
+    
+    private java.util.List<String> images;
+
+    // userId is NOT included here, it comes from JWT / header in the controller for security!
+    // Add more fields as model extends, with corresponding validations
+    
+    // For example, for media/image in future:
+    // private String mediaId;
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/request/CreateProductRequest.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/request/UpdateCategoryRequest.java ---
+// src/main/java/com/buyone/productservice/request/UpdateCategoryRequest.java
+package com.buyone.productservice.request;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class UpdateCategoryRequest {
+    @NotBlank(message = "Category name is required")
+    private String name;
+    
+    private String icon;
+    private String description;
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/request/UpdateCategoryRequest.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/request/UpdateProductRequest.java ---
+package com.buyone.productservice.request;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import jakarta.validation.constraints.*;
+
+import java.math.BigDecimal;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UpdateProductRequest {
+    
+    @Size(min = 2, max = 100, message = "Product name must be between 2 and 100 characters")
+    private String name;
+    
+    @Size(max = 500, message = "Description must be less than 500 characters")
+    private String description;
+    
+    @DecimalMin(value = "0.0", inclusive = true, message = "Price must be non-negative")
+    private BigDecimal price;
+    
+    @Min(value = 0, message = "Quantity must be zero or greater")
+    private Integer quantity;
+    
+    private String categoryId;
+
+    private java.util.List<String> images;
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/request/UpdateProductRequest.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/request/ReserveStockRequest.java ---
+package com.buyone.productservice.dto.request;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReserveStockRequest {
+    @NotBlank(message = "Product ID is required")
+    private String productId;
+    
+    @Min(value = 1, message = "Quantity must be at least 1")
+    private int quantity;
+    
+    @NotBlank(message = "Order number is required")
+    private String orderNumber;
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/request/ReserveStockRequest.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/service/ProductService.java ---
+package com.buyone.productservice.service;
+
+import com.buyone.productservice.request.CreateProductRequest;
+import com.buyone.productservice.request.UpdateProductRequest;
+import com.buyone.productservice.response.ProductResponse;
+
+import java.util.List;
+
+public interface ProductService {
+    ProductResponse createProduct(CreateProductRequest request, String sellerId);
+    ProductResponse getProductById(String id);
+    List<ProductResponse> getAllProducts();
+    ProductResponse updateProduct(String id, UpdateProductRequest request, String sellerId);
+    void deleteProduct(String id, String sellerId);
+    List<ProductResponse> getProductsBySeller(String sellerId); // for seller dashboard
+    
+    
+    void reserveStock(String productId, int quantity, String orderNumber);
+    
+    void releaseStock(String productId, int quantity);
+}
+
+
+// Methods should use DTOs for incoming and outgoing data (except for internal lookups).-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/service/ProductService.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/service/CategoryServiceImpl.java ---
+package com.buyone.productservice.service;
+
+import com.buyone.productservice.exception.ResourceNotFoundException;
+import com.buyone.productservice.model.Category;
+import com.buyone.productservice.repository.CategoryRepository;
+import com.buyone.productservice.request.UpdateCategoryRequest;
+import com.buyone.productservice.response.CategoryResponse;
+import com.buyone.productservice.service.CategoryService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class CategoryServiceImpl implements CategoryService {
+    
+    private final CategoryRepository categoryRepository;
+    
+    @Override
+    public List<CategoryResponse> getAllCategories() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+    
+    @Override
+    public CategoryResponse getCategoryById(String id) {
+        var category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found: " + id));
+        return toResponse(category);
+    }
+    
+    @Override
+    public void deleteCategory(String id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Category not found: " + id);
+        }
+        categoryRepository.deleteById(id);
+    }
+    
+    @Override
+    public CategoryResponse updateCategory(String id, UpdateCategoryRequest request) {
+        Category cat = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found: " + id));
+        cat.setName(request.getName());
+        cat.setIcon(request.getIcon());
+        cat.setDescription(request.getDescription());
+        Category saved = categoryRepository.save(cat);
+        return toResponse(saved);
+    }
+    
+    private CategoryResponse toResponse(Category c) {
+        return new CategoryResponse(
+                c.getId(),
+                c.getSlug(),
+                c.getName(),
+                c.getIcon(),
+                c.getDescription()
+        );
+    }
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/service/CategoryServiceImpl.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/service/ProductServiceImpl.java ---
+package com.buyone.productservice.service;
+
+import com.buyone.productservice.model.Product;
+import com.buyone.productservice.repository.ProductRepository;
+import com.buyone.productservice.request.CreateProductRequest;
+import com.buyone.productservice.request.UpdateProductRequest;
+import com.buyone.productservice.response.ProductResponse;
+import com.buyone.productservice.exception.ProductNotFoundException;
+import com.buyone.productservice.exception.BadRequestException;
+import com.buyone.productservice.exception.ConflictException;
+import com.buyone.productservice.exception.ForbiddenException;
+import com.buyone.productservice.event.ProductCreatedEvent;
+import com.buyone.productservice.event.ProductUpdatedEvent;
+import com.buyone.productservice.event.ProductDeletedEvent;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class ProductServiceImpl implements ProductService {
+    
+    private final ProductRepository productRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private static final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
+    
+    
+    @Value("${app.kafka.topic.product-created}")
+    private String productCreatedTopic;
+    @Value("${app.kafka.topic.product-updated}")
+    private String productUpdatedTopic;
+    @Value("${app.kafka.topic.product-deleted}")
+    private String productDeletedTopic;
+    
+    public ProductServiceImpl(ProductRepository productRepository, KafkaTemplate<String, Object> kafkaTemplate) {
+        this.productRepository = productRepository;
+        this.kafkaTemplate = kafkaTemplate;
+    }
+    
+    // Create Product (seller only, enforce at controller)
+    @Override
+    public ProductResponse createProduct(CreateProductRequest request, String sellerId) {
+        
+        // Example conflict check (duplicate product name for seller)
+        if (productRepository.findByUserId(sellerId).stream()
+                .anyMatch(p -> p.getName().equalsIgnoreCase(request.getName()))) {
+            throw new ConflictException("Product name already exists for seller.");
+        }
+        
+        Product product = Product.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .quantity(request.getQuantity())
+                .userId(sellerId)
+                .categoryId(request.getCategoryId())
+                .images(request.getImages())
+                .build();
+        
+        Product savedProduct = productRepository.save(product);
+//        ProductCreatedEvent event = ProductCreatedEvent.builder()
+//                .productId(savedProduct.getId())
+//                .sellerId(sellerId)
+//                .name(savedProduct.getName())
+//                .price(savedProduct.getPrice())
+//                .build();
+        // Publish event
+        // kafkaTemplate.send(productCreatedTopic, event)
+        //         .whenComplete((result, ex) -> {
+        //             if (ex != null) {
+        //                 log.error("Failed to publish event", ex);
+        //             } else {
+        //                 log.info("Event published: " + event);
+        //             }
+        //         });
+        return toProductResponse(savedProduct);
+    }
+    
+    // Get single product by ID
+    @Override
+    public ProductResponse getProductById(String id) {
+        return productRepository.findById(id)
+                .map(this::toProductResponse)
+                .orElseThrow(() ->
+                        new ProductNotFoundException("Product not found with ID: " + id)
+                );
+    }
+    
+    // Get all products (consider pagination for production)
+    // consider Pagination. (page,size) to reduce a massive call as this scales.
+    @Override
+    public List<ProductResponse> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+        if (products.isEmpty()) {
+            throw new ProductNotFoundException("No products found.");
+        }
+        return products.stream()
+                .map(this::toProductResponse)
+                .collect(Collectors.toList());
+    }
+    
+    // Update product (seller only)
+    @Override
+    public ProductResponse updateProduct(String id, UpdateProductRequest request, String sellerId) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Cannot update — Product not found with ID: " + id));
+        // BUSINESS RULE:
+        // Only owner (seller) can update this product
+        if (!product.getUserId().equals(sellerId)) {
+            throw new ForbiddenException("Unauthorized: You do not own this product");
+        }
+        
+//        // Validate business logic on incoming changes
+//        if (request.getPrice() != null && request.getPrice() < 0) {
+//            throw new BadRequestException("Price must be non-negative.");
+//        }
+//        if (request.getQuantity() != null && request.getQuantity() < 0) {
+//            throw new BadRequestException("Quantity must be zero or greater.");
+//        }
+        
+        // Prevent changing to a name that already exists for same seller (conflict)
+        if (request.getName() != null && !request.getName().equals(product.getName())) {
+            List<Product> existing = productRepository.findByUserId(sellerId)
+                    .stream()
+                    .filter(p -> p.getName().equalsIgnoreCase(request.getName()) && !p.getId().equals(product.getId()))
+                    .collect(Collectors.toList());
+            if (!existing.isEmpty()) {
+                throw new ConflictException("Product with name already exists for seller.");
+            }
+        }
+        
+        // Update fields if provided
+        if (request.getName() != null) product.setName(request.getName());
+        if (request.getDescription() != null) product.setDescription(request.getDescription());
+        if (request.getPrice() != null) product.setPrice(request.getPrice());
+        if (request.getQuantity() != null) product.setQuantity(request.getQuantity());
+        if (request.getCategoryId() != null) product.setCategoryId(request.getCategoryId());
+        if (request.getImages() != null) product.setImages(request.getImages());
+
+        Product updatedProduct = productRepository.save(product);
+//        ProductUpdatedEvent event = ProductUpdatedEvent.builder()
+//                .productId(updatedProduct.getId())
+//                .sellerId(sellerId)
+//                .name(updatedProduct.getName())
+//                .price(updatedProduct.getPrice())
+//                .build();
+        // kafkaTemplate.send(productUpdatedTopic, event)
+        //         .whenComplete((result, ex) -> {
+        //             if (ex != null) {
+        //                 log.error("Failed to publish event", ex);
+        //             } else {
+        //                 log.info("Event published: " + event);
+        //             }
+        //         });
+        return toProductResponse(updatedProduct);
+    }
+    
+    // Delete product (seller only)
+    @Override
+    @Transactional
+    public void deleteProduct(String id, String sellerId) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Cannot delete — Product not found with ID: " + id));
+        // BUSINESS RULE:
+        // Only owner (seller) can delete this product
+        if (!product.getUserId().equals(sellerId)) {
+            throw new ForbiddenException("Unauthorized: You do not own this product");
+        }
+        productRepository.deleteById(id);
+        
+        ProductDeletedEvent event = ProductDeletedEvent.builder()
+                .productId(product.getId())
+                .sellerId(sellerId)
+                .build();
+         kafkaTemplate.send(productDeletedTopic, event)
+                 .whenComplete((result, ex) -> {
+                     if (ex != null) {
+                         log.error("Failed to publish event", ex);
+                     } else {
+                         log.info("Event published: " + event);
+                     }
+                 });
+
+    }
+    
+    // Get all products by seller (for seller dashboard)
+    @Override
+    public List<ProductResponse> getProductsBySeller(String sellerId) {
+        List<Product> products = productRepository.findByUserId(sellerId);
+        // Do NOT throw on empty; just map to DTOs
+        // if (products.isEmpty()) {
+        //     throw new ProductNotFoundException("No products found for seller: " + sellerId);
+        // }
+        return products.stream().map(this::toProductResponse).collect(Collectors.toList());
+    }
+    
+    @Override
+    @Transactional  // MongoDB single-doc ACID
+    public void reserveStock(String productId, int quantity, String orderNumber) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new BadRequestException("Product not found: " + productId));  // Use BadRequest for client errors
+        
+        if (product.getQuantity() < quantity) {
+            throw new BadRequestException(
+                    String.format("Insufficient stock. Available: %d, Requested: %d",
+                            product.getQuantity(), quantity));
+        }
+        
+        product.setQuantity(product.getQuantity() - quantity);
+        productRepository.save(product);
+        
+        log.info("Reserved {} units of {} (order={})", quantity, productId, orderNumber);
+    }
+    
+    @Override
+    @Transactional
+    public void releaseStock(String productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new BadRequestException("Product not found: " + productId));
+        
+        // Allow oversell recovery (quantity may be negative from partial txns)
+        product.setQuantity(product.getQuantity() + quantity);
+        productRepository.save(product);
+        
+        log.info("Released {} units of {}", quantity, productId);
+    }
+    
+    
+    // Helper: Map Product entity to ProductResponse DTO
+    private ProductResponse toProductResponse(Product product) {
+        return ProductResponse.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .images(product.getImages())
+                .quantity(product.getQuantity())
+                .userId(product.getUserId()) // Correct getter
+                .categoryId(product.getCategoryId())
+                .build();
+    }
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/service/ProductServiceImpl.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/service/CategoryService.java ---
+package com.buyone.productservice.service;
+
+import com.buyone.productservice.request.UpdateCategoryRequest;
+import com.buyone.productservice.response.CategoryResponse;
+
+import java.util.List;
+
+public interface CategoryService {
+    List<CategoryResponse> getAllCategories();
+    CategoryResponse getCategoryById(String id);
+    CategoryResponse updateCategory(String id, UpdateCategoryRequest request);
+    void deleteCategory(String id);
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/service/CategoryService.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/exception/ForbiddenException.java ---
+package com.buyone.productservice.exception;
+
+public class ForbiddenException extends RuntimeException {
+    
+    public ForbiddenException() {
+        super();
+    }
+    
+    public ForbiddenException(String message) {
+        super(message);
+    }
+    
+    public ForbiddenException(String message, Throwable cause) {
+        super(message, cause);
+    }
+    
+    public ForbiddenException(Throwable cause) {
+        super(cause);
+    }
+    
+}-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/exception/ForbiddenException.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/exception/ResourceNotFoundException.java ---
+package com.buyone.productservice.exception;
+
+public class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException() {
+        super();
+    }
+    
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+    
+    public ResourceNotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }
+    
+    public ResourceNotFoundException(Throwable cause) {
+        super(cause);
+    }
+}-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/exception/ResourceNotFoundException.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/exception/ProductNotFoundException.java ---
+package com.buyone.productservice.exception;
+
+public class ProductNotFoundException extends RuntimeException {
+    public ProductNotFoundException() {
+        super();
+    }
+    
+    public ProductNotFoundException(String message) {
+        super(message);
+    }
+    
+    public ProductNotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }
+    
+    public ProductNotFoundException(Throwable cause) {
+        super(cause);
+    }
+}-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/exception/ProductNotFoundException.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/exception/ConflictException.java ---
+package com.buyone.productservice.exception;
+
+public class ConflictException extends RuntimeException {
+    
+    public ConflictException() {
+        super();
+    }
+    
+    public ConflictException(String message) {
+        super(message);
+    }
+    
+    public ConflictException(String message, Throwable cause) {
+        super(message, cause);
+    }
+    
+    public ConflictException(Throwable cause) {
+        super(cause);
+    }
+    
+}-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/exception/ConflictException.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/exception/GlobalExceptionHandler.java ---
+package com.buyone.productservice.exception;
+
+import com.buyone.productservice.response.ErrorResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import jakarta.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
+import java.util.stream.Collectors;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    
+    // Helper for building consistent error responses
+    private ResponseEntity<ErrorResponse> buildError(HttpStatus status, String message, String path) {
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(status.value())
+                .error(status.getReasonPhrase())
+                .message(message)
+                .path(path)
+                .build();
+        return new ResponseEntity<>(error, status);
+    }
+    
+    // 400: Bean validation (@Valid) errors
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        // Collects all field validation errors into a single string
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .map(err -> err.getField() + ": " + err.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        return buildError(HttpStatus.BAD_REQUEST, message, request.getRequestURI());
+    }
+    
+    // 400: Custom bad request
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
+    }
+    
+    // 403: Forbidden (custom app-level)
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponse> handleForbidden(ForbiddenException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.FORBIDDEN, ex.getMessage(), request.getRequestURI());
+    }
+    
+    // 403: Spring Security's access denied
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.FORBIDDEN, "Access Denied: " + ex.getMessage(), request.getRequestURI());
+    }
+    
+    // 404: Not found for product
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProductNotFound(ProductNotFoundException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
+    }
+    
+    // 405: HTTP Method not allowed
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.METHOD_NOT_ALLOWED, "Method Not Allowed: " + ex.getMessage(), request.getRequestURI());
+    }
+    
+    // 409: Conflict (e.g., duplicate product name)
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(ConflictException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
+    }
+    
+    // 500: Fallback for unhandled exceptions
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
+        // In production, log this exception instead of printing!
+        ex.printStackTrace();
+        String cause = ex.getCause() != null ? ex.getCause().toString() : "No root cause";
+        String fullMessage = (ex.getMessage() != null ? ex.getMessage() : "Unexpected server error")
+                + " [" + cause + "]";
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, fullMessage, request.getRequestURI());
+    }
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/exception/GlobalExceptionHandler.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/exception/BadRequestException.java ---
+package com.buyone.productservice.exception;
+
+public class BadRequestException extends RuntimeException {
+    public BadRequestException() {
+        super();
+    }
+    
+    public BadRequestException(String message) {
+        super(message);
+    }
+    
+    public BadRequestException(String message, Throwable cause) {
+        super(message, cause);
+    }
+    
+    public BadRequestException(Throwable cause) {
+        super(cause);
+    }
+}-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/exception/BadRequestException.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/event/ProductDeletedEvent.java ---
+package com.buyone.productservice.event;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ProductDeletedEvent {
+    private String productId;
+    private String sellerId;
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/event/ProductDeletedEvent.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/event/ProductCreatedEvent.java ---
+package com.buyone.productservice.event;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ProductCreatedEvent {
+    private String productId;
+    private String sellerId;
+    private String name;
+    private BigDecimal price;
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/event/ProductCreatedEvent.java ---
+
+--- FILE: backend/product-service/src/main/java/com/buyone/productservice/event/ProductUpdatedEvent.java ---
+package com.buyone.productservice.event;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ProductUpdatedEvent {
+    private String productId;
+    private String sellerId;
+    private String name;
+    private BigDecimal price;
+}
+-e 
+--- END FILE: backend/product-service/src/main/java/com/buyone/productservice/event/ProductUpdatedEvent.java ---
+

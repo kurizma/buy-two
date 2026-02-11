@@ -45,8 +45,11 @@ wait_for_http "http://localhost:8567/actuator/health" "product-service" || exit 
 
 # 5. media-service :8678
 start_service_script "./media-service/start.sh"
-wait_for_http "http://localhost:8678/actuator/health" "media-service" || \
-  echo "media-service HTTP not healthy yet (maybe waiting for Kafka)."
+wait_for_http "http://localhost:8678/actuator/health" "media-service" || exit 1
+
+# 5. order-service :8789
+start_service_script "./order-service/start.sh"
+wait_for_http "http://localhost:8789/actuator/health" "order-service" || exit 1
 
 cd ..
 

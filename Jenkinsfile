@@ -1,8 +1,5 @@
 pipeline {
 	agent any
-	triggers {
-		githubPush()
-	}
 	options {
 		timestamps()
 		timeout(time: 20, unit: 'MINUTES')
@@ -189,66 +186,104 @@ pipeline {
 			}
 		}
 
-		// SonarCloud Code Analysis
-		stage('SonarCloud Analysis - Backend') {
+		stage('Sonar: Discovery Service') {
 			steps {
 				script {
 					def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
 					env.PATH = "${scannerHome}/bin:${env.PATH}"
-
-					withSonarQubeEnv('SonarCloud') {
-						dir('backend/discovery-service') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_discovery-service -Dsonar.projectName='Discovery Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-						}
-						dir('backend/gateway-service') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_gateway-service -Dsonar.projectName='Gateway Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-						}
-						dir('backend/order-service') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_order-service -Dsonar.projectName='Order Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-						}
-						dir('backend/order-service') {
-							sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_order-service -Dsonar.projectName='Order Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-						}
-						dir('backend/user-service') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_user-service -Dsonar.projectName='User Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-						}
-						dir('backend/product-service') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_product-service -Dsonar.projectName='Product Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-						}
-						dir('backend/media-service') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_media-service -Dsonar.projectName='Media Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log'"
-						}
+				}
+				withSonarQubeEnv('SonarCloud') {
+					dir('backend/discovery-service') {
+							sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_discovery-service -Dsonar.projectName='Discovery Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log' -Dsonar.qualitygate.wait=true"
 					}
 				}
 			}
 		}
 
-		stage('SonarCloud Analysis - Frontend') {
-			steps {
-				dir('frontend') {
-					script {
-						def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-						env.PATH = "${scannerHome}/bin:${env.PATH}"
-
-						withSonarQubeEnv('SonarCloud') {
-							sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_frontend -Dsonar.projectName='Frontend' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src/app -Dsonar.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,**/*.d.ts,node_modules/**,dist/**,coverage/**,**/.env,**/.env*,src/environments/**,src/assets/**' -Dsonar.cpd.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,node_modules/**'"
-						}
-					}
-				}
-			}
-		}
-
-		// Quality Gate Check → Skip deploy → Post FAILURE Slack
-		stage('Quality Gate Check') {
+		stage('Sonar: Gateway Service') {
 			steps {
 				script {
-					echo 'Checking SonarQube Quality Gate...'
-					timeout(time: 5, unit: 'MINUTES') {
-						waitForQualityGate abortPipeline: true
+					def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+					env.PATH = "${scannerHome}/bin:${env.PATH}"
+				}
+				withSonarQubeEnv('SonarCloud') {
+					dir('backend/gateway-service') {
+							sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_gateway-service -Dsonar.projectName='Gateway Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log' -Dsonar.qualitygate.wait=true"
 					}
 				}
 			}
 		}
+
+		stage('Sonar: User Service') {
+			steps {
+				script {
+					def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+					env.PATH = "${scannerHome}/bin:${env.PATH}"
+				}
+				withSonarQubeEnv('SonarCloud') {
+					dir('backend/user-service') {
+						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_user-service -Dsonar.projectName='User Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log' -Dsonar.qualitygate.wait=true"
+					}
+				}
+			}
+		}
+
+		stage('Sonar: Product Service') {
+			steps {
+				script {
+					def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+					env.PATH = "${scannerHome}/bin:${env.PATH}"
+				}
+				withSonarQubeEnv('SonarCloud') {
+					dir('backend/product-service') {
+							sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_product-service -Dsonar.projectName='Product Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log' -Dsonar.qualitygate.wait=true"
+					}
+				}
+			}
+		}
+
+		stage('Sonar: Media Service') {
+			steps {
+				script {
+					def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+					env.PATH = "${scannerHome}/bin:${env.PATH}"
+				}
+				withSonarQubeEnv('SonarCloud') {
+					dir('backend/media-service') {
+						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_media-service -Dsonar.projectName='Media Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log' -Dsonar.qualitygate.wait=true"
+					}
+				}
+			}
+		}
+
+		stage('Sonar: Order Service') {
+			steps {
+				script {
+					def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+					env.PATH = "${scannerHome}/bin:${env.PATH}"
+				}
+				withSonarQubeEnv('SonarCloud') {
+					dir('backend/order-service') {
+						sh "sonar-scanner -Dsonar.branch.name=${BRANCH} -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_order-service -Dsonar.projectName='Order Service' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src -Dsonar.java.binaries=target/classes -Dsonar.exclusions='**/.env,**/*.log' -Dsonar.qualitygate.wait=true"
+					}
+				}
+			}
+		}
+
+		stage('Sonar: Frontend') {
+			steps {
+				script {
+					def scannerHome = tool name: 'SonarQube Scanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+					env.PATH = "${scannerHome}/bin:${env.PATH}"
+				}
+				withSonarQubeEnv('SonarCloud') {
+					dir('frontend') {
+						sh "sonar-scanner -Dsonar.organization=kurizma -Dsonar.projectKey=kurizma_buy-two_frontend -Dsonar.projectName='Frontend' -Dsonar.projectVersion='${VERSION}-${BRANCH}' -Dsonar.sources=src/app -Dsonar.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,**/*.d.ts,node_modules/**,dist/**,coverage/**,**/.env,**/.env*,src/environments/**,src/assets/**' -Dsonar.cpd.exclusions='**/*.spec.ts,**/*.test.ts,**/*.stories.ts,**/*.mock.ts,node_modules/**' -Dsonar.qualitygate.wait=true"
+					}
+				}
+			}
+		}
+
 
 		stage('Build Images') {
 			steps {
@@ -286,7 +321,7 @@ pipeline {
 								string(credentialsId: 'r2-secret-key', variable: 'R2_SECRET_KEY')
 							]) {
 								sh '''
-									cat > .env << EOF
+cat > .env << EOF
 ATLAS_URI=${ATLAS_URI}
 SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_SECRET=${JWT_SECRET}
 KEY_STORE_PASSWORD=${KEYSTORE_PASSWORD}
@@ -314,14 +349,14 @@ EOF
 									sh 'docker compose build frontend || exit 1'
 									sh 'docker compose build --pull --parallel --progress=plain'
 									sh '''
-                                        docker tag frontend:${VERSION} frontend:${STABLE_TAG} frontend:build-${BUILD_NUMBER} || true
-                                        docker tag discovery-service:${VERSION} discovery-service:${STABLE_TAG} discovery-service:build-${BUILD_NUMBER} || true
-                                        docker tag gateway-service:${VERSION} gateway-service:${STABLE_TAG} gateway-service:build-${BUILD_NUMBER} || true
-                                        docker tag user-service:${VERSION} user-service:${STABLE_TAG} user-service:build-${BUILD_NUMBER} || true
-                                        docker tag product-service:${VERSION} product-service:${STABLE_TAG} product-service:build-${BUILD_NUMBER} || true
-                                        docker tag order-service:${VERSION} order-service:${STABLE_TAG} order-service:build-${BUILD_NUMBER} || true
-                                        docker tag media-service:${VERSION} media-service:${STABLE_TAG} media-service:build-${BUILD_NUMBER} || true
-                                    '''
+docker tag frontend:${VERSION} frontend:${STABLE_TAG} frontend:build-${BUILD_NUMBER} || true
+docker tag discovery-service:${VERSION} discovery-service:${STABLE_TAG} discovery-service:build-${BUILD_NUMBER} || true
+docker tag gateway-service:${VERSION} gateway-service:${STABLE_TAG} gateway-service:build-${BUILD_NUMBER} || true
+docker tag user-service:${VERSION} user-service:${STABLE_TAG} user-service:build-${BUILD_NUMBER} || true
+docker tag product-service:${VERSION} product-service:${STABLE_TAG} product-service:build-${BUILD_NUMBER} || true
+docker tag order-service:${VERSION} order-service:${STABLE_TAG} order-service:build-${BUILD_NUMBER} || true
+docker tag media-service:${VERSION} media-service:${STABLE_TAG} media-service:build-${BUILD_NUMBER} || true
+									'''
 
 									// Deploy new version for verification
 									sh 'docker compose up -d'
@@ -329,11 +364,10 @@ EOF
 
 									// Strong health check
 									sh '''
-                                        timeout 30 bash -c "until docker compose ps | grep -q Up && curl -f http://localhost:4200 || curl -f http://localhost:8080/health; do sleep 2; done" || exit 1
-                                        if docker compose ps | grep -q "Exit"; then exit 1; fi
-                                    '''
+timeout 30 bash -c "until docker compose ps | grep -q Up && curl -f http://localhost:4200 || curl -f http://localhost:8080/health; do sleep 2; done" || exit 1
+if docker compose ps | grep -q "Exit"; then exit 1; fi
+									'''
 								}
-								echo "✅ New deploy verified - promoted build-${BUILD_NUMBER} to stable"
 								echo "✅ New deploy verified - promoted build-${BUILD_NUMBER} to stable"
 								currentBuild.result = 'SUCCESS'
 
@@ -344,20 +378,20 @@ EOF
 
 								withCredentials([string(credentialsId: 'slack-webhook', variable: 'SLACK_WEBHOOK')]) {
 									sh """
-                                    curl -sS -X POST -H 'Content-type: application/json' \\
-                                        --data '{\"text\":\"🚨 Rollback #${BUILD_NUMBER} → ${stableTag}\"}' \$SLACK_WEBHOOK
-                                """
+curl -sS -X POST -H 'Content-type: application/json' \\
+--data '{\\"text\\":\\"🚨 Rollback #${BUILD_NUMBER} → ${stableTag}\\"}' \\\$SLACK_WEBHOOK
+									"""
 								}
 
 								// Rollback: Always deploy known stable
 								sh """
-                                STABLE_TAG=\${STABLE_TAG:-latest}
-                                docker compose down || true
-                                IMAGE_TAG=\$STABLE_TAG docker compose up -d --pull never
-                                sleep 10
-                                docker compose ps  # Verify
-                                echo "✅ Rolled back to ${stableTag}"
-                            """
+STABLE_TAG=\\\${STABLE_TAG:-latest}
+docker compose down || true
+IMAGE_TAG=\\\$STABLE_TAG docker compose up -d --pull never
+sleep 10
+docker compose ps # Verify
+echo "✅ Rolled back to ${stableTag}"
+								"""
 								currentBuild.result = 'UNSTABLE'
 								throw e
 							}
@@ -366,8 +400,10 @@ EOF
 				}
 			}
 		}
-	}
+	
+
 	// end of stages
+	}
 
 	post {
 		always {
@@ -422,4 +458,5 @@ EOF
 			}
 		}
 	}
+
 }

@@ -1,0 +1,16 @@
+meta {
+  name: /api/users/sellers
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{userUrl}}/api/users/sellers
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

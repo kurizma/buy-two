@@ -30,7 +30,7 @@
                   <span class="badge bg-secondary mb-2 fs-6">{{ getCategoryName() }}</span>
                   <p class="card-text text-white mb-3">{{ product.description }}</p>
                   <p class="price mb-1">
-                    Price: <span class="text-primary fw-bold fs-4" data-test="product-price">€{{ product.price }}</span>
+                    Price: <span class="text-primary fw-bold fs-4" data-test="product-price">€{{ product.price }}</span> (incl. VAT)
                   </p>
                   <p class="mb-1"><span class="fw-semibold">Quantity:</span> {{ product.quantity }}</p>
                   <p class="mb-4">
@@ -48,16 +48,21 @@
                           {{ seller.name }}
                         </a>
 
-                        <!-- <span class="fw seller-name">{{ seller.name }}</span> -->
                       </div>
                     </ng-container>
                   </p>
                   <button 
                     class="btn btn-outline-secondary mb-2 w-100 hover-lift"
-                    (click)="addToCart();
+                    [class.btn-secondary]="isInCart(product.id)"
+                    (click)="addToCart(product);
                     $event.stopPropagation()"
+                    [disabled]="isSeller()"
                   >
-                    <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+                    <i class="fas me-2"
+                      [class.fa-shopping-cart] ="!isInCart(product.id)"
+                      [class.fa-check] ="isInCart(product.id)">
+                    </i> 
+                    {{isInCart(product.id) ? 'In Cart' : 'Add to Cart'}}
                   </button>
                 </div>
               </div>

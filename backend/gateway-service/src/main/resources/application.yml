@@ -38,6 +38,13 @@ spring:
           filters:
             - JwtHeader
 
+        # Public product search endpoint (no auth)
+        - id: product-service-search
+          uri: lb://PRODUCT-SERVICE
+          predicates:
+            - Path=/products/search
+            - Method=GET
+
         - id: product-service
           uri: lb://PRODUCT-SERVICE
           predicates:
@@ -74,5 +81,8 @@ eureka:
 logging:
   level:
     org.springframework.security: DEBUG
+    org.springframework.security.oauth2.server.resource.web: DEBUG
+    org.springframework.security.oauth2.jwt: DEBUG
+
 
 

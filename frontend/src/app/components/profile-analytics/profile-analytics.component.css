@@ -1,0 +1,120 @@
+.analytics-container { 
+    padding: 1.5rem; 
+}
+
+.total-amount { 
+    font-size: 2.5rem; 
+    font-weight: bold; 
+    color: var(--link); 
+    margin: 0; 
+}
+
+.chart-card { 
+    height: 300px; 
+    width: 100%;
+    position: relative; 
+}
+
+.chart-card canvas { 
+    max-height: 100%; 
+}
+
+.chart-card-pie {
+    height: 300px; 
+    width: 100%;
+    position: relative; 
+}
+
+.chart-card-bar {
+    height: 300px; 
+    width: 100%;
+    position: relative; 
+}
+
+.best-seller-label i {
+    font-size: 2rem;
+    color: gold; /* gold-ish */
+    position: absolute; 
+    top: 25px; 
+    left: 85%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.product-table { 
+    overflow-x: auto; 
+    border-radius: 5px;
+}  
+
+.table {
+    width: 100%; 
+}
+
+.table-head  th{ 
+    background: var(--primary) !important; 
+    color: var(--text-primary); 
+    width: 100%;
+}
+
+.product-table td { 
+    width: 100%; 
+    border-collapse: collapse; 
+    background-color: transparent;
+    color: var(--text-primary);
+}
+
+.custom-cell {
+    width: 1%; 
+    white-space: nowrap; 
+    max-width: 300px; 
+}
+
+.empty-state {
+    padding: 3rem 1.5rem;
+    background: transparent;
+}
+
+.empty-state i {
+    color: var(--text-primary) !important;
+}
+
+.empty-state p {
+    color: var(--text-primary) !important;
+    font-size: 1rem;
+}
+
+
+.empty-state h3 {
+    color: var(--text-primary) !important;
+    font-weight: 600;
+}
+
+@media (min-width: 750px) { 
+    .best-seller-label i {
+        font-size: 1.5rem;
+        top: 30px; 
+        left: 85%;
+    }
+}
+
+@media (max-width: 745px) { 
+    .total-amount { 
+        font-size: 2rem; 
+    } 
+    .chart-card { 
+        height: 200px; 
+    }
+    .best-seller-label i {
+        font-size: 1.5rem;
+        top: 30px; 
+        left: 85%;
+    }
+}
+
+@media (min-width: 1400px) { 
+    .best-seller-label i {
+        font-size: 2rem;
+        top: 25px; 
+        left: 85%;
+    }
+}

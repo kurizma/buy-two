@@ -1,0 +1,27 @@
+meta {
+  name: /api/cart/items/{id}
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/cart/items/693ebc3f832bec1689f8af76
+  body: none
+  auth: bearer
+}
+
+headers {
+  Authorization': Bearer {{clientToken}}
+  X-USER-ID: 697b7c7c46572d7003f412a1
+  X-USER-ROLE: CLIENT
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb29uQGNsaWVudC5rciIsImlkIjoiNjk3YjdjN2M0NjU3MmQ3MDAzZjQxMmExIiwicm9sZSI6IkNMSUVOVCIsImlhdCI6MTc2OTg0OTcwMywiZXhwIjoxNzY5OTM2MTAzfQ.SjVeUnSSZyzGJ5IUtwls3WYbWORemhFGGajgYjnMeuo
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

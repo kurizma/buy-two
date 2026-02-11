@@ -1,18 +1,3 @@
 package com.buyone.productservice.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Builder;
-
-import java.time.LocalDateTime;
-
-@Data
-@AllArgsConstructor
-@Builder
-public class ErrorResponse {
-    private int status;
-    private String error;
-    private String message;
-    private String path;
-    private LocalDateTime timestamp;
-}
+public record ErrorResponse(String code, String message, Object details) {}

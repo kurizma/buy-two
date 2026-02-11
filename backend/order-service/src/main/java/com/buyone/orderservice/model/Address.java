@@ -9,6 +9,9 @@ import jakarta.validation.constraints.Pattern;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Address {
+    @NotBlank(message = "Name is required")
+    private String fullName;
+
     @NotBlank(message = "Street is required")
     private String street;
     

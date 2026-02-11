@@ -11,18 +11,51 @@ import { SellerShopComponent } from './components/seller-shop/seller-shop.compon
 import { AboutComponent } from './components/about/about.component';
 import { SellerGuard } from './guards/seller.guard';
 import { AuthGuard } from './guards/auth.guard';
+import { CartComponent } from './components/cart/cart.component';
+import { CheckoutComponent } from './components/checkout/checkout.component';
+import { ClientOnlyGuard } from './guards/client-only.guard';
+import { OrderDetailComponent } from './components/order-detail/order-detail.component';
+import { OrderListComponent } from './components/order-list/order-list.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, pathMatch: 'full' },
   { path: 'signin', component: SignInComponent },
   { path: 'signup', component: SignUpComponent },
-  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'product-listing', component: ProductListingComponent },
   { path: 'product/:id', component: ProductCardComponent },
   { path: 'categories', component: CategoriesComponent },
   { path: 'categories/:slug', component: CategoriesComponent },
-  { path: 'seller-dashboard', component: SellerDashboardComponent, canActivate: [SellerGuard] },
   { path: 'seller-shop/:id', component: SellerShopComponent },
   { path: 'about', component: AboutComponent },
+  {
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [AuthGuard], //Any logged-in user
+  },
+  {
+    path: 'seller-dashboard',
+    component: SellerDashboardComponent,
+    canActivate: [SellerGuard], //Only sellers
+  },
+  {
+    path: 'cart',
+    component: CartComponent,
+    canActivate: [ClientOnlyGuard], //Client + has items in cart
+  },
+  {
+    path: 'checkout',
+    component: CheckoutComponent,
+    canActivate: [ClientOnlyGuard], //Client + has items in cart
+  },
+  {
+    path: 'order-detail/:orderNumber',
+    component: OrderDetailComponent,
+    canActivate: [ClientOnlyGuard], // Assuming only clients can view order details
+  },
+  {
+    path: 'order-list',
+    component: OrderListComponent,
+    canActivate: [AuthGuard], // Assuming only clients can view order list
+  },
   { path: '**', redirectTo: '' },
 ];

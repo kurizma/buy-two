@@ -1,0 +1,23 @@
+meta {
+  name: client: api/analytics/client/id
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/analytics/client/697b7c7c46572d7003f412a1
+  body: json
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer {{clientToken}}
+  X-USER-ID: 697b7c7c46572d7003f412a1
+  X-USER-ROLE: CLIENT
+  Content-Type: application/json
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
